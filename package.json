@@ -30,10 +30,11 @@
     ]
   },
   "peerDependencies": {
-    "@angular/cdk": ">=21.0.0",
-    "@angular/common": ">=21.0.0",
-    "@angular/core": ">=21.0.0",
-    "@angular/material": ">=21.0.0"
+    "@angular/cdk": "^21.0.0",
+    "@angular/common": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/material": "^21.0.0",
+    "@teqbench/tbx-mat-severity-icons": "^0.1.0"
   },
   "devDependencies": {
     "@analogjs/vite-plugin-angular": "^2.3.1",
