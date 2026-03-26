@@ -1,7 +1,7 @@
 {
-  "name": "@teqbench/TODO-package-name",
-  "version": "0.6.1",
-  "description": "TODO: Package description",
+  "name": "@teqbench/tbx-mat-dialogs",
+  "version": "0.0.0",
+  "description": "Opinionated Angular dialog service built on Material dialog. Typed methods for info, warning, error, confirm, and input dialogs returning Promise<DialogOutput<T, F>>. Features emphasis-driven styling, rich footer controls, signal-based input validation via DialogContent, and pluggable icon resolution. Angular 21+.",
   "type": "module",
   "license": "Apache-2.0",
   "engines": {
@@ -36,6 +36,9 @@
     "@angular/material": ">=21.0.0"
   },
   "devDependencies": {
+    "@analogjs/vite-plugin-angular": "^2.3.1",
+    "@analogjs/vitest-angular": "^2.3.1",
+    "@angular/build": "^21.2.4",
     "@angular/cdk": "^21.2.4",
     "@angular/common": "^21.2.6",
     "@angular/compiler": "^21.2.6",
@@ -45,14 +48,17 @@
     "@angular/platform-browser": "^21.2.6",
     "@types/node": "~24.12.0",
     "@vitest/coverage-v8": "^4.1.1",
+    "angular-eslint": "^21.3.1",
     "eslint": "^9.39.2",
     "husky": "^9.1.7",
+    "jsdom": "^29.0.1",
     "lint-staged": "^16.3.3",
     "ng-packagr": "^21.2.1",
     "prettier": "^3.8.1",
     "typescript": "~5.9.0",
     "typescript-eslint": "8.57.2",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "zone.js": "^0.16.1"
   },
   "lint-staged": {
     "*.{ts,json,md,yml,yaml}": [

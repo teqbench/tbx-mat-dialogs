@@ -1,2 +1,2 @@
-// TODO: Replace with your package's public API exports
-export { greet } from './greet';
+// Public API — @teqbench/tbx-mat-dialogs
+export {};

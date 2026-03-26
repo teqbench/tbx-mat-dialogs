@@ -4,9 +4,9 @@ This file provides guidance for Claude Code when working in this repository.
 
 ## Package Overview
 
-<!-- TODO: Describe what this package does and its primary use case -->
+Opinionated Angular dialog service built on Angular Material dialog. Provides typed methods for info, warning, error, confirm, and input dialogs returning `Promise<DialogOutput<T, F>>`. Features emphasis-driven styling, rich footer controls, signal-based input validation via `DialogContent`, and pluggable icon resolution. Angular 21+.
 
-This is a `@teqbench` npm package built with TypeScript.
+This is a `@teqbench` Angular library package built with TypeScript and ng-packagr.
 
 ## Tech Stack
 
@@ -78,5 +78,3 @@ Follow **Conventional Commits** strictly:
 - Never delete branches.
 - Never modify CI workflow files without explicit instruction.
 - Never modify `release-please-config.json`, `.release-please-manifest.json`, or `CHANGELOG.md`.
-
-<!-- TODO: Add package-specific guidance below -->
