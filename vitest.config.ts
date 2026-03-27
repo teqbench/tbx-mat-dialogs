@@ -11,7 +11,13 @@ export default defineConfig({
         coverage: {
             // Exclude files that contain only constants, interfaces, types,
             // or injection tokens — no testable logic to cover.
-            exclude: ['src/constants/**', 'src/models/**', 'src/tokens/**', 'src/types/**'],
+            exclude: [
+                'src/constants/**',
+                'src/models/**',
+                'src/tokens/**',
+                'src/types/**',
+                'src/**/*.stories.ts',
+            ],
             thresholds: {
                 lines: 80,
                 functions: 80,

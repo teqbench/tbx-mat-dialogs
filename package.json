@@ -23,6 +23,8 @@
     "test:coverage": "vitest run --coverage",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
     "prepare": "husky"
   },
   "devDependenciesPinned": {
@@ -42,6 +44,7 @@
     "@teqbench/tbx-mat-severity-icons": "^0.1.0"
   },
   "devDependencies": {
+    "@analogjs/storybook-angular": "^2.3.1",
     "@analogjs/vite-plugin-angular": "^2.3.1",
     "@analogjs/vitest-angular": "^2.3.1",
     "@angular/animations": "^21.2.6",
@@ -51,8 +54,11 @@
     "@angular/compiler": "^21.2.6",
     "@angular/compiler-cli": "^21.2.6",
     "@angular/core": "^21.2.6",
+    "@angular/forms": "^21.2.6",
     "@angular/material": "^21.2.4",
     "@angular/platform-browser": "^21.2.6",
+    "@angular/platform-browser-dynamic": "^21.2.6",
+    "@storybook/angular": "^10.3.3",
     "@types/node": "~24.12.0",
     "@vitest/coverage-v8": "^4.1.1",
     "angular-eslint": "^21.3.1",
@@ -62,6 +68,7 @@
     "lint-staged": "^16.3.3",
     "ng-packagr": "^21.2.1",
     "prettier": "^3.8.1",
+    "storybook": "^10.3.3",
     "typescript": "~5.9.0",
     "typescript-eslint": "8.57.2",
     "vitest": "^4.0.18",
