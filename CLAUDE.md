@@ -4,9 +4,9 @@ This file provides guidance for Claude Code when working in this repository.
 
 ## Package Overview
 
-<!-- TODO: Describe what this package does and its primary use case -->
+Opinionated Angular dialog service built on Angular Material dialog. Provides typed methods for info, warning, error, confirm, and input dialogs returning `Promise<DialogOutput<T, F>>`. Features emphasis-driven styling, rich footer controls, signal-based input validation via `DialogContent`, and pluggable icon resolution. Angular 21+.
 
-This is a `@teqbench` npm package built with TypeScript.
+This is a `@teqbench` Angular library package built with TypeScript and ng-packagr.
 
 ## Tech Stack
 
@@ -28,12 +28,15 @@ This is a `@teqbench` npm package built with TypeScript.
 - `npm run lint` — Run ESLint
 - `npm run format` — Format all files with Prettier
 - `npm run format:check` — Check formatting (CI mode)
+- `npm run storybook` — Start Storybook dev server on port 6006
+- `npm run build-storybook` — Build static Storybook output
 
 ## Project Structure
 
 - `src/` — Source code (all `.ts` files live here)
 - `src/index.ts` — Barrel file (public API exports)
 - `dist/` — Compiled output (git-ignored, only this directory is published)
+- `.storybook/` — Storybook configuration (Vite-based via @analogjs/storybook-angular)
 - `docs/` — Documentation (placeholder for package-specific guides)
 - `.github/workflows/` — CI/CD pipelines (ci, release, sync, dep-compat-check, claude)
 - `.github/dependabot.yml` — Automated dependency update PRs targeting `dev`
@@ -78,5 +81,3 @@ Follow **Conventional Commits** strictly:
 - Never delete branches.
 - Never modify CI workflow files without explicit instruction.
 - Never modify `release-please-config.json`, `.release-please-manifest.json`, or `CHANGELOG.md`.
-
-<!-- TODO: Add package-specific guidance below -->
