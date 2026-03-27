@@ -28,12 +28,15 @@ This is a `@teqbench` Angular library package built with TypeScript and ng-packa
 - `npm run lint` — Run ESLint
 - `npm run format` — Format all files with Prettier
 - `npm run format:check` — Check formatting (CI mode)
+- `npm run storybook` — Start Storybook dev server on port 6006
+- `npm run build-storybook` — Build static Storybook output
 
 ## Project Structure
 
 - `src/` — Source code (all `.ts` files live here)
 - `src/index.ts` — Barrel file (public API exports)
 - `dist/` — Compiled output (git-ignored, only this directory is published)
+- `.storybook/` — Storybook configuration (Vite-based via @analogjs/storybook-angular)
 - `docs/` — Documentation (placeholder for package-specific guides)
 - `.github/workflows/` — CI/CD pipelines (ci, release, sync, dep-compat-check, claude)
 - `.github/dependabot.yml` — Automated dependency update PRs targeting `dev`

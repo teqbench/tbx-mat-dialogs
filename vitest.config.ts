@@ -10,12 +10,13 @@ export default defineConfig({
         passWithNoTests: false,
         coverage: {
             // Exclude files that contain only constants, interfaces, types,
-            // or injection tokens — no testable logic to cover.
+            // injection tokens, or test infrastructure — no testable logic to cover.
             exclude: [
                 'src/constants/**',
                 'src/models/**',
                 'src/tokens/**',
                 'src/types/**',
+                'src/test-setup.ts',
                 'src/**/*.stories.ts',
             ],
             thresholds: {
