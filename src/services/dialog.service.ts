@@ -272,6 +272,11 @@ export class DialogService {
      * 'first-tabbable' autoFocus (Material default). Content components
      * that need a specific element focused should apply cdkFocusInitial
      * to that element — the CDK focus trap honors it.
+     *
+     * Footer values and content data are only included in the output
+     * when the user affirms. Deny, Cancel, Close, ESC, and backdrop
+     * dismiss all return empty footerValues — negative actions should
+     * not carry state that implies confirmation.
      * Returns a Promise that resolves with the dialog output, or a
      * fallback Close result if the dialog is dismissed without a result
      * (e.g., backdrop click when disableClose is false).
@@ -301,7 +306,8 @@ export class DialogService {
         const output = await firstValueFrom(dialogRef.afterClosed());
 
         // When dialog is dismissed via backdrop/Escape without a button click,
-        // afterClosed() emits undefined. Return a Close result with empty footer values.
+        // afterClosed() emits undefined. Return a Close result with empty
+        // footer values — dismissal is a negative action like Cancel/Deny.
         if (!output) {
             return {
                 result: DialogResultType.Close,

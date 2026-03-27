@@ -531,21 +531,28 @@ export class DialogShellComponent {
     close(): void {
         this.dialogRef.close({
             result: DialogResultType.Close,
-            footerValues: this.footerValues(),
+            footerValues: {},
         });
     }
 
-    /** Handle a footer button click. If the button has a result, close the dialog. */
+    /**
+     * Handle a footer button click. If the button has a result, close the dialog.
+     *
+     * Only Affirm includes data and footerValues — the user confirmed the
+     * dialog's content. Deny, Cancel, and Close are negative actions;
+     * returning footer state alongside them would be a mixed signal.
+     */
     onButtonClick(button: DialogFooterButton): void {
         if (button.result === undefined) {
             return;
         }
 
+        const isAffirm = button.result === DialogResultType.Affirm;
+
         this.dialogRef.close({
             result: button.result,
-            data:
-                button.result === DialogResultType.Affirm ? this.contentRef()?.value() : undefined,
-            footerValues: this.footerValues(),
+            data: isAffirm ? this.contentRef()?.value() : undefined,
+            footerValues: isAffirm ? this.footerValues() : {},
         });
     }
 

@@ -166,7 +166,7 @@ describe('DialogShellComponent', () => {
             );
         });
 
-        it('should include current footer values when closing', () => {
+        it('should return empty footerValues when closing (negative action)', () => {
             const footer: DialogFooterControlType[] = [
                 {
                     key: 'remember',
@@ -183,7 +183,8 @@ describe('DialogShellComponent', () => {
 
             expect(dialogRef.close).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    footerValues: { remember: true },
+                    result: 'close',
+                    footerValues: {},
                 })
             );
         });
