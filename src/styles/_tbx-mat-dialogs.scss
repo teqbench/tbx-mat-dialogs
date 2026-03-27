@@ -1,0 +1,88 @@
+@use '@angular/material' as mat;
+
+/* ─── Dialog Emphasis Tokens ─────────────────────────────────────────────────
+ *
+ * Default dialog emphasis colors follow universal UX conventions:
+ *   default = primary (neutral action), destructive = red (delete/remove),
+ *   warning = amber (irreversible), informational = blue (FYI)
+ *
+ * Each emphasis has an accent (background/icon color) and on-accent (text color)
+ * pair, guaranteeing readable contrast. These color the header icon, primary
+ * action button, and separator highlight in the dialog shell.
+ *
+ * These are intentionally NOT tied to --mat-sys-* palette tokens because
+ * emphasis colors must be immediately recognizable regardless of theme.
+ * A purple-themed app still needs red destructive dialogs.
+ *
+ * Themes can optionally override these via html[data-theme="id"] blocks
+ * in _theme-registry.scss by redefining the --tbx-dialog-* properties.
+ * Same pattern as --tbx-notification-* tokens.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+html {
+    /* Default — primary action (delegates to M3 system tokens) */
+    --tbx-dialog-default-accent: var(--mat-sys-primary);
+    --tbx-dialog-default-on-accent: var(--mat-sys-on-primary);
+
+    /* Destructive — delete, remove, revoke */
+    --tbx-dialog-destructive-accent: #c62828;
+    --tbx-dialog-destructive-on-accent: #ffffff;
+
+    /* Warning — irreversible but not destructive */
+    --tbx-dialog-warning-accent: #f9a825;
+    --tbx-dialog-warning-on-accent: #1a1a1a;
+
+    /* Informational — FYI, read-only */
+    --tbx-dialog-info-accent: #1565c0;
+    --tbx-dialog-info-on-accent: #ffffff;
+}
+
+/* ─── Global Dialog Styles ──────────────────────────────────────────────────
+ *
+ * MatDialog renders overlays outside component scope, so styles that need
+ * to reach into the dialog container must be global. The shell component
+ * handles its own internal layout; these rules handle the overlay container
+ * and any emphasis-driven overrides that require global specificity.
+ *
+ * Emphasis classes (tbx-dialog-default, tbx-dialog-destructive, etc.) are
+ * applied to the MatDialog panelClass by DialogService and consumed here.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+/* Remove default MatDialog padding — the shell component manages its own padding
+ * via --dialog-padding-inline so sections (header, body, footer) and divider
+ * insets are always aligned. */
+.tbx-dialog-panel .mat-mdc-dialog-container .mat-mdc-dialog-surface {
+    padding: 0;
+    border-radius: 1rem;
+}
+
+/* ─── Button Emphasis Overrides ─────────────────────────────────────────────
+ *
+ * Applied via [class.dialog-btn-primary] and [class.dialog-btn-destructive]
+ * in the dialog shell template. Uses Angular Material's recommended override
+ * mixin API — same pattern as _snackbar-panels.scss.
+ *
+ * Primary buttons read --tbx-dialog-current-accent/on-accent from the :host
+ * element (set by the component's data-emphasis attribute). Destructive
+ * buttons always use --tbx-dialog-destructive-* regardless of dialog emphasis.
+ *
+ * The .tbx-dialog-panel prefix scopes these overrides to dialog overlays.
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+.tbx-dialog-panel .dialog-btn-primary {
+    @include mat.button-overrides(
+        (
+            filled-container-color: var(--tbx-dialog-current-accent),
+            filled-label-text-color: var(--tbx-dialog-current-on-accent),
+        )
+    );
+}
+
+.tbx-dialog-panel .dialog-btn-destructive {
+    @include mat.button-overrides(
+        (
+            filled-container-color: var(--tbx-dialog-destructive-accent),
+            filled-label-text-color: var(--tbx-dialog-destructive-on-accent),
+        )
+    );
+}

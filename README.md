@@ -1,8 +1,8 @@
-# @teqbench/TODO-package-name
+# @teqbench/tbx-mat-dialogs
 
-![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teqbench-shields-bot/a69600f4ed4ebed89ffb35d808e05eb4/raw/teqbench.dev.templates.tbx-package-main-build-status.json) ![Tests](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teqbench-shields-bot/a69600f4ed4ebed89ffb35d808e05eb4/raw/teqbench.dev.templates.tbx-package-main-tests.json) ![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teqbench-shields-bot/a69600f4ed4ebed89ffb35d808e05eb4/raw/teqbench.dev.templates.tbx-package-main-coverage.json) ![Version](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teqbench-shields-bot/a69600f4ed4ebed89ffb35d808e05eb4/raw/teqbench.dev.templates.tbx-package-main-version.json) ![Build Number](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teqbench-shields-bot/a69600f4ed4ebed89ffb35d808e05eb4/raw/teqbench.dev.templates.tbx-package-main-build-number.json)
+![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teqbench-shields-bot/a69600f4ed4ebed89ffb35d808e05eb4/raw/tbx-mat-dialogs-main-build-status.json) ![Tests](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teqbench-shields-bot/a69600f4ed4ebed89ffb35d808e05eb4/raw/tbx-mat-dialogs-main-tests.json) ![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teqbench-shields-bot/a69600f4ed4ebed89ffb35d808e05eb4/raw/tbx-mat-dialogs-main-coverage.json) ![Version](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teqbench-shields-bot/a69600f4ed4ebed89ffb35d808e05eb4/raw/tbx-mat-dialogs-main-version.json) ![Build Number](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teqbench-shields-bot/a69600f4ed4ebed89ffb35d808e05eb4/raw/tbx-mat-dialogs-main-build-number.json)
 
-> TODO: Package description (1-2 sentences explaining what this package provides).
+> Opinionated Angular dialog service built on Angular Material dialog. Typed methods for info, warning, error, confirm, and input dialogs returning `Promise<DialogOutput<T, F>>`. Features emphasis-driven styling, rich footer controls, signal-based input validation via `DialogContent`, and pluggable icon resolution. Angular 21+.
 
 ## Installation
 
@@ -15,14 +15,13 @@ echo "@teqbench:registry=https://npm.pkg.github.com" >> .npmrc
 Install the package:
 
 ```bash
-npm install @teqbench/TODO-package-name
+npm install @teqbench/tbx-mat-dialogs
 ```
 
 ## Usage
 
 ```typescript
-// TODO: Add usage example
-import {} from '@teqbench/TODO-package-name';
+import { TbxMatDialogService } from '@teqbench/tbx-mat-dialogs';
 ```
 
 ## API Reference
@@ -33,6 +32,7 @@ import {} from '@teqbench/TODO-package-name';
 
 | Dependency | Version  |
 | ---------- | -------- |
+| Angular    | >=21.0.0 |
 | TypeScript | ~5.9.0   |
 | Node.js    | >=24.0.0 |
 
