@@ -12,6 +12,8 @@
  *   - DialogFooterControlType  — discriminated union of footer items
  *   - BUTTONS_OK/OK_CANCEL/YES_NO/YES_NO_CANCEL — button presets
  *   - DIALOG_DEFAULT_WIDTH     — default width constant
+ *   - DIALOG_ICON_SERVICE      — injection token for pluggable icon resolution
+ *   - DialogIconService        — default icon service (Material Symbols Rounded)
  *   - SampleInputComponent     — reference DialogContent<SampleInputData> implementation
  *   - SampleInputData          — data type returned by SampleInputComponent
  *
@@ -52,8 +54,12 @@ export {
     BUTTONS_YES_NO_CANCEL,
 } from './constants/dialog.constants';
 
+// Tokens — pluggable DI
+export { DIALOG_ICON_SERVICE } from './tokens/dialog-icon-service.token';
+
 // Services
 export { DialogService } from './services/dialog.service';
+export { DialogIconService } from './services/dialog-icon.service';
 
 // Components — sample/reference implementations
 export { SampleInputComponent } from './components/sample-input.component';

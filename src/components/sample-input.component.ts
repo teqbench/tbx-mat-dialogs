@@ -28,6 +28,11 @@ export interface SampleInputData {
  *   - Drive the affirm button's disabled state (disabled when isValid is false)
  *   - Include value in DialogOutput.data when the user confirms
  *
+ * Focus management: the first name input carries `cdkFocusInitial` so the
+ * CDK focus trap redirects initial focus there instead of the header close
+ * button. Content components that need a specific element focused on open
+ * should apply this plain HTML attribute (no directive import needed).
+ *
  * Validation demonstrates mat-error spacing within a dialog body:
  *   - Required fields (first name, last name) use default subscript sizing
  *     so space is always reserved for the error message — prevents layout
@@ -44,6 +49,7 @@ export interface SampleInputData {
                 <mat-label>First Name</mat-label>
                 <input
                     matInput
+                    cdkFocusInitial
                     required
                     [ngModel]="firstName()"
                     (ngModelChange)="firstName.set($event)"
