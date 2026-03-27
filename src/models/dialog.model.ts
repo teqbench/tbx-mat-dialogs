@@ -118,13 +118,30 @@ export interface DialogConfig<T = void> {
  * ## Input dialogs (form content)
  *
  * ```typescript
- * @Component({ ... })
+ * @Component({
+ *     imports: [MatFormFieldModule, MatInputModule],
+ *     template: `
+ *         <mat-form-field>
+ *             <input matInput cdkFocusInitial [ngModel]="name()" (ngModelChange)="name.set($event)" />
+ *         </mat-form-field>
+ *     `,
+ * })
  * export class RenameFormComponent implements DialogContent<string> {
  *     readonly name = signal('');
  *     readonly isValid = computed(() => this.name().trim().length > 0);
  *     readonly value = this.name;
  * }
  * ```
+ *
+ * ## Focus management
+ *
+ * The dialog uses `autoFocus: 'first-tabbable'` (Material default). For
+ * input dialogs, the first tabbable element in DOM order is typically the
+ * header close button — not the first form field. Content components should
+ * apply the `cdkFocusInitial` attribute to the element that should receive
+ * initial focus. This is a plain HTML attribute recognized by the CDK focus
+ * trap — no directive import needed. See `SampleInputComponent` for a
+ * reference implementation.
  *
  * ## Non-input components (display-only content)
  *

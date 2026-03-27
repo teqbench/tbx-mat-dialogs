@@ -95,10 +95,11 @@ export interface DialogShellData {
  * overrides use Angular Material's mat.button-overrides() mixin in the global
  * _dialog-panels.scss (same pattern as _snackbar-panels.scss).
  *
- * Icon position uses CSS `order` rather than template ordering — Material's
- * internal content projection overrides DOM order, and there is no
- * `iconPositionEnd` binding on `matButton`. Setting `order: 1` on the mat-icon
- * moves it visually after the label (which defaults to order: 0).
+ * Icon position uses Material's `iconPositionEnd` attribute on `mat-icon`.
+ * Material's button template has separate content projection slots for
+ * before-label and after-label icons. The `iconPositionEnd` attribute
+ * routes the icon to the after-label slot, which also applies the correct
+ * margin spacing via `--mat-button-*-icon-spacing` and `--mat-button-*-icon-offset`.
  *
  * Padding is controlled by a single CSS custom property (--dialog-padding-inline)
  * on :host, ensuring header, body, footer, and divider insets are always aligned.
@@ -176,9 +177,9 @@ export interface DialogShellData {
                                 <!-- matButton is a compile-time directive and cannot be
                                 bound dynamically via [attr.matButton]. Separate elements
                                 for filled vs text ensure proper Material rendering.
-                                Icon position uses CSS order — Material's content projection
-                                overrides DOM order, so style.order is the only reliable
-                                way to place icons after labels. -->
+                                Icon position uses Material's iconPositionEnd attribute
+                                to route mat-icon to the correct content projection slot,
+                                which also applies proper margin spacing. -->
                                 @if (btn.emphasis === 'primary' || btn.emphasis === 'destructive') {
                                     <button
                                         matButton="filled"
@@ -186,16 +187,17 @@ export interface DialogShellData {
                                         [class.dialog-btn-destructive]="
                                             btn.emphasis === 'destructive'
                                         "
+                                        [attr.cdkFocusInitial]="shouldAutoFocus(btn) ? '' : null"
                                         [disabled]="isButtonDisabled(btn)"
                                         (click)="onButtonClick(btn)"
                                     >
-                                        @if (btn.icon) {
-                                            <mat-icon
-                                                [style.order]="btn.iconPosition === 'after' ? 1 : 0"
-                                                >{{ btn.icon }}</mat-icon
-                                            >
+                                        @if (btn.icon && btn.iconPosition !== 'after') {
+                                            <mat-icon>{{ btn.icon }}</mat-icon>
                                         }
                                         {{ btn.label }}
+                                        @if (btn.icon && btn.iconPosition === 'after') {
+                                            <mat-icon iconPositionEnd>{{ btn.icon }}</mat-icon>
+                                        }
                                     </button>
                                 } @else {
                                     <button
@@ -203,13 +205,13 @@ export interface DialogShellData {
                                         [disabled]="isButtonDisabled(btn)"
                                         (click)="onButtonClick(btn)"
                                     >
-                                        @if (btn.icon) {
-                                            <mat-icon
-                                                [style.order]="btn.iconPosition === 'after' ? 1 : 0"
-                                                >{{ btn.icon }}</mat-icon
-                                            >
+                                        @if (btn.icon && btn.iconPosition !== 'after') {
+                                            <mat-icon>{{ btn.icon }}</mat-icon>
                                         }
                                         {{ btn.label }}
+                                        @if (btn.icon && btn.iconPosition === 'after') {
+                                            <mat-icon iconPositionEnd>{{ btn.icon }}</mat-icon>
+                                        }
                                     </button>
                                 }
                             }
@@ -545,6 +547,18 @@ export class DialogShellComponent {
                 button.result === DialogResultType.Affirm ? this.contentRef()?.value() : undefined,
             footerValues: this.footerValues(),
         });
+    }
+
+    /**
+     * Whether this button should receive initial focus via cdkFocusInitial.
+     *
+     * For non-input dialogs (no content component), the affirm button receives
+     * focus so the close button in the header does not. For input dialogs,
+     * the content component manages its own focus via cdkFocusInitial on the
+     * appropriate form element.
+     */
+    shouldAutoFocus(button: DialogFooterButton): boolean {
+        return !this.config.content && button.result === DialogResultType.Affirm;
     }
 
     /**

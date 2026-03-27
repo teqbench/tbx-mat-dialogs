@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
@@ -53,8 +53,8 @@ import { SampleInputComponent } from './sample-input.component';
                 <button mat-flat-button (click)="showCustom()">Full Control (show)</button>
             </div>
 
-            @if (lastResult) {
-                <p class="state">Last result: {{ lastResult }}</p>
+            @if (lastResult()) {
+                <p class="state">Last result: {{ lastResult() }}</p>
             }
         </div>
     `,
@@ -102,14 +102,14 @@ import { SampleInputComponent } from './sample-input.component';
 })
 class DialogHarnessComponent {
     private readonly dialog = inject(DialogService);
-    lastResult = '';
+    readonly lastResult = signal('');
 
     async showInformation(): Promise<void> {
         const output = await this.dialog.information({
             title: 'Session Expired',
             message: 'Your session has expired. Please sign in again to continue working.',
         });
-        this.lastResult = output.result;
+        this.lastResult.set(output.result);
     }
 
     async showWarning(): Promise<void> {
@@ -118,7 +118,7 @@ class DialogHarnessComponent {
             message:
                 'You have unsaved changes that will be lost if you navigate away. Are you sure you want to leave this page?',
         });
-        this.lastResult = output.result;
+        this.lastResult.set(output.result);
     }
 
     async showError(): Promise<void> {
@@ -127,7 +127,7 @@ class DialogHarnessComponent {
             message:
                 'Could not save your changes. The server returned an unexpected error. Please try again or contact support if the problem persists.',
         });
-        this.lastResult = output.result;
+        this.lastResult.set(output.result);
     }
 
     async showConfirm(): Promise<void> {
@@ -136,7 +136,7 @@ class DialogHarnessComponent {
             message:
                 'This action cannot be undone. All data associated with this project will be permanently removed.',
         });
-        this.lastResult = output.result;
+        this.lastResult.set(output.result);
     }
 
     async showInput(): Promise<void> {
@@ -148,10 +148,11 @@ class DialogHarnessComponent {
             title: 'Enter Details',
             content: SampleInputComponent,
         });
-        this.lastResult =
+        this.lastResult.set(
             output.result === DialogResultType.Affirm
                 ? `${output.result}: ${JSON.stringify(output.data)}`
-                : output.result;
+                : output.result
+        );
     }
 
     async showWithSubtitle(): Promise<void> {
@@ -161,7 +162,7 @@ class DialogHarnessComponent {
             message:
                 'A new version is available with performance improvements and bug fixes. The update will be applied automatically during the next maintenance window.',
         });
-        this.lastResult = output.result;
+        this.lastResult.set(output.result);
     }
 
     async showWithContextBadge(): Promise<void> {
@@ -171,7 +172,7 @@ class DialogHarnessComponent {
             message:
                 'This feature is currently in beta. Some functionality may change before the final release.',
         });
-        this.lastResult = output.result;
+        this.lastResult.set(output.result);
     }
 
     async showConfirmWithCancel(): Promise<void> {
@@ -180,7 +181,7 @@ class DialogHarnessComponent {
             message: 'You have an unsaved draft. Would you like to save it before closing?',
             footer: BUTTONS_YES_NO_CANCEL,
         });
-        this.lastResult = output.result;
+        this.lastResult.set(output.result);
     }
 
     async showDestructive(): Promise<void> {
@@ -212,7 +213,7 @@ class DialogHarnessComponent {
                 'This will permanently delete your account and all associated data. This action cannot be undone.',
             footer: destructiveButtons,
         });
-        this.lastResult = output.result;
+        this.lastResult.set(output.result);
     }
 
     async showWithCheckbox(): Promise<void> {
@@ -230,7 +231,7 @@ class DialogHarnessComponent {
             message: 'Would you like to receive notifications for this project?',
             footer,
         });
-        this.lastResult = `${output.result} (footer: ${JSON.stringify(output.footerValues)})`;
+        this.lastResult.set(`${output.result} (footer: ${JSON.stringify(output.footerValues)})`);
     }
 
     async showWithToggle(): Promise<void> {
@@ -248,7 +249,7 @@ class DialogHarnessComponent {
             message: 'Export your current configuration to a file.',
             footer,
         });
-        this.lastResult = `${output.result} (footer: ${JSON.stringify(output.footerValues)})`;
+        this.lastResult.set(`${output.result} (footer: ${JSON.stringify(output.footerValues)})`);
     }
 
     async showWithRadio(): Promise<void> {
@@ -271,7 +272,7 @@ class DialogHarnessComponent {
             message: 'Choose the format for your export.',
             footer,
         });
-        this.lastResult = `${output.result} (footer: ${JSON.stringify(output.footerValues)})`;
+        this.lastResult.set(`${output.result} (footer: ${JSON.stringify(output.footerValues)})`);
     }
 
     async showCustom(): Promise<void> {
@@ -310,7 +311,7 @@ class DialogHarnessComponent {
                 },
             ],
         });
-        this.lastResult = `${output.result} (footer: ${JSON.stringify(output.footerValues)})`;
+        this.lastResult.set(`${output.result} (footer: ${JSON.stringify(output.footerValues)})`);
     }
 }
 

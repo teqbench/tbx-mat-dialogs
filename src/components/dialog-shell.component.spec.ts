@@ -389,7 +389,7 @@ describe('DialogShellComponent', () => {
             expect(icon.nativeElement.textContent.trim()).toBe('delete');
         });
 
-        it('should place icon before label by default (order 0)', () => {
+        it('should place icon before label by default (no iconPositionEnd)', () => {
             const footer: DialogFooterControlType[] = [
                 buildButton({
                     key: 'save',
@@ -402,10 +402,10 @@ describe('DialogShellComponent', () => {
             const fixture = createFixture({ title: 'Test' }, footer);
 
             const icon = fixture.debugElement.query(By.css('mat-dialog-actions button mat-icon'));
-            expect(icon.nativeElement.style.order).toBe('0');
+            expect(icon.nativeElement.hasAttribute('iconpositionend')).toBe(false);
         });
 
-        it('should place icon after label when iconPosition is after (order 1)', () => {
+        it('should place icon after label when iconPosition is after (iconPositionEnd)', () => {
             const footer: DialogFooterControlType[] = [
                 buildButton({
                     key: 'next',
@@ -419,7 +419,7 @@ describe('DialogShellComponent', () => {
             const fixture = createFixture({ title: 'Test' }, footer);
 
             const icon = fixture.debugElement.query(By.css('mat-dialog-actions button mat-icon'));
-            expect(icon.nativeElement.style.order).toBe('1');
+            expect(icon.nativeElement.hasAttribute('iconpositionend')).toBe(true);
         });
 
         it('should disable button when disabled is true', () => {

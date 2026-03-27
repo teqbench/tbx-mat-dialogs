@@ -427,7 +427,7 @@ describe('DialogService', () => {
             );
         });
 
-        it('should set autoFocus to dialog', async () => {
+        it('should set autoFocus to first-tabbable', async () => {
             setupTestBed();
             const promise = service.information({ title: 'Test' });
             resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
@@ -435,7 +435,19 @@ describe('DialogService', () => {
 
             expect(dialogSpy.open).toHaveBeenCalledWith(
                 DialogShellComponent,
-                expect.objectContaining({ autoFocus: 'dialog' })
+                expect.objectContaining({ autoFocus: 'first-tabbable' })
+            );
+        });
+
+        it('should set ariaModal to true', async () => {
+            setupTestBed();
+            const promise = service.information({ title: 'Test' });
+            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            await promise;
+
+            expect(dialogSpy.open).toHaveBeenCalledWith(
+                DialogShellComponent,
+                expect.objectContaining({ ariaModal: true })
             );
         });
 
