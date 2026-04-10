@@ -1,36 +1,28 @@
 import { Injectable } from '@angular/core';
-import { SeverityIconService } from '@teqbench/tbx-mat-severity-icons';
+import {
+    TbxMatSeverityFontIconService,
+    TbxMatSeverityLevel,
+} from '@teqbench/tbx-mat-severity-icons';
 
 /**
- * Default dialog icon service using Material Symbols Rounded.
+ * Default dialog icon service using Material Symbols font icons.
  *
  * Provides icon ligatures for each severity level. Consumers can use this
- * implementation directly or provide their own SeverityIconService subclass
- * via the DIALOG_ICON_SERVICE injection token.
+ * implementation directly or provide their own service via the
+ * DIALOG_ICON_SERVICE injection token.
  */
 @Injectable()
-export class DialogIconService extends SeverityIconService {
-    constructor() {
-        super('material-symbols-rounded');
+export class DialogIconService extends TbxMatSeverityFontIconService {
+    constructor(fontSet?: string) {
+        super(fontSet);
     }
 
-    success(): string {
-        return 'check';
-    }
-
-    error(): string {
-        return 'exclamation';
-    }
-
-    warning(): string {
-        return 'exclamation';
-    }
-
-    information(): string {
-        return 'info_i';
-    }
-
-    help(): string {
-        return 'question_mark';
+    protected override initialize(): void {
+        super.initialize();
+        this.register(TbxMatSeverityLevel.Success, 'check');
+        this.register(TbxMatSeverityLevel.Error, 'exclamation');
+        this.register(TbxMatSeverityLevel.Warning, 'exclamation');
+        this.register(TbxMatSeverityLevel.Information, 'info_i');
+        this.register(TbxMatSeverityLevel.Help, 'question_mark');
     }
 }
