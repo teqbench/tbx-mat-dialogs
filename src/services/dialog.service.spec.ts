@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
-import { SeverityIconService } from '@teqbench/tbx-mat-severity-icons';
+import type { TbxMatSeverityResolver } from '@teqbench/tbx-mat-severity-icons';
 import { DialogIconService } from './dialog-icon.service';
 import { DIALOG_ICON_SERVICE } from '../tokens/dialog-icon-service.token';
 import { DialogService } from './dialog.service';
@@ -18,7 +18,7 @@ import {
 
 describe('DialogService', () => {
     let service: DialogService;
-    let icons: SeverityIconService;
+    let icons: TbxMatSeverityResolver;
     let dialogSpy: { open: ReturnType<typeof vi.fn> };
     let afterClosed$: Subject<unknown>;
 
@@ -35,7 +35,10 @@ describe('DialogService', () => {
             providers: [
                 DialogService,
                 { provide: MatDialog, useValue: dialogSpy },
-                { provide: DIALOG_ICON_SERVICE, useClass: DialogIconService },
+                {
+                    provide: DIALOG_ICON_SERVICE,
+                    useFactory: () => new DialogIconService('material-symbols-rounded'),
+                },
             ],
         });
 

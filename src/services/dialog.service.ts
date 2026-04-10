@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
-import { SeverityLevelType } from '@teqbench/tbx-mat-severity-icons';
+import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-icons';
 import { DIALOG_ICON_SERVICE } from '../tokens/dialog-icon-service.token';
 import { DialogShellComponent, type DialogShellData } from '../components/dialog-shell.component';
 import { DialogResultType } from '../types/dialog-result.type';
@@ -19,16 +19,16 @@ import {
 /**
  * Severity levels used by dialogs (excludes Success, which has no dialog method).
  *
- * Declared as an enum rather than `Exclude<SeverityLevelType, SeverityLevelType.Success>`
+ * Declared as an enum rather than `Exclude<TbxMatSeverityLevel, TbxMatSeverityLevel.Success>`
  * because a type alias has no runtime presence and cannot be used as computed
  * property keys or in other value positions. Initializing each member from
- * SeverityLevelType keeps the values in sync with the upstream enum.
+ * TbxMatSeverityLevel keeps the values in sync with the upstream enum.
  */
 enum DialogSeverityLevelType {
-    Information = SeverityLevelType.Information,
-    Warning = SeverityLevelType.Warning,
-    Error = SeverityLevelType.Error,
-    Help = SeverityLevelType.Help,
+    Information = TbxMatSeverityLevel.Information,
+    Warning = TbxMatSeverityLevel.Warning,
+    Error = TbxMatSeverityLevel.Error,
+    Help = TbxMatSeverityLevel.Help,
 }
 
 /**
