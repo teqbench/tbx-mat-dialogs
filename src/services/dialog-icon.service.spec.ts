@@ -7,7 +7,12 @@ describe('DialogIconService', () => {
 
     function setupTestBed(): void {
         TestBed.configureTestingModule({
-            providers: [DialogIconService],
+            providers: [
+                {
+                    provide: DialogIconService,
+                    useFactory: () => new DialogIconService('material-symbols-rounded'),
+                },
+            ],
         });
 
         service = TestBed.inject(DialogIconService);
@@ -23,27 +28,27 @@ describe('DialogIconService', () => {
         expect(service.fontSet).toBe('material-symbols-rounded');
     });
 
-    it('should return "check" for success()', () => {
+    it('should resolve "check" for success', () => {
         setupTestBed();
         expect(service.success()).toBe('check');
     });
 
-    it('should return "exclamation" for error()', () => {
+    it('should resolve "exclamation" for error', () => {
         setupTestBed();
         expect(service.error()).toBe('exclamation');
     });
 
-    it('should return "exclamation" for warning()', () => {
+    it('should resolve "exclamation" for warning', () => {
         setupTestBed();
         expect(service.warning()).toBe('exclamation');
     });
 
-    it('should return "info_i" for information()', () => {
+    it('should resolve "info_i" for information', () => {
         setupTestBed();
         expect(service.information()).toBe('info_i');
     });
 
-    it('should return "question_mark" for help()', () => {
+    it('should resolve "question_mark" for help', () => {
         setupTestBed();
         expect(service.help()).toBe('question_mark');
     });

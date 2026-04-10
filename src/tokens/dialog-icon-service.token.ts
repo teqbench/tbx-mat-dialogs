@@ -1,11 +1,11 @@
 import { InjectionToken } from '@angular/core';
-import type { SeverityIconService } from '@teqbench/tbx-mat-severity-icons';
+import type { TbxMatSeverityResolver } from '@teqbench/tbx-mat-severity-icons';
 
 /**
  * Optional injection token for customizing dialog icons.
  *
- * Provide a SeverityIconService implementation to override the default
- * hardcoded Material Icons ligatures used by DialogComponent.
+ * Provide a TbxMatSeverityResolver implementation to override the default
+ * Material Symbols ligatures used by DialogComponent.
  *
  * ```typescript
  * providers: [
@@ -13,4 +13,6 @@ import type { SeverityIconService } from '@teqbench/tbx-mat-severity-icons';
  * ]
  * ```
  */
-export const DIALOG_ICON_SERVICE = new InjectionToken<SeverityIconService>('DIALOG_ICON_SERVICE');
+export const DIALOG_ICON_SERVICE = new InjectionToken<TbxMatSeverityResolver>(
+    'DIALOG_ICON_SERVICE'
+);

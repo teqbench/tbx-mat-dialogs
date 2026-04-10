@@ -3,7 +3,15 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
     {
-        ignores: ['coverage/', 'dist/', 'node_modules/', '.storybook/', 'storybook-static/'],
+        ignores: [
+            '.claude/',
+            '.shared-skills/',
+            '.storybook/',
+            'coverage/',
+            'dist/',
+            'node_modules/',
+            'storybook-static/',
+        ],
     },
     ...tseslint.configs.recommended,
     ...angular.configs.tsRecommended,

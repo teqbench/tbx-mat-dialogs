@@ -1,6 +1,6 @@
 {
   "name": "@teqbench/tbx-mat-dialogs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Opinionated Angular dialog service built on Material dialog. Typed methods for info, warning, error, confirm, and input dialogs returning Promise<DialogOutput<T, F>>. Features emphasis-driven styling, rich footer controls, signal-based input validation via DialogContent, and pluggable icon resolution. Angular 21+.",
   "type": "module",
   "exports": {
@@ -41,7 +41,7 @@
     "@angular/common": "^21.0.0",
     "@angular/core": "^21.0.0",
     "@angular/material": "^21.0.0",
-    "@teqbench/tbx-mat-severity-icons": "^0.1.0"
+    "@teqbench/tbx-mat-severity-icons": ">=7.0.0"
   },
   "devDependencies": {
     "@analogjs/storybook-angular": "^2.3.1",
@@ -58,6 +58,7 @@
     "@angular/material": "^21.2.4",
     "@angular/platform-browser": "^21.2.6",
     "@angular/platform-browser-dynamic": "^21.2.6",
+    "@teqbench/tbx-mat-severity-icons": "^7.0.0",
     "@storybook/angular": "^10.3.3",
     "@types/node": "~24.12.0",
     "@vitest/coverage-v8": "^4.1.1",

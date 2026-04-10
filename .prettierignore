@@ -26,3 +26,6 @@ storybook-static/
 # The submodule files are owned by the skills repo, not the foundation template.
 # The foundation's Prettier shouldn't be reformatting files from another repository.
 .claude/skills
+
+# Vendored shared-skills submodule — owned by the shared-skills repo, not this repo.
+.shared-skills
