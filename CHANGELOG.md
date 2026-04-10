@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.1](https://github.com/teqbench/tbx-mat-dialogs/compare/v0.1.0...v0.1.1) (2026-04-10)
+
+
+### Bug Fixes
+
+* **deps:** migrate to @teqbench/tbx-mat-severity-icons v7 API ([6a4dd4f](https://github.com/teqbench/tbx-mat-dialogs/commit/6a4dd4f55bd59fc9d5722fa1c787a48a56df0c08))
+* **deps:** migrate to @teqbench/tbx-mat-severity-icons v7 API ([3dbf733](https://github.com/teqbench/tbx-mat-dialogs/commit/3dbf73387d6117a7414cc4387691d4c7d8f19d09))
+
 ## 0.1.0 (2026-03-27)
 
 
