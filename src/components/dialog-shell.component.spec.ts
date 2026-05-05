@@ -6,7 +6,7 @@ import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { DialogShellComponent, type DialogShellData } from './dialog-shell.component';
 import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
-import { TbxMatDialogEmphasisType } from '../types/dialog-emphasis.type';
+import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
 import { type TbxMatDialogConfig, type TbxMatDialogData } from '../models/dialog.model';
 import { type TbxMatDialogFooterButton } from '../models/dialog-footer.model';
 import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
@@ -676,53 +676,75 @@ describe('DialogShellComponent', () => {
         });
     });
 
-    describe('emphasis', () => {
-        it('should set data-emphasis to default for Default emphasis', () => {
+    describe('severity', () => {
+        it('should set data-emphasis to default for Default severity', () => {
             const fixture = createFixture({
                 title: 'Test',
                 icon: 'info',
-                emphasis: TbxMatDialogEmphasisType.Default,
+                type: TbxMatSeverityLevel.Default,
             });
 
             const host = fixture.nativeElement as HTMLElement;
             expect(host.getAttribute('data-emphasis')).toBe('default');
         });
 
-        it('should set data-emphasis to destructive for Destructive emphasis', () => {
+        it('should set data-emphasis to destructive for Error severity', () => {
             const fixture = createFixture({
                 title: 'Test',
                 icon: 'warning',
-                emphasis: TbxMatDialogEmphasisType.Destructive,
+                type: TbxMatSeverityLevel.Error,
             });
 
             const host = fixture.nativeElement as HTMLElement;
             expect(host.getAttribute('data-emphasis')).toBe('destructive');
         });
 
-        it('should set data-emphasis to warning for Warning emphasis', () => {
+        it('should set data-emphasis to warning for Warning severity', () => {
             const fixture = createFixture({
                 title: 'Test',
                 icon: 'warning',
-                emphasis: TbxMatDialogEmphasisType.Warning,
+                type: TbxMatSeverityLevel.Warning,
             });
 
             const host = fixture.nativeElement as HTMLElement;
             expect(host.getAttribute('data-emphasis')).toBe('warning');
         });
 
-        it('should set data-emphasis to info for Informational emphasis', () => {
+        it('should set data-emphasis to info for Information severity', () => {
             const fixture = createFixture({
                 title: 'Test',
                 icon: 'info',
-                emphasis: TbxMatDialogEmphasisType.Informational,
+                type: TbxMatSeverityLevel.Information,
             });
 
             const host = fixture.nativeElement as HTMLElement;
             expect(host.getAttribute('data-emphasis')).toBe('info');
         });
 
-        it('should default to default emphasis when not specified', () => {
+        it('should default to default severity when not specified', () => {
             const fixture = createFixture({ title: 'Test', icon: 'info' });
+
+            const host = fixture.nativeElement as HTMLElement;
+            expect(host.getAttribute('data-emphasis')).toBe('default');
+        });
+
+        it('should map Success severity to data-emphasis default (placeholder until #46)', () => {
+            const fixture = createFixture({
+                title: 'Test',
+                icon: 'check',
+                type: TbxMatSeverityLevel.Success,
+            });
+
+            const host = fixture.nativeElement as HTMLElement;
+            expect(host.getAttribute('data-emphasis')).toBe('default');
+        });
+
+        it('should map Help severity to data-emphasis default (placeholder until #46)', () => {
+            const fixture = createFixture({
+                title: 'Test',
+                icon: 'help',
+                type: TbxMatSeverityLevel.Help,
+            });
 
             const host = fixture.nativeElement as HTMLElement;
             expect(host.getAttribute('data-emphasis')).toBe('default');
@@ -732,7 +754,7 @@ describe('DialogShellComponent', () => {
             const fixture = createFixture({
                 title: 'Test',
                 icon: 'info',
-                emphasis: TbxMatDialogEmphasisType.Destructive,
+                type: TbxMatSeverityLevel.Error,
             });
 
             const container = fixture.debugElement.query(By.css('.header-icon-container'));
@@ -797,7 +819,7 @@ describe('DialogShellComponent', () => {
                 buildButton({ emphasis: 'primary', result: TbxMatDialogDismissReason.Affirm }),
             ];
             const fixture = createFixture(
-                { title: 'Test', emphasis: TbxMatDialogEmphasisType.Warning },
+                { title: 'Test', type: TbxMatSeverityLevel.Warning },
                 footer
             );
 
@@ -815,7 +837,7 @@ describe('DialogShellComponent', () => {
                 buildButton({ emphasis: 'destructive', result: TbxMatDialogDismissReason.Affirm }),
             ];
             const fixture = createFixture(
-                { title: 'Test', emphasis: TbxMatDialogEmphasisType.Default },
+                { title: 'Test', type: TbxMatSeverityLevel.Default },
                 footer
             );
 

@@ -6,7 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
 import { TbxMatDialogService } from '../services/dialog.service';
-import { TbxMatDialogEmphasisType } from '../types/dialog-emphasis.type';
+import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
 import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
 import {
     TBX_MAT_DIALOG_BUTTONS_OK,
@@ -111,11 +111,18 @@ class StoryInputComponent implements TbxMatDialogData<StoryInputData> {
                 are independent of the M3 theme palette.
             </p>
 
-            <h3>Dialog Types</h3>
+            <h3>Severity Methods</h3>
             <div class="button-group">
-                <button mat-flat-button (click)="showInformation()">Information</button>
-                <button mat-flat-button (click)="showWarning()">Warning</button>
+                <button mat-flat-button (click)="showSuccess()">Success</button>
                 <button mat-flat-button (click)="showError()">Error</button>
+                <button mat-flat-button (click)="showWarning()">Warning</button>
+                <button mat-flat-button (click)="showInformation()">Information</button>
+                <button mat-flat-button (click)="showHelp()">Help</button>
+                <button mat-flat-button (click)="showDefault()">Default</button>
+            </div>
+
+            <h3>Dialog Patterns</h3>
+            <div class="button-group">
                 <button mat-flat-button (click)="showConfirm()">Confirm</button>
                 <button mat-flat-button (click)="showInput()">Input</button>
             </div>
@@ -191,10 +198,19 @@ class DialogHarnessComponent {
     private readonly dialog = inject(TbxMatDialogService);
     readonly lastResult = signal('');
 
-    async showInformation(): Promise<void> {
-        const output = await this.dialog.information({
-            title: 'Session Expired',
-            message: 'Your session has expired. Please sign in again to continue working.',
+    async showSuccess(): Promise<void> {
+        const output = await this.dialog.success({
+            title: 'Saved',
+            message: 'Your changes have been saved successfully.',
+        });
+        this.lastResult.set(output.result);
+    }
+
+    async showError(): Promise<void> {
+        const output = await this.dialog.error({
+            title: 'Save Failed',
+            message:
+                'Could not save your changes. The server returned an unexpected error. Please try again or contact support if the problem persists.',
         });
         this.lastResult.set(output.result);
     }
@@ -208,11 +224,27 @@ class DialogHarnessComponent {
         this.lastResult.set(output.result);
     }
 
-    async showError(): Promise<void> {
-        const output = await this.dialog.error({
-            title: 'Save Failed',
+    async showInformation(): Promise<void> {
+        const output = await this.dialog.information({
+            title: 'Session Expired',
+            message: 'Your session has expired. Please sign in again to continue working.',
+        });
+        this.lastResult.set(output.result);
+    }
+
+    async showHelp(): Promise<void> {
+        const output = await this.dialog.help({
+            title: 'How it works',
             message:
-                'Could not save your changes. The server returned an unexpected error. Please try again or contact support if the problem persists.',
+                'This panel shows tips and guidance for completing your task. Tap any control for more details.',
+        });
+        this.lastResult.set(output.result);
+    }
+
+    async showDefault(): Promise<void> {
+        const output = await this.dialog.default({
+            title: 'Notice',
+            message: 'A neutral, severity-agnostic dialog surface for general announcements.',
         });
         this.lastResult.set(output.result);
     }
@@ -291,7 +323,7 @@ class DialogHarnessComponent {
         const output = await this.dialog.show({
             title: 'Delete Account',
             icon: 'error',
-            emphasis: TbxMatDialogEmphasisType.Destructive,
+            type: TbxMatSeverityLevel.Error,
             message:
                 'This will permanently delete your account and all associated data. This action cannot be undone.',
             footer: destructiveButtons,
@@ -364,7 +396,7 @@ class DialogHarnessComponent {
             icon: 'build',
             subtitle: 'Using show() for full control',
             contextBadge: 'v2',
-            emphasis: TbxMatDialogEmphasisType.Warning,
+            type: TbxMatSeverityLevel.Warning,
             message:
                 'This dialog was opened via the show() method with all options configured manually.',
             footer: [

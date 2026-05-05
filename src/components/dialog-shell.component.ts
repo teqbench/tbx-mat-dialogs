@@ -25,8 +25,8 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDivider } from '@angular/material/divider';
 import { MatChipSet, MatChip } from '@angular/material/chips';
+import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
 import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
-import { TbxMatDialogEmphasisType } from '../types/dialog-emphasis.type';
 import { type TbxMatDialogConfig, type TbxMatDialogData } from '../models/dialog.model';
 import {
     type TbxMatDialogFooterButton,
@@ -38,15 +38,24 @@ import {
 import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
 
 /**
- * Emphasis CSS variable prefix mapping.
- * Maps TbxMatDialogEmphasisType enum values to the --tbx-mat-dialog-* token prefix
- * used in _dialog-panels.scss.
+ * Placeholder mapping from `TbxMatSeverityLevel` to the legacy `data-emphasis`
+ * attribute token consumed by `_tbx-mat-dialogs.scss`.
+ *
+ * The four-tier emphasis token system (default / destructive / warning / info)
+ * is interim: it survives until the SCSS rewrite (#46) replaces it with the
+ * six-tier severity-theme panel class system used by `tbx-mat-banners` and
+ * `tbx-mat-notifications`. Until then, severities that have no legacy
+ * equivalent (`Success`, `Help`) collapse to `default`, and the existing
+ * `:host([data-emphasis='X'])` CSS rules continue to drive accent colors
+ * for the four mapped severities.
  */
-const EMPHASIS_TOKEN_MAP: Readonly<Record<TbxMatDialogEmphasisType, string>> = {
-    [TbxMatDialogEmphasisType.Default]: 'default',
-    [TbxMatDialogEmphasisType.Destructive]: 'destructive',
-    [TbxMatDialogEmphasisType.Warning]: 'warning',
-    [TbxMatDialogEmphasisType.Informational]: 'info',
+const SEVERITY_TO_EMPHASIS_TOKEN: Readonly<Record<TbxMatSeverityLevel, string>> = {
+    [TbxMatSeverityLevel.Default]: 'default',
+    [TbxMatSeverityLevel.Success]: 'default',
+    [TbxMatSeverityLevel.Error]: 'destructive',
+    [TbxMatSeverityLevel.Warning]: 'warning',
+    [TbxMatSeverityLevel.Information]: 'info',
+    [TbxMatSeverityLevel.Help]: 'default',
 };
 
 /**
@@ -454,15 +463,17 @@ export class DialogShellComponent {
     );
 
     /**
-     * The resolved emphasis — defaults to Default when not specified.
+     * The resolved severity — defaults to Default when not specified.
      */
-    private readonly emphasis = this.config.emphasis ?? TbxMatDialogEmphasisType.Default;
+    private readonly type = this.config.type ?? TbxMatSeverityLevel.Default;
 
     /**
-     * Token suffix for the current emphasis — used by the host data-emphasis
-     * attribute binding and the :host([data-emphasis]) CSS selectors.
+     * Token suffix mapped from the current severity to the legacy four-tier
+     * emphasis tokens consumed by the host `data-emphasis` attribute binding
+     * and the `:host([data-emphasis])` CSS selectors. Replaced by per-severity
+     * panel classes in #46.
      */
-    readonly emphasisToken = EMPHASIS_TOKEN_MAP[this.emphasis];
+    readonly emphasisToken = SEVERITY_TO_EMPHASIS_TOKEN[this.type];
 
     /**
      * Index of the first footer item with align: 'end'.

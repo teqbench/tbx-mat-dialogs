@@ -5,7 +5,6 @@ import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
 import { TBX_MAT_DIALOG_ICON_SERVICE } from '../tokens/dialog-icon-service.token';
 import { DialogShellComponent, type DialogShellData } from '../components/dialog-shell.component';
 import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
-import { TbxMatDialogEmphasisType } from '../types/dialog-emphasis.type';
 import { type TbxMatDialogConfig, type TbxMatDialogResult } from '../models/dialog.model';
 import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
 import { type TbxMatDialogConfigArgs } from '../types/dialog-config-override.type';
@@ -17,57 +16,44 @@ import {
 } from '../constants/dialog.constants';
 
 /**
- * Severity levels used by dialogs (excludes Success, which has no dialog method).
- *
- * Declared as an enum rather than `Exclude<TbxMatSeverityLevel, TbxMatSeverityLevel.Success>`
- * because a type alias has no runtime presence and cannot be used as computed
- * property keys or in other value positions. Initializing each member from
- * TbxMatSeverityLevel keeps the values in sync with the upstream enum.
- */
-enum DialogSeverityLevelType {
-    Information = TbxMatSeverityLevel.Information,
-    Warning = TbxMatSeverityLevel.Warning,
-    Error = TbxMatSeverityLevel.Error,
-    Help = TbxMatSeverityLevel.Help,
-}
-
-/**
  * Application-wide dialog service.
  *
- * Provides six opinionated dialog methods with sensible defaults and a
+ * Provides nine opinionated dialog methods with sensible defaults and a
  * general-purpose show() method for full control. All dialogs use the
  * shared DialogShellComponent for consistent chrome (header, body, footer).
+ *
+ * Severity-leveled methods (`success`, `error`, `warning`, `information`,
+ * `help`, `default`) mirror the surface exposed by `TbxMatBannerService`
+ * and `TbxMatNotificationService`. Dialog-specific patterns
+ * (`confirm`, `input`) layer on top of the severity model with their own
+ * default footer presets.
  *
  * All methods return a Promise that resolves when the dialog closes,
  * so consumers use async/await with no subscription management.
  *
- * Icons are resolved via the injected TBX_MAT_DIALOG_ICON_SERVICE token, ensuring
- * dialogs use icons optimized for their visual context (filled variants
- * inside colored circle containers by default). Downstream apps swap the
- * icon set via { provide: TBX_MAT_DIALOG_ICON_SERVICE, useClass: ... } in app.config.ts.
+ * Icons are resolved via the injected TBX_MAT_DIALOG_ICON_SERVICE token,
+ * ensuring dialogs use icons optimized for their visual context. Downstream
+ * apps swap the icon set via
+ * `{ provide: TBX_MAT_DIALOG_ICON_SERVICE, useClass: ... }` in `app.config.ts`.
  *
- * Opinionated methods — each provides defaults for icon, emphasis, and footer:
+ * Opinionated methods — each provides defaults for icon, severity type, and footer:
  *
  * ```typescript
  * private readonly dialog = inject(TbxMatDialogService);
  *
- * // Simplest — just title and message, everything else defaulted
- * await this.dialog.info({ title: 'Session Expired', message: 'Please sign in again.' });
- *
- * // Override defaults selectively
- * await this.dialog.info({ title: 'Welcome', message: 'Ready.', icon: 'celebration' });
- *
- * // Warning dialog — amber emphasis, warning icon
- * await this.dialog.warning({ title: 'Caution', message: 'This may take a while.' });
- *
- * // Error dialog — destructive emphasis, error icon
+ * // Severity methods (mirror banners/notifications)
+ * await this.dialog.success({ title: 'Saved', message: 'Your changes are saved.' });
  * await this.dialog.error({ title: 'Failed', message: 'Could not save changes.' });
+ * await this.dialog.warning({ title: 'Caution', message: 'This may take a while.' });
+ * await this.dialog.information({ title: 'FYI', message: 'Heads up.' });
+ * await this.dialog.help({ title: 'How it works', message: 'Tap to learn more.' });
+ * await this.dialog.default({ title: 'Notice', message: 'Neutral surface.' });
  *
- * // Confirmation — default emphasis, help icon, Yes/No buttons
+ * // Confirmation — Help severity, Yes/No buttons
  * const output = await this.dialog.confirm({ title: 'Continue?', message: 'Proceed?' });
  * if (output.result === TbxMatDialogDismissReason.Affirm) { ... }
  *
- * // Input — default emphasis, info icon, OK/Cancel buttons
+ * // Input — Information severity, OK/Cancel buttons
  * const output = await this.dialog.input<string>({
  *     title: 'Rename',
  *     content: RenameFormComponent,
@@ -91,7 +77,7 @@ enum DialogSeverityLevelType {
  * const output = await this.dialog.show({
  *     title: 'Custom',
  *     icon: 'build',
- *     emphasis: TbxMatDialogEmphasisType.Warning,
+ *     type: TbxMatSeverityLevel.Warning,
  *     message: 'Full control over every option.',
  *     footer: [...customFooter],
  * });
@@ -102,12 +88,17 @@ export class TbxMatDialogService {
     private readonly dialog = inject(MatDialog);
     private readonly icons = inject(TBX_MAT_DIALOG_ICON_SERVICE, { optional: true });
 
-    /** Hardcoded fallbacks when TBX_MAT_DIALOG_ICON_SERVICE is not provided. */
-    private static readonly FALLBACK_ICONS: Record<DialogSeverityLevelType, string> = {
-        [DialogSeverityLevelType.Information]: 'info_i',
-        [DialogSeverityLevelType.Warning]: 'exclamation',
-        [DialogSeverityLevelType.Error]: 'exclamation',
-        [DialogSeverityLevelType.Help]: 'question_mark',
+    /**
+     * Hardcoded icon fallbacks when TBX_MAT_DIALOG_ICON_SERVICE is not provided.
+     * Mirrors the registrations made by the default `TbxMatDialogIconService`.
+     */
+    private static readonly FALLBACK_ICONS: Record<TbxMatSeverityLevel, string> = {
+        [TbxMatSeverityLevel.Default]: 'info',
+        [TbxMatSeverityLevel.Success]: 'check',
+        [TbxMatSeverityLevel.Error]: 'exclamation',
+        [TbxMatSeverityLevel.Warning]: 'exclamation',
+        [TbxMatSeverityLevel.Information]: 'info_i',
+        [TbxMatSeverityLevel.Help]: 'question_mark',
     };
 
     /**
@@ -127,43 +118,15 @@ export class TbxMatDialogService {
     }
 
     /**
-     * Open an informational dialog.
+     * Open a success dialog.
      *
-     * Defaults: info icon, Informational emphasis, OK button.
-     * All defaults can be overridden via config properties.
-     *
-     * @typeParam F - Type of footer control values. Defaults to Record<string, unknown>.
+     * Defaults: success icon, Success severity, OK button.
      */
-    async information<F extends Record<string, unknown> = Record<string, unknown>>(
+    async success<F extends Record<string, unknown> = Record<string, unknown>>(
         config: TbxMatDialogConfigArgs<void>
     ): Promise<TbxMatDialogResult<void, F>> {
         return this.open<void, F>(
-            this.mergeDefaults(
-                config,
-                this.resolveIcon(DialogSeverityLevelType.Information),
-                TbxMatDialogEmphasisType.Informational
-            ),
-            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
-        );
-    }
-
-    /**
-     * Open a warning dialog.
-     *
-     * Defaults: warning icon, Warning emphasis, OK button.
-     * All defaults can be overridden via config properties.
-     *
-     * @typeParam F - Type of footer control values. Defaults to Record<string, unknown>.
-     */
-    async warning<F extends Record<string, unknown> = Record<string, unknown>>(
-        config: TbxMatDialogConfigArgs<void>
-    ): Promise<TbxMatDialogResult<void, F>> {
-        return this.open<void, F>(
-            this.mergeDefaults(
-                config,
-                this.resolveIcon(DialogSeverityLevelType.Warning),
-                TbxMatDialogEmphasisType.Warning
-            ),
+            this.mergeDefaults(config, TbxMatSeverityLevel.Success),
             config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
         );
     }
@@ -171,20 +134,69 @@ export class TbxMatDialogService {
     /**
      * Open an error dialog.
      *
-     * Defaults: error icon, Destructive emphasis, OK button.
-     * All defaults can be overridden via config properties.
-     *
-     * @typeParam F - Type of footer control values. Defaults to Record<string, unknown>.
+     * Defaults: error icon, Error severity, OK button.
      */
     async error<F extends Record<string, unknown> = Record<string, unknown>>(
         config: TbxMatDialogConfigArgs<void>
     ): Promise<TbxMatDialogResult<void, F>> {
         return this.open<void, F>(
-            this.mergeDefaults(
-                config,
-                this.resolveIcon(DialogSeverityLevelType.Error),
-                TbxMatDialogEmphasisType.Destructive
-            ),
+            this.mergeDefaults(config, TbxMatSeverityLevel.Error),
+            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
+        );
+    }
+
+    /**
+     * Open a warning dialog.
+     *
+     * Defaults: warning icon, Warning severity, OK button.
+     */
+    async warning<F extends Record<string, unknown> = Record<string, unknown>>(
+        config: TbxMatDialogConfigArgs<void>
+    ): Promise<TbxMatDialogResult<void, F>> {
+        return this.open<void, F>(
+            this.mergeDefaults(config, TbxMatSeverityLevel.Warning),
+            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
+        );
+    }
+
+    /**
+     * Open an informational dialog.
+     *
+     * Defaults: info icon, Information severity, OK button.
+     */
+    async information<F extends Record<string, unknown> = Record<string, unknown>>(
+        config: TbxMatDialogConfigArgs<void>
+    ): Promise<TbxMatDialogResult<void, F>> {
+        return this.open<void, F>(
+            this.mergeDefaults(config, TbxMatSeverityLevel.Information),
+            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
+        );
+    }
+
+    /**
+     * Open a help dialog.
+     *
+     * Defaults: help icon, Help severity, OK button.
+     */
+    async help<F extends Record<string, unknown> = Record<string, unknown>>(
+        config: TbxMatDialogConfigArgs<void>
+    ): Promise<TbxMatDialogResult<void, F>> {
+        return this.open<void, F>(
+            this.mergeDefaults(config, TbxMatSeverityLevel.Help),
+            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
+        );
+    }
+
+    /**
+     * Open a default-severity (neutral) dialog.
+     *
+     * Defaults: default icon, Default severity, OK button.
+     */
+    async default<F extends Record<string, unknown> = Record<string, unknown>>(
+        config: TbxMatDialogConfigArgs<void>
+    ): Promise<TbxMatDialogResult<void, F>> {
+        return this.open<void, F>(
+            this.mergeDefaults(config, TbxMatSeverityLevel.Default),
             config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
         );
     }
@@ -192,20 +204,14 @@ export class TbxMatDialogService {
     /**
      * Open a confirmation dialog.
      *
-     * Defaults: help icon, Default emphasis, Yes/No buttons.
-     * All defaults can be overridden via config properties.
-     *
-     * @typeParam F - Type of footer control values. Defaults to Record<string, unknown>.
+     * Dialog-specific UX pattern layered on top of the severity model.
+     * Defaults: help icon, Help severity, Yes/No buttons.
      */
     async confirm<F extends Record<string, unknown> = Record<string, unknown>>(
         config: TbxMatDialogConfigArgs<void>
     ): Promise<TbxMatDialogResult<void, F>> {
         return this.open<void, F>(
-            this.mergeDefaults(
-                config,
-                this.resolveIcon(DialogSeverityLevelType.Help),
-                TbxMatDialogEmphasisType.Default
-            ),
+            this.mergeDefaults(config, TbxMatSeverityLevel.Help),
             config.footer ?? TBX_MAT_DIALOG_BUTTONS_YES_NO
         );
     }
@@ -216,21 +222,16 @@ export class TbxMatDialogService {
      * Renders a content component in the dialog body. The content component
      * must implement TbxMatDialogData<T>. Returns typed data on affirm.
      *
-     * Defaults: info icon, Default emphasis, OK/Cancel buttons.
-     * All defaults can be overridden via config properties.
+     * Dialog-specific UX pattern layered on top of the severity model.
+     * Defaults: info icon, Information severity, OK/Cancel buttons.
      *
      * @typeParam T - Type of data returned by the content component.
-     * @typeParam F - Type of footer control values. Defaults to Record<string, unknown>.
      */
     async input<T, F extends Record<string, unknown> = Record<string, unknown>>(
         config: TbxMatDialogConfigArgs<T>
     ): Promise<TbxMatDialogResult<T, F>> {
         return this.open<T, F>(
-            this.mergeDefaults(
-                config,
-                this.resolveIcon(DialogSeverityLevelType.Information),
-                TbxMatDialogEmphasisType.Default
-            ),
+            this.mergeDefaults(config, TbxMatSeverityLevel.Information),
             config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK_CANCEL
         );
     }
@@ -239,9 +240,9 @@ export class TbxMatDialogService {
      * Resolve an icon from the icon service with hardcoded fallback.
      * If the service is not provided or returns a falsy value, the fallback is used.
      */
-    private resolveIcon(method: DialogSeverityLevelType): string {
-        const fromService = this.icons?.[method]();
-        return fromService || TbxMatDialogService.FALLBACK_ICONS[method];
+    private resolveIcon(severity: TbxMatSeverityLevel): string {
+        const fromService = this.icons?.[severity]();
+        return fromService || TbxMatDialogService.FALLBACK_ICONS[severity];
     }
 
     /**
@@ -250,17 +251,16 @@ export class TbxMatDialogService {
      * Caller-provided values win — defaults are only applied for fields
      * the caller did not specify (undefined). This means passing
      * `{ icon: 'custom_icon' }` overrides the default icon, but omitting
-     * `icon` uses the default.
+     * `icon` uses the default for the chosen severity.
      */
     private mergeDefaults<T>(
         config: TbxMatDialogConfigArgs<T>,
-        defaultIcon: string,
-        defaultEmphasis: TbxMatDialogEmphasisType
+        defaultType: TbxMatSeverityLevel
     ): TbxMatDialogConfig<T> {
         return {
             ...config,
-            icon: config.icon ?? defaultIcon,
-            emphasis: config.emphasis ?? defaultEmphasis,
+            icon: config.icon ?? this.resolveIcon(defaultType),
+            type: config.type ?? defaultType,
         } as TbxMatDialogConfig<T>;
     }
 
@@ -277,6 +277,12 @@ export class TbxMatDialogService {
      * when the user affirms. Deny, Cancel, Close, ESC, and backdrop
      * dismiss all return empty footerValues — negative actions should
      * not carry state that implies confirmation.
+     *
+     * The panelClass list includes the per-severity placeholder
+     * `tbx-mat-dialog-panel-{level}` class. CSS rules for those classes
+     * land in the SCSS rewrite (#46) that adopts the shared severity-theme
+     * mixin; until then, they're applied but inert.
+     *
      * Returns a Promise that resolves with the dialog output, or a
      * fallback Close result if the dialog is dismissed without a result
      * (e.g., backdrop click when disableClose is false).
@@ -290,6 +296,8 @@ export class TbxMatDialogService {
             resolvedFooter,
         };
 
+        const severity = config.type ?? TbxMatSeverityLevel.Default;
+
         const dialogRef = this.dialog.open(DialogShellComponent, {
             data: shellData,
             width: config.width ?? TBX_MAT_DIALOG_DEFAULT_WIDTH,
@@ -298,7 +306,7 @@ export class TbxMatDialogService {
             minHeight: config.minHeight,
             maxHeight: config.maxHeight,
             disableClose: config.disableClose ?? false,
-            panelClass: 'tbx-mat-dialog-panel',
+            panelClass: ['tbx-mat-dialog-panel', `tbx-mat-dialog-panel-${severity}`],
             autoFocus: 'first-tabbable',
             ariaModal: true,
         });

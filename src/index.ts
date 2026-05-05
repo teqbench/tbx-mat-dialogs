@@ -2,10 +2,9 @@
  * Dialog system — typed modal dialogs with emphasis, footer controls, and input content.
  *
  * Public API:
- *   - TbxMatDialogService            — inject and call show(), information(), warning(), error(), confirm(), input()
+ *   - TbxMatDialogService            — inject and call show(), success(), error(), warning(), information(), help(), default(), confirm(), input()
  *   - TbxMatDialogConfigArgs         — Partial config with required title (for opinionated methods)
  *   - TbxMatDialogDismissReason      — result enum (Affirm, Deny, Cancel, Close)
- *   - TbxMatDialogEmphasisType       — emphasis enum (Default, Destructive, Warning, Informational)
  *   - TbxMatDialogResult<T, F>       — typed return value
  *   - TbxMatDialogConfig<T>          — full configuration for show()
  *   - TbxMatDialogData<T>            — contract for input dialog content components
@@ -22,7 +21,6 @@
 
 // Types — enum values
 export { TbxMatDialogDismissReason } from './types/dialog-result.type';
-export { TbxMatDialogEmphasisType } from './types/dialog-emphasis.type';
 
 // Models — dialog types
 export type {

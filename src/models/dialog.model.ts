@@ -1,6 +1,6 @@
 import { type Signal, Type } from '@angular/core';
+import { type TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
 import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
-import { TbxMatDialogEmphasisType } from '../types/dialog-emphasis.type';
 import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
 
 /**
@@ -49,7 +49,7 @@ export interface TbxMatDialogConfig<T = void> {
     /** Dialog title displayed in the header. Required. */
     readonly title: string;
 
-    /** Material icon name displayed before the title. Colored by emphasis. */
+    /** Material icon name displayed before the title. Colored by severity type. */
     readonly icon?: string;
 
     /** Secondary text displayed below the title. */
@@ -64,8 +64,12 @@ export interface TbxMatDialogConfig<T = void> {
     /** Message text displayed in the dialog body. Ignored when `content` is provided. */
     readonly message?: string;
 
-    /** Visual emphasis — determines accent color for icon, buttons, and separators. */
-    readonly emphasis?: TbxMatDialogEmphasisType;
+    /**
+     * Severity level — determines accent color for icon, buttons, separators, and
+     * the per-severity panel class applied to the dialog overlay. Mirrors the
+     * `type` field on `TbxMatBannerConfig` and `TbxMatNotificationConfig`.
+     */
+    readonly type?: TbxMatSeverityLevel;
 
     /**
      * Component class to render in the dialog body for input dialogs.
