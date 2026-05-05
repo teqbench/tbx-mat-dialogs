@@ -2,9 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
-import { TbxMatSeverityLevel, type TbxMatSeverityResolver } from '@teqbench/tbx-mat-severity-theme';
-import { TbxMatDialogIconService } from './dialog-icon.service';
-import { TBX_MAT_DIALOG_ICON_SERVICE } from '../tokens/dialog-icon-service.token';
+import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
 import { TbxMatDialogService } from './dialog.service';
 import { DialogShellComponent } from '../components/dialog-shell.component';
 import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
@@ -15,9 +13,20 @@ import {
     TBX_MAT_DIALOG_DEFAULT_WIDTH,
 } from '../constants/dialog.constants';
 
+/**
+ * Service-level tests focus on what the service is responsible for:
+ *   - applying severity-type defaults via mergeDefaults()
+ *   - applying footer presets per dialog method
+ *   - passing the correct config + dialog options to MatDialog.open()
+ *   - returning a Close result when the dialog is dismissed without a value
+ *
+ * Icon resolution is no longer the service's concern — `DialogShellComponent`
+ * resolves both the severity icon and the close icon via
+ * `TBX_MAT_DIALOG_PROVIDER_CONFIG`. Icon-related assertions live in the
+ * component spec.
+ */
 describe('TbxMatDialogService', () => {
     let service: TbxMatDialogService;
-    let icons: TbxMatSeverityResolver;
     let dialogSpy: { open: ReturnType<typeof vi.fn> };
     let afterClosed$: Subject<unknown>;
 
@@ -31,18 +40,10 @@ describe('TbxMatDialogService', () => {
         };
 
         TestBed.configureTestingModule({
-            providers: [
-                TbxMatDialogService,
-                { provide: MatDialog, useValue: dialogSpy },
-                {
-                    provide: TBX_MAT_DIALOG_ICON_SERVICE,
-                    useFactory: () => new TbxMatDialogIconService('material-symbols-rounded'),
-                },
-            ],
+            providers: [TbxMatDialogService, { provide: MatDialog, useValue: dialogSpy }],
         });
 
         service = TestBed.inject(TbxMatDialogService);
-        icons = TestBed.inject(TBX_MAT_DIALOG_ICON_SERVICE);
     }
 
     /** Resolve the pending dialog with a result. */
@@ -56,242 +57,137 @@ describe('TbxMatDialogService', () => {
         return dialogSpy.open.mock.calls[0][1].data;
     }
 
-    describe('information()', () => {
-        it('should default to info icon from TBX_MAT_DIALOG_ICON_SERVICE', async () => {
+    describe('show()', () => {
+        it('should pass config through with no defaults applied', async () => {
             setupTestBed();
-            const promise = service.information({ title: 'Test' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['icon']).toBe(icons.information());
-        });
-
-        it('should default to Information severity', async () => {
-            setupTestBed();
-            const promise = service.information({ title: 'Test' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['type']).toBe(TbxMatSeverityLevel.Information);
-        });
-
-        it('should default to TBX_MAT_DIALOG_BUTTONS_OK footer', async () => {
-            setupTestBed();
-            const promise = service.information({ title: 'Test' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().resolvedFooter).toEqual(TBX_MAT_DIALOG_BUTTONS_OK);
-        });
-
-        it('should allow overriding icon', async () => {
-            setupTestBed();
-            const promise = service.information({ title: 'Test', icon: 'celebration' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['icon']).toBe('celebration');
-        });
-
-        it('should allow overriding type', async () => {
-            setupTestBed();
-            const promise = service.information({
-                title: 'Test',
+            const promise = service.show({
+                title: 'Custom',
+                icon: 'build',
                 type: TbxMatSeverityLevel.Warning,
+                message: 'Full control.',
+            });
+            resolveDialog({ result: TbxMatDialogDismissReason.Close, footerValues: {} });
+            await promise;
+
+            const shellData = getShellData();
+            expect(shellData.config['title']).toBe('Custom');
+            expect(shellData.config['icon']).toBe('build');
+            expect(shellData.config['type']).toBe(TbxMatSeverityLevel.Warning);
+            expect(shellData.config['message']).toBe('Full control.');
+        });
+
+        it('should not apply default icon when omitted', async () => {
+            setupTestBed();
+            const promise = service.show({ title: 'No Icon' });
+            resolveDialog({ result: TbxMatDialogDismissReason.Close, footerValues: {} });
+            await promise;
+
+            expect(getShellData().config['icon']).toBeUndefined();
+        });
+
+        it('should not apply default type when omitted', async () => {
+            setupTestBed();
+            const promise = service.show({ title: 'No Type' });
+            resolveDialog({ result: TbxMatDialogDismissReason.Close, footerValues: {} });
+            await promise;
+
+            expect(getShellData().config['type']).toBeUndefined();
+        });
+
+        it('should use empty footer when no footer provided', async () => {
+            setupTestBed();
+            const promise = service.show({ title: 'Bare' });
+            resolveDialog({ result: TbxMatDialogDismissReason.Close, footerValues: {} });
+            await promise;
+
+            expect(getShellData().resolvedFooter).toEqual([]);
+        });
+
+        it('should use provided footer', async () => {
+            setupTestBed();
+            const promise = service.show({
+                title: 'Custom',
+                footer: [...TBX_MAT_DIALOG_BUTTONS_OK],
             });
             resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(getShellData().config['type']).toBe(TbxMatSeverityLevel.Warning);
-        });
-
-        it('should allow overriding footer', async () => {
-            setupTestBed();
-            const customFooter = [
-                {
-                    key: 'close',
-                    type: 'button' as const,
-                    label: 'Close',
-                    result: TbxMatDialogDismissReason.Close,
-                    align: 'end' as const,
-                },
-            ];
-            const promise = service.information({ title: 'Test', footer: customFooter });
-            resolveDialog({ result: TbxMatDialogDismissReason.Close, footerValues: {} });
-            await promise;
-
-            expect(getShellData().resolvedFooter).toEqual(customFooter);
-        });
-
-        it('should return TbxMatDialogResult when resolved', async () => {
-            setupTestBed();
-            const promise = service.information({ title: 'Test' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-
-            const output = await promise;
-            expect(output.result).toBe(TbxMatDialogDismissReason.Affirm);
-        });
-    });
-
-    describe('warning()', () => {
-        it('should default to warning icon from TBX_MAT_DIALOG_ICON_SERVICE', async () => {
-            setupTestBed();
-            const promise = service.warning({ title: 'Caution' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['icon']).toBe(icons.warning());
-        });
-
-        it('should default to Warning severity', async () => {
-            setupTestBed();
-            const promise = service.warning({ title: 'Caution' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['type']).toBe(TbxMatSeverityLevel.Warning);
-        });
-
-        it('should default to TBX_MAT_DIALOG_BUTTONS_OK footer', async () => {
-            setupTestBed();
-            const promise = service.warning({ title: 'Caution' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
             expect(getShellData().resolvedFooter).toEqual(TBX_MAT_DIALOG_BUTTONS_OK);
         });
     });
 
-    describe('error()', () => {
-        it('should default to error icon from TBX_MAT_DIALOG_ICON_SERVICE', async () => {
-            setupTestBed();
-            const promise = service.error({ title: 'Failed' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
+    describe('severity methods', () => {
+        const cases = [
+            { method: 'success', severity: TbxMatSeverityLevel.Success },
+            { method: 'error', severity: TbxMatSeverityLevel.Error },
+            { method: 'warning', severity: TbxMatSeverityLevel.Warning },
+            { method: 'information', severity: TbxMatSeverityLevel.Information },
+            { method: 'help', severity: TbxMatSeverityLevel.Help },
+            { method: 'default', severity: TbxMatSeverityLevel.Default },
+        ] as const;
 
-            expect(getShellData().config['icon']).toBe(icons.error());
-        });
+        for (const { method, severity } of cases) {
+            describe(`${method}()`, () => {
+                it(`should default to ${severity} severity`, async () => {
+                    setupTestBed();
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const promise = (service as any)[method]({ title: 'Test' });
+                    resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
+                    await promise;
 
-        it('should default to Error severity', async () => {
-            setupTestBed();
-            const promise = service.error({ title: 'Failed' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
+                    expect(getShellData().config['type']).toBe(severity);
+                });
 
-            expect(getShellData().config['type']).toBe(TbxMatSeverityLevel.Error);
-        });
+                it('should default to TBX_MAT_DIALOG_BUTTONS_OK footer', async () => {
+                    setupTestBed();
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const promise = (service as any)[method]({ title: 'Test' });
+                    resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
+                    await promise;
 
-        it('should default to TBX_MAT_DIALOG_BUTTONS_OK footer', async () => {
-            setupTestBed();
-            const promise = service.error({ title: 'Failed' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
+                    expect(getShellData().resolvedFooter).toEqual(TBX_MAT_DIALOG_BUTTONS_OK);
+                });
 
-            expect(getShellData().resolvedFooter).toEqual(TBX_MAT_DIALOG_BUTTONS_OK);
-        });
-    });
+                it('should not pre-compute icon when no override is given', async () => {
+                    setupTestBed();
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const promise = (service as any)[method]({ title: 'Test' });
+                    resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
+                    await promise;
 
-    describe('success()', () => {
-        it('should default to success icon from TBX_MAT_DIALOG_ICON_SERVICE', async () => {
-            setupTestBed();
-            const promise = service.success({ title: 'Saved' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
+                    expect(getShellData().config['icon']).toBeUndefined();
+                });
 
-            expect(getShellData().config['icon']).toBe(icons.success());
-        });
+                it('should preserve a caller-provided icon override', async () => {
+                    setupTestBed();
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const promise = (service as any)[method]({
+                        title: 'Test',
+                        icon: 'celebration',
+                    });
+                    resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
+                    await promise;
 
-        it('should default to Success severity', async () => {
-            setupTestBed();
-            const promise = service.success({ title: 'Saved' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
+                    expect(getShellData().config['icon']).toBe('celebration');
+                });
 
-            expect(getShellData().config['type']).toBe(TbxMatSeverityLevel.Success);
-        });
+                it('should preserve a caller-provided type override', async () => {
+                    setupTestBed();
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const promise = (service as any)[method]({
+                        title: 'Test',
+                        type: TbxMatSeverityLevel.Warning,
+                    });
+                    resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
+                    await promise;
 
-        it('should default to TBX_MAT_DIALOG_BUTTONS_OK footer', async () => {
-            setupTestBed();
-            const promise = service.success({ title: 'Saved' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().resolvedFooter).toEqual(TBX_MAT_DIALOG_BUTTONS_OK);
-        });
-    });
-
-    describe('help()', () => {
-        it('should default to help icon from TBX_MAT_DIALOG_ICON_SERVICE', async () => {
-            setupTestBed();
-            const promise = service.help({ title: 'How it works' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['icon']).toBe(icons.help());
-        });
-
-        it('should default to Help severity', async () => {
-            setupTestBed();
-            const promise = service.help({ title: 'How it works' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['type']).toBe(TbxMatSeverityLevel.Help);
-        });
-
-        it('should default to TBX_MAT_DIALOG_BUTTONS_OK footer', async () => {
-            setupTestBed();
-            const promise = service.help({ title: 'How it works' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().resolvedFooter).toEqual(TBX_MAT_DIALOG_BUTTONS_OK);
-        });
-    });
-
-    describe('default()', () => {
-        it('should default to fallback icon when icon service does not register Default', async () => {
-            // The current TbxMatDialogIconService does not register an icon for
-            // TbxMatSeverityLevel.Default — that gap is filled in #45 when the
-            // icon services are refactored. Until then, the service falls back
-            // to FALLBACK_ICONS[Default] = 'info'.
-            setupTestBed();
-            const promise = service.default({ title: 'Notice' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['icon']).toBe('info');
-        });
-
-        it('should default to Default severity', async () => {
-            setupTestBed();
-            const promise = service.default({ title: 'Notice' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['type']).toBe(TbxMatSeverityLevel.Default);
-        });
-
-        it('should default to TBX_MAT_DIALOG_BUTTONS_OK footer', async () => {
-            setupTestBed();
-            const promise = service.default({ title: 'Notice' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().resolvedFooter).toEqual(TBX_MAT_DIALOG_BUTTONS_OK);
-        });
+                    expect(getShellData().config['type']).toBe(TbxMatSeverityLevel.Warning);
+                });
+            });
+        }
     });
 
     describe('confirm()', () => {
-        it('should default to help icon from TBX_MAT_DIALOG_ICON_SERVICE', async () => {
-            setupTestBed();
-            const promise = service.confirm({ title: 'Continue?' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['icon']).toBe(icons.help());
-        });
-
         it('should default to Help severity', async () => {
             setupTestBed();
             const promise = service.confirm({ title: 'Continue?' });
@@ -355,15 +251,6 @@ describe('TbxMatDialogService', () => {
     });
 
     describe('input()', () => {
-        it('should default to info icon from TBX_MAT_DIALOG_ICON_SERVICE', async () => {
-            setupTestBed();
-            const promise = service.input({ title: 'Rename' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Cancel, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['icon']).toBe(icons.information());
-        });
-
         it('should default to Information severity', async () => {
             setupTestBed();
             const promise = service.input({ title: 'Rename' });
@@ -404,65 +291,6 @@ describe('TbxMatDialogService', () => {
             const output = await promise;
             expect(output.result).toBe(TbxMatDialogDismissReason.Cancel);
             expect(output.data).toBeUndefined();
-        });
-    });
-
-    describe('show()', () => {
-        it('should pass config through with no defaults applied', async () => {
-            setupTestBed();
-            const promise = service.show({
-                title: 'Custom',
-                icon: 'build',
-                type: TbxMatSeverityLevel.Warning,
-                message: 'Full control.',
-            });
-            resolveDialog({ result: TbxMatDialogDismissReason.Close, footerValues: {} });
-            await promise;
-
-            const shellData = getShellData();
-            expect(shellData.config['title']).toBe('Custom');
-            expect(shellData.config['icon']).toBe('build');
-            expect(shellData.config['type']).toBe(TbxMatSeverityLevel.Warning);
-            expect(shellData.config['message']).toBe('Full control.');
-        });
-
-        it('should not apply default icon when omitted', async () => {
-            setupTestBed();
-            const promise = service.show({ title: 'No Icon' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Close, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['icon']).toBeUndefined();
-        });
-
-        it('should not apply default type when omitted', async () => {
-            setupTestBed();
-            const promise = service.show({ title: 'No Emphasis' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Close, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['type']).toBeUndefined();
-        });
-
-        it('should use empty footer when no footer provided', async () => {
-            setupTestBed();
-            const promise = service.show({ title: 'Bare' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Close, footerValues: {} });
-            await promise;
-
-            expect(getShellData().resolvedFooter).toEqual([]);
-        });
-
-        it('should use provided footer', async () => {
-            setupTestBed();
-            const promise = service.show({
-                title: 'Custom',
-                footer: [...TBX_MAT_DIALOG_BUTTONS_OK],
-            });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().resolvedFooter).toEqual(TBX_MAT_DIALOG_BUTTONS_OK);
         });
     });
 
@@ -576,66 +404,6 @@ describe('TbxMatDialogService', () => {
             const shellData = getShellData();
             expect(shellData.config['title']).toBe('Hello');
             expect(shellData.config['message']).toBe('World');
-        });
-    });
-
-    describe('fallback icons when TBX_MAT_DIALOG_ICON_SERVICE is not provided', () => {
-        function setupWithoutIconService(): void {
-            afterClosed$ = new Subject<unknown>();
-            dialogSpy = {
-                open: vi.fn().mockReturnValue({
-                    afterClosed: () => afterClosed$.asObservable(),
-                }),
-            };
-            TestBed.configureTestingModule({
-                providers: [TbxMatDialogService, { provide: MatDialog, useValue: dialogSpy }],
-            });
-            service = TestBed.inject(TbxMatDialogService);
-        }
-
-        it('should use fallback icon for info() when icon service is missing', async () => {
-            setupWithoutIconService();
-            const promise = service.information({ title: 'Test' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['icon']).toBe('info_i');
-        });
-
-        it('should use fallback icon for warning() when icon service is missing', async () => {
-            setupWithoutIconService();
-            const promise = service.warning({ title: 'Test' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['icon']).toBe('exclamation');
-        });
-
-        it('should use fallback icon for error() when icon service is missing', async () => {
-            setupWithoutIconService();
-            const promise = service.error({ title: 'Test' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['icon']).toBe('exclamation');
-        });
-
-        it('should use fallback icon for confirm() when icon service is missing', async () => {
-            setupWithoutIconService();
-            const promise = service.confirm({ title: 'Test' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['icon']).toBe('question_mark');
-        });
-
-        it('should use fallback icon for input() when icon service is missing', async () => {
-            setupWithoutIconService();
-            const promise = service.input({ title: 'Test' });
-            resolveDialog({ result: TbxMatDialogDismissReason.Cancel, footerValues: {} });
-            await promise;
-
-            expect(getShellData().config['icon']).toBe('info_i');
         });
     });
 

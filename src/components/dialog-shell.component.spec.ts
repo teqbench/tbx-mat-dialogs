@@ -7,6 +7,10 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { DialogShellComponent, type DialogShellData } from './dialog-shell.component';
 import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
 import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
+import {
+    TBX_MAT_FONT_ICON_DEFAULT_FONT_SET,
+    TBX_MAT_ICON_FONT_SET_MATERIAL_SYMBOLS_ROUNDED,
+} from '@teqbench/tbx-mat-icons';
 import { type TbxMatDialogConfig, type TbxMatDialogData } from '../models/dialog.model';
 import { type TbxMatDialogFooterButton } from '../models/dialog-footer.model';
 import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
@@ -16,6 +20,9 @@ import {
     TBX_MAT_DIALOG_BUTTONS_YES_NO,
     TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL,
 } from '../constants/dialog.constants';
+import { TBX_MAT_DIALOG_PROVIDER_CONFIG } from '../tokens/dialog-provider-config.token';
+import { TbxMatDialogSeverityFontIconService } from '../services/dialog-severity-font-icon.service';
+import { type TbxMatDialogProviderConfig } from '../models/dialog-provider-config.model';
 
 /**
  * Test component implementing TbxMatDialogData<string>.
@@ -34,9 +41,18 @@ class TestInputComponent implements TbxMatDialogData<string> {
     readonly value = computed(() => this.name().trim());
 }
 
+function buildDefaultProviderConfig(): TbxMatDialogProviderConfig {
+    return {
+        severityIconResolverService: new TbxMatDialogSeverityFontIconService(
+            TBX_MAT_ICON_FONT_SET_MATERIAL_SYMBOLS_ROUNDED
+        ),
+    };
+}
+
 function createFixture(
     config: Partial<TbxMatDialogConfig<unknown>>,
-    footer?: readonly TbxMatDialogFooterControlType[]
+    footer?: readonly TbxMatDialogFooterControlType[],
+    providerConfig: TbxMatDialogProviderConfig = buildDefaultProviderConfig()
 ): ComponentFixture<DialogShellComponent> {
     const fullConfig: TbxMatDialogConfig<unknown> = {
         title: 'Test Dialog',
@@ -52,10 +68,12 @@ function createFixture(
         imports: [DialogShellComponent, NoopAnimationsModule],
         providers: [
             { provide: MAT_DIALOG_DATA, useValue: shellData },
+            { provide: MatDialogRef, useValue: { close: vi.fn() } },
             {
-                provide: MatDialogRef,
-                useValue: { close: vi.fn() },
+                provide: TBX_MAT_FONT_ICON_DEFAULT_FONT_SET,
+                useValue: TBX_MAT_ICON_FONT_SET_MATERIAL_SYMBOLS_ROUNDED,
             },
+            { provide: TBX_MAT_DIALOG_PROVIDER_CONFIG, useValue: providerConfig },
         ],
     });
 
@@ -106,8 +124,38 @@ describe('DialogShellComponent', () => {
             expect(icon.nativeElement.textContent.trim()).toBe('warning');
         });
 
-        it('should not display the icon container when icon is omitted', () => {
+        it('should display the severity-resolved icon container when icon is not overridden', () => {
+            // With the provider-config refactor, every dialog renders a header
+            // icon — the severity resolver always provides one. Consumers
+            // suppress the icon by overriding the severity-icon resolver to
+            // return undefined for the level (or by providing one that has
+            // no registration for the level).
             const fixture = createFixture({ title: 'Test' });
+
+            const container = fixture.debugElement.query(By.css('.header-icon-container'));
+            expect(container).not.toBeNull();
+        });
+
+        it('should hide the icon container when the resolver returns no icon for the level', () => {
+            // Stub resolver with the same shape as a real severity resolver but
+            // returning undefined for every level — verifies the component's
+            // null-fall-through path.
+            const noopMethod = (): undefined => undefined;
+            const emptyResolver = {
+                iconType: 0,
+                resolve: noopMethod,
+                default: noopMethod,
+                success: noopMethod,
+                error: noopMethod,
+                warning: noopMethod,
+                information: noopMethod,
+                help: noopMethod,
+            } as unknown as TbxMatDialogProviderConfig['severityIconResolverService'];
+            const fixture = createFixture(
+                { title: 'Test', type: TbxMatSeverityLevel.Default },
+                undefined,
+                { severityIconResolverService: emptyResolver }
+            );
 
             const container = fixture.debugElement.query(By.css('.header-icon-container'));
             expect(container).toBeNull();

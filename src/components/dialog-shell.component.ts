@@ -18,7 +18,7 @@ import {
     MatDialogActions,
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { MatIconModule, MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatRadioModule } from '@angular/material/radio';
@@ -26,6 +26,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDivider } from '@angular/material/divider';
 import { MatChipSet, MatChip } from '@angular/material/chips';
 import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
+import { TbxMatIconType, TBX_MAT_FONT_ICON_DEFAULT_FONT_SET } from '@teqbench/tbx-mat-icons';
 import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
 import { type TbxMatDialogConfig, type TbxMatDialogData } from '../models/dialog.model';
 import {
@@ -36,6 +37,10 @@ import {
     type TbxMatDialogFooterToggleGroup,
 } from '../models/dialog-footer.model';
 import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
+import { type TbxMatDialogIconResolver } from '../types/dialog-icon-resolver.type';
+import { type ResolvedIcon } from '../models/resolved-icon.model';
+import { TBX_MAT_DIALOG_PROVIDER_CONFIG } from '../tokens/dialog-provider-config.token';
+import { TbxMatDialogCloseFontIconService } from '../services/dialog-close-font-icon.service';
 
 /**
  * Placeholder mapping from `TbxMatSeverityLevel` to the legacy `data-emphasis`
@@ -138,9 +143,20 @@ export interface DialogShellData {
         <!-- ── Header ───────────────────────────────────────── -->
         <header class="dialog-header">
             <div class="header-content">
-                @if (config.icon) {
+                @let severityIconValue = severityIcon();
+                @if (severityIconValue) {
                     <div class="header-icon-container">
-                        <mat-icon class="header-icon">{{ config.icon }}</mat-icon>
+                        @if (severityIconValue.isSvg) {
+                            <mat-icon
+                                class="header-icon"
+                                [svgIcon]="severityIconValue.name"
+                                aria-hidden="true"
+                            ></mat-icon>
+                        } @else {
+                            <mat-icon class="header-icon" aria-hidden="true">{{
+                                severityIconValue.name
+                            }}</mat-icon>
+                        }
                     </div>
                 }
                 <div class="header-text">
@@ -158,7 +174,14 @@ export interface DialogShellData {
                 </div>
             </div>
             <button matIconButton (click)="close()" aria-label="Close dialog">
-                <mat-icon>close</mat-icon>
+                @let closeIconValue = closeIcon();
+                @if (closeIconValue) {
+                    @if (closeIconValue.isSvg) {
+                        <mat-icon [svgIcon]="closeIconValue.name" aria-hidden="true"></mat-icon>
+                    } @else {
+                        <mat-icon aria-hidden="true">{{ closeIconValue.name }}</mat-icon>
+                    }
+                }
             </button>
         </header>
 
@@ -434,8 +457,19 @@ export interface DialogShellData {
 export class DialogShellComponent {
     private readonly dialogRef = inject(MatDialogRef<DialogShellComponent>);
     private readonly shellData = inject<DialogShellData>(MAT_DIALOG_DATA);
+    private readonly providerConfig = inject(TBX_MAT_DIALOG_PROVIDER_CONFIG);
 
-    /** The caller's configuration (title, icon, message, emphasis, content, etc.). */
+    /**
+     * Package-provided default close icon resolver, used when the consumer's
+     * `TbxMatDialogProviderConfig` does not supply a custom `closeIconResolverService`.
+     * Mirrors the pattern used by `TbxMatBannerComponent`.
+     */
+    private readonly defaultCloseIconService = new TbxMatDialogCloseFontIconService(
+        inject(TBX_MAT_FONT_ICON_DEFAULT_FONT_SET, { optional: true }) ??
+            inject(MAT_ICON_DEFAULT_OPTIONS, { optional: true })?.fontSet
+    );
+
+    /** The caller's configuration (title, icon, message, type, content, etc.). */
     readonly config = this.shellData.config;
 
     /** Resolved footer items (service applies default presets when caller omits footer). */
@@ -474,6 +508,34 @@ export class DialogShellComponent {
      * panel classes in #46.
      */
     readonly emphasisToken = SEVERITY_TO_EMPHASIS_TOKEN[this.type];
+
+    /**
+     * Resolved severity icon for the header.
+     *
+     * A consumer-provided `config.icon` override always wins and is rendered
+     * as a font ligature. When no override is present, the icon is resolved
+     * from the severity (`config.type`) via the configured
+     * `severityIconResolverService` on `TBX_MAT_DIALOG_PROVIDER_CONFIG`.
+     * Returns `null` when no icon should be rendered.
+     */
+    readonly severityIcon = computed<ResolvedIcon | null>(() => {
+        if (this.config.icon) {
+            return { name: this.config.icon, isSvg: false };
+        }
+        return this.resolveIcon(this.providerConfig.severityIconResolverService, this.type);
+    });
+
+    /**
+     * Resolved close button icon. Defers to the consumer's
+     * `closeIconResolverService` when provided; otherwise uses the package
+     * default `TbxMatDialogCloseFontIconService` (font ligature `'close'`).
+     */
+    readonly closeIcon = computed<ResolvedIcon | null>(() =>
+        this.resolveIcon(
+            this.providerConfig.closeIconResolverService ?? this.defaultCloseIconService,
+            'close'
+        )
+    );
 
     /**
      * Index of the first footer item with align: 'end'.
@@ -637,5 +699,30 @@ export class DialogShellComponent {
         }
 
         return values;
+    }
+
+    /**
+     * Resolve a `ResolvedIcon` from a resolver and key.
+     *
+     * Returns `null` when the resolver or key is missing, or when the
+     * resolver does not have an icon registered for the given key. The
+     * `isSvg` flag is derived from the resolver's `iconType` property —
+     * the template uses it to choose between `<mat-icon [svgIcon]>` and
+     * `<mat-icon>{{ name }}</mat-icon>` rendering branches.
+     */
+    private resolveIcon(
+        resolver: TbxMatDialogIconResolver | undefined,
+        key: string | undefined
+    ): ResolvedIcon | null {
+        /* v8 ignore start -- defensive guard; resolver and key are present in normal flow */
+        if (!resolver || !key) {
+            return null;
+        }
+        /* v8 ignore stop */
+        const name = resolver.resolve(key);
+        if (!name) {
+            return null;
+        }
+        return { name, isSvg: resolver.iconType === TbxMatIconType.Svg };
     }
 }

@@ -2,7 +2,6 @@ import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
 import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
-import { TBX_MAT_DIALOG_ICON_SERVICE } from '../tokens/dialog-icon-service.token';
 import { DialogShellComponent, type DialogShellData } from '../components/dialog-shell.component';
 import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
 import { type TbxMatDialogConfig, type TbxMatDialogResult } from '../models/dialog.model';
@@ -31,10 +30,12 @@ import {
  * All methods return a Promise that resolves when the dialog closes,
  * so consumers use async/await with no subscription management.
  *
- * Icons are resolved via the injected TBX_MAT_DIALOG_ICON_SERVICE token,
- * ensuring dialogs use icons optimized for their visual context. Downstream
- * apps swap the icon set via
- * `{ provide: TBX_MAT_DIALOG_ICON_SERVICE, useClass: ... }` in `app.config.ts`.
+ * Icons are resolved at render time by `DialogShellComponent` via the
+ * required `TBX_MAT_DIALOG_PROVIDER_CONFIG` injection token. Consumers
+ * configure the severity icon resolver (font or SVG) and an optional
+ * close icon resolver in `app.config.ts`; see `TbxMatDialogProviderConfig`
+ * for the full shape. Per-call `config.icon` overrides take precedence
+ * over the resolved severity icon and are rendered as font ligatures.
  *
  * Opinionated methods — each provides defaults for icon, severity type, and footer:
  *
@@ -86,20 +87,6 @@ import {
 @Injectable({ providedIn: 'root' })
 export class TbxMatDialogService {
     private readonly dialog = inject(MatDialog);
-    private readonly icons = inject(TBX_MAT_DIALOG_ICON_SERVICE, { optional: true });
-
-    /**
-     * Hardcoded icon fallbacks when TBX_MAT_DIALOG_ICON_SERVICE is not provided.
-     * Mirrors the registrations made by the default `TbxMatDialogIconService`.
-     */
-    private static readonly FALLBACK_ICONS: Record<TbxMatSeverityLevel, string> = {
-        [TbxMatSeverityLevel.Default]: 'info',
-        [TbxMatSeverityLevel.Success]: 'check',
-        [TbxMatSeverityLevel.Error]: 'exclamation',
-        [TbxMatSeverityLevel.Warning]: 'exclamation',
-        [TbxMatSeverityLevel.Information]: 'info_i',
-        [TbxMatSeverityLevel.Help]: 'question_mark',
-    };
 
     /**
      * Open a dialog with full control — no defaults applied.
@@ -237,21 +224,14 @@ export class TbxMatDialogService {
     }
 
     /**
-     * Resolve an icon from the icon service with hardcoded fallback.
-     * If the service is not provided or returns a falsy value, the fallback is used.
-     */
-    private resolveIcon(severity: TbxMatSeverityLevel): string {
-        const fromService = this.icons?.[severity]();
-        return fromService || TbxMatDialogService.FALLBACK_ICONS[severity];
-    }
-
-    /**
      * Merge caller overrides with method defaults.
      *
-     * Caller-provided values win — defaults are only applied for fields
-     * the caller did not specify (undefined). This means passing
-     * `{ icon: 'custom_icon' }` overrides the default icon, but omitting
-     * `icon` uses the default for the chosen severity.
+     * Sets `type` to the method's default severity when the caller did
+     * not specify one. Icon resolution happens at render time in
+     * `DialogShellComponent` based on `config.type` and the provider
+     * config — the service no longer pre-computes icon strings. A
+     * caller-provided `config.icon` is preserved as-is and rendered as
+     * a font ligature, taking precedence over severity resolution.
      */
     private mergeDefaults<T>(
         config: TbxMatDialogConfigArgs<T>,
@@ -259,7 +239,6 @@ export class TbxMatDialogService {
     ): TbxMatDialogConfig<T> {
         return {
             ...config,
-            icon: config.icon ?? this.resolveIcon(defaultType),
             type: config.type ?? defaultType,
         } as TbxMatDialogConfig<T>;
     }
