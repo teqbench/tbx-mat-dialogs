@@ -4,7 +4,7 @@ This file provides guidance for Claude Code when working in this repository.
 
 ## Package Overview
 
-Opinionated Angular dialog service built on Angular Material dialog. Provides typed methods for info, warning, error, confirm, and input dialogs returning `Promise<DialogOutput<T, F>>`. Features emphasis-driven styling, rich footer controls, signal-based input validation via `DialogContent`, and pluggable icon resolution. Angular 21+.
+Opinionated Angular modal dialog service built on `@angular/material`'s `MatDialog`. Exposes nine async dialog methods returning `Promise<TbxMatDialogResult<T, F>>`: six severity-leveled methods that mirror `tbx-mat-banners` and `tbx-mat-notifications` (`success`, `error`, `warning`, `information`, `help`, `default`), two dialog-specific UX patterns (`confirm` for Yes/No, `input` for projected form content), and `show` for full-control configuration. Severity colors come from `@teqbench/tbx-mat-severity-theme`; pluggable icon resolution is wired via `TBX_MAT_DIALOG_PROVIDER_CONFIG` with three default services (font / SVG / close-icon). Footer is a single flex row of buttons and form controls (checkbox, slide-toggle, radio group, button-toggle group). Input dialog content components implement `TbxMatDialogData<T>` with signal-based validation. Angular 21+.
 
 This is a `@teqbench` Angular library package built with TypeScript and ng-packagr.
 
@@ -28,8 +28,10 @@ This is a `@teqbench` Angular library package built with TypeScript and ng-packa
 - `npm run lint` — Run ESLint
 - `npm run format` — Format all files with Prettier
 - `npm run format:check` — Check formatting (CI mode)
-- `npm run storybook` — Start Storybook dev server on port 6006
-- `npm run build-storybook` — Build static Storybook output
+- `npm run storybook` / `npm run storybook:dev` — Start Storybook dev mode (port 6006, loads `src/components/**/*.stories.ts`)
+- `npm run storybook:docs` — Start Storybook docs mode (port 6007, loads `src/stories/**/*.stories.ts`)
+- `npm run build-storybook` / `npm run build-storybook:dev` — Build dev-mode static Storybook (`storybook-dev-static/`)
+- `npm run build-storybook:docs` — Build docs-mode static Storybook (`storybook-docs-static/`)
 
 ## Project Structure
 
