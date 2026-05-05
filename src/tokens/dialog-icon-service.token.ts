@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import type { TbxMatSeverityResolver } from '@teqbench/tbx-mat-severity-icons';
+import type { TbxMatSeverityResolver } from '@teqbench/tbx-mat-severity-theme';
 
 /**
  * Optional injection token for customizing dialog icons.

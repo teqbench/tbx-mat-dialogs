@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {
     TbxMatSeverityFontIconService,
     TbxMatSeverityLevel,
-} from '@teqbench/tbx-mat-severity-icons';
+} from '@teqbench/tbx-mat-severity-theme';
 
 /**
  * Default dialog icon service using Material Symbols font icons.

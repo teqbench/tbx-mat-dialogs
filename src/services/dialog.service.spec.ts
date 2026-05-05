@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
-import type { TbxMatSeverityResolver } from '@teqbench/tbx-mat-severity-icons';
+import type { TbxMatSeverityResolver } from '@teqbench/tbx-mat-severity-theme';
 import { DialogIconService } from './dialog-icon.service';
 import { DIALOG_ICON_SERVICE } from '../tokens/dialog-icon-service.token';
 import { DialogService } from './dialog.service';

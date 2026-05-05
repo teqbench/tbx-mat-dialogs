@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
-import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-icons';
+import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
 import { DIALOG_ICON_SERVICE } from '../tokens/dialog-icon-service.token';
 import { DialogShellComponent, type DialogShellData } from '../components/dialog-shell.component';
 import { DialogResultType } from '../types/dialog-result.type';
