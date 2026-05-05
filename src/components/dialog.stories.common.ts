@@ -1,12 +1,12 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, Injectable, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import type { Meta, StoryObj } from '@storybook/angular';
-import { moduleMetadata } from '@storybook/angular';
-import { TbxMatDialogService } from '../services/dialog.service';
+import { applicationConfig } from '@storybook/angular';
 import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
+import { TbxMatFontIconService } from '@teqbench/tbx-mat-icons';
+import { TbxMatDialogService } from '../services/dialog.service';
 import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
 import {
     TBX_MAT_DIALOG_BUTTONS_OK,
@@ -15,17 +15,20 @@ import {
 } from '../constants/dialog.constants';
 import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
 import { type TbxMatDialogData } from '../models/dialog.model';
+import { TBX_MAT_DIALOG_PROVIDER_CONFIG } from '../tokens/dialog-provider-config.token';
+import { TbxMatDialogSeverityFontIconService } from '../services/dialog-severity-font-icon.service';
+import { TbxMatDialogSeveritySvgIconService } from '../services/dialog-severity-svg-icon.service';
 
-/**
- * Demo input component implementing TbxMatDialogData<StoryInputData>.
+/* ─── Demo input component ──────────────────────────────────────────────────
  *
- * Lives inside the stories file (not exported from the package) so the
- * Input story can demonstrate the input dialog flow without exposing a
- * sample/reference component on the public API surface — matching how
- * tbx-mat-banners and tbx-mat-notifications keep example UI inside their
- * stories files.
+ * Implements `TbxMatDialogData<StoryInputData>`. Lives inside the stories
+ * common file (not exported from the package) so the Input flow story can
+ * demonstrate the input dialog UX without exposing a sample/reference
+ * component on the public API surface — matching how `tbx-mat-banners`
+ * and `tbx-mat-notifications` keep example UI inside their stories files.
  */
-interface StoryInputData {
+
+export interface StoryInputData {
     readonly firstName: string;
     readonly lastName: string;
     readonly address: string;
@@ -74,13 +77,12 @@ interface StoryInputData {
             flex-direction: column;
             gap: 0.25rem;
         }
-
         .story-input-form mat-form-field {
             width: 100%;
         }
     `,
 })
-class StoryInputComponent implements TbxMatDialogData<StoryInputData> {
+export class StoryInputComponent implements TbxMatDialogData<StoryInputData> {
     readonly firstName = signal('');
     readonly lastName = signal('');
     readonly address = signal('');
@@ -96,19 +98,45 @@ class StoryInputComponent implements TbxMatDialogData<StoryInputData> {
     }));
 }
 
-/**
- * Wrapper component that exposes buttons to trigger dialogs.
- * Dialogs render in the CDK overlay (outside the component tree),
- * so we trigger them programmatically via TbxMatDialogService.
+/* ─── Demo close-icon resolver ──────────────────────────────────────────────
+ *
+ * A consumer-defined alternate close icon resolver used by the
+ * "custom close icon" story. Registers `'cancel'` (a Material Symbols
+ * X-in-circle ligature) instead of the default `'close'` ligature.
  */
+
+@Injectable()
+export class StoryAlternateCloseIconService extends TbxMatFontIconService<string> {
+    constructor(fontSet?: string) {
+        super(fontSet);
+    }
+
+    protected override initialize(): void {
+        super.initialize();
+        this.register('close', 'cancel');
+    }
+}
+
+/* ─── Wrapper harness ───────────────────────────────────────────────────────
+ *
+ * Buttons that trigger every dialog API surface. Dialogs render in the
+ * CDK overlay (outside the component tree) so we trigger them
+ * programmatically via `TbxMatDialogService`.
+ */
+
 @Component({
     selector: 'tbx-dialog-harness',
     imports: [MatButtonModule],
+    styleUrls: ['./story-harness.css'],
     template: `
         <div class="harness">
+            @if (description) {
+                <p class="story-description">{{ description }}</p>
+            }
             <p class="theme-note">
-                Theme: Angular Material prebuilt <strong>Azure Blue</strong>. Dialog emphasis colors
-                are independent of the M3 theme palette.
+                Theme: Angular Material prebuilt <strong>Azure Blue</strong>. Dialog severity colors
+                are driven by <code>@teqbench/tbx-mat-severity-theme</code>; dialog UX patterns
+                (confirm/input) layer on top of severity.
             </p>
 
             <h3>Severity Methods</h3>
@@ -159,44 +187,14 @@ class StoryInputComponent implements TbxMatDialogData<StoryInputData> {
             color: var(--mat-sys-on-surface);
             min-height: 100vh;
         }
-
-        .harness {
-            font-family: Roboto, sans-serif;
-            padding: 1.5rem;
-        }
-
-        h3 {
-            margin: 1.5rem 0 0.5rem;
-        }
-
-        h3:first-of-type {
-            margin-top: 0;
-        }
-
-        .button-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .theme-note {
-            font-size: 0.8125rem;
-            color: var(--mat-sys-on-surface-variant);
-            border-left: 3px solid var(--mat-sys-outline-variant);
-            padding: 0.25rem 0.75rem;
-            margin: 0 0 1rem;
-        }
-
-        .state {
-            margin-top: 1rem;
-            font-size: 0.875rem;
-            color: var(--mat-sys-on-surface-variant);
-        }
     `,
 })
-class DialogHarnessComponent {
+export class DialogHarnessComponent {
     private readonly dialog = inject(TbxMatDialogService);
     readonly lastResult = signal('');
+
+    /** Optional description rendered above the button grid (used by docs stories). */
+    description = '';
 
     async showSuccess(): Promise<void> {
         const output = await this.dialog.success({
@@ -430,17 +428,42 @@ class DialogHarnessComponent {
     }
 }
 
-const meta: Meta<DialogHarnessComponent> = {
-    title: 'Dialogs',
-    component: DialogHarnessComponent,
-    decorators: [
-        moduleMetadata({
-            imports: [DialogHarnessComponent],
-        }),
-    ],
-};
+/* ─── Reusable decorators ───────────────────────────────────────────────────
+ *
+ * Each decorator overrides the dialog provider config for the scope of a
+ * single story. Mirrors the `withSvgIcons()` pattern in
+ * `tbx-mat-banners/src/components/banner-overlay.stories.common.ts`.
+ */
 
-export default meta;
-type Story = StoryObj<DialogHarnessComponent>;
+/** Swap the severity icon resolver to the SVG variant. */
+export function withSvgIcons() {
+    return applicationConfig({
+        providers: [
+            {
+                provide: TBX_MAT_DIALOG_PROVIDER_CONFIG,
+                useFactory: () => ({
+                    severityIconResolverService: new TbxMatDialogSeveritySvgIconService(),
+                }),
+            },
+        ],
+    });
+}
 
-export const Default: Story = {};
+/** Override the close icon resolver with a story-defined alternate. */
+export function withAlternateCloseIcon() {
+    return applicationConfig({
+        providers: [
+            {
+                provide: TBX_MAT_DIALOG_PROVIDER_CONFIG,
+                useFactory: () => ({
+                    severityIconResolverService: new TbxMatDialogSeverityFontIconService(
+                        'material-symbols-rounded'
+                    ),
+                    closeIconResolverService: new StoryAlternateCloseIconService(
+                        'material-symbols-rounded'
+                    ),
+                }),
+            },
+        ],
+    });
+}
