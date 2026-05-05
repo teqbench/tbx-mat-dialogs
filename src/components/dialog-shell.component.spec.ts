@@ -5,40 +5,40 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { DialogShellComponent, type DialogShellData } from './dialog-shell.component';
-import { DialogResultType } from '../types/dialog-result.type';
-import { DialogEmphasisType } from '../types/dialog-emphasis.type';
-import { type DialogConfig, type DialogContent } from '../models/dialog.model';
-import { type DialogFooterButton } from '../models/dialog-footer.model';
-import { type DialogFooterControlType } from '../types/dialog-footer-control.type';
+import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
+import { TbxMatDialogEmphasisType } from '../types/dialog-emphasis.type';
+import { type TbxMatDialogConfig, type TbxMatDialogData } from '../models/dialog.model';
+import { type TbxMatDialogFooterButton } from '../models/dialog-footer.model';
+import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
 import {
-    BUTTONS_OK,
-    BUTTONS_OK_CANCEL,
-    BUTTONS_YES_NO,
-    BUTTONS_YES_NO_CANCEL,
+    TBX_MAT_DIALOG_BUTTONS_OK,
+    TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
+    TBX_MAT_DIALOG_BUTTONS_YES_NO,
+    TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL,
 } from '../constants/dialog.constants';
 
 /**
- * Test component implementing DialogContent<string>.
+ * Test component implementing TbxMatDialogData<string>.
  * Used to verify the shell's content component integration:
  *   - Dynamic creation via ViewContainerRef
  *   - isValid driving affirm button disabled state
- *   - value included in DialogOutput.data on affirm
+ *   - value included in TbxMatDialogResult.data on affirm
  */
 @Component({
     selector: 'tbx-test-input',
     template: `<input [value]="name()" (input)="name.set($any($event.target).value)" />`,
 })
-class TestInputComponent implements DialogContent<string> {
+class TestInputComponent implements TbxMatDialogData<string> {
     readonly name = signal('');
     readonly isValid = computed(() => this.name().trim().length > 0);
     readonly value = computed(() => this.name().trim());
 }
 
 function createFixture(
-    config: Partial<DialogConfig<unknown>>,
-    footer?: readonly DialogFooterControlType[]
+    config: Partial<TbxMatDialogConfig<unknown>>,
+    footer?: readonly TbxMatDialogFooterControlType[]
 ): ComponentFixture<DialogShellComponent> {
-    const fullConfig: DialogConfig<unknown> = {
+    const fullConfig: TbxMatDialogConfig<unknown> = {
         title: 'Test Dialog',
         ...config,
     };
@@ -75,8 +75,8 @@ function queryCloseButton(fixture: ComponentFixture<DialogShellComponent>) {
     return fixture.debugElement.query(By.css('button[aria-label="Close dialog"]'));
 }
 
-/** Helper to build a typed DialogFooterButton with sensible defaults. */
-function buildButton(overrides: Partial<DialogFooterButton> = {}): DialogFooterButton {
+/** Helper to build a typed TbxMatDialogFooterButton with sensible defaults. */
+function buildButton(overrides: Partial<TbxMatDialogFooterButton> = {}): TbxMatDialogFooterButton {
     return {
         key: 'test',
         type: 'button',
@@ -153,7 +153,7 @@ describe('DialogShellComponent', () => {
     });
 
     describe('close button', () => {
-        it('should close dialog with DialogResultType.Close', () => {
+        it('should close dialog with TbxMatDialogDismissReason.Close', () => {
             const fixture = createFixture({ title: 'Test' });
             const dialogRef = getDialogRef(fixture);
 
@@ -161,13 +161,13 @@ describe('DialogShellComponent', () => {
 
             expect(dialogRef.close).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    result: DialogResultType.Close,
+                    result: TbxMatDialogDismissReason.Close,
                 })
             );
         });
 
         it('should return empty footerValues when closing (negative action)', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 {
                     key: 'remember',
                     type: 'checkbox',
@@ -210,7 +210,7 @@ describe('DialogShellComponent', () => {
     describe('content component (input dialogs)', () => {
         it('should dynamically create content component when config.content is provided', () => {
             const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [
-                ...BUTTONS_OK_CANCEL,
+                ...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
             ]);
 
             const input = fixture.debugElement.query(By.css('tbx-test-input'));
@@ -220,7 +220,7 @@ describe('DialogShellComponent', () => {
         it('should not display message when content component is provided', () => {
             const fixture = createFixture(
                 { title: 'Input', message: 'Ignored', content: TestInputComponent },
-                [...BUTTONS_OK_CANCEL]
+                [...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL]
             );
 
             const message = fixture.debugElement.query(By.css('.dialog-message'));
@@ -229,7 +229,7 @@ describe('DialogShellComponent', () => {
 
         it('should disable affirm button when content isValid is false', () => {
             const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [
-                ...BUTTONS_OK_CANCEL,
+                ...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
             ]);
 
             // Content starts with empty name → isValid is false
@@ -243,7 +243,7 @@ describe('DialogShellComponent', () => {
 
         it('should enable affirm button when content isValid becomes true', () => {
             const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [
-                ...BUTTONS_OK_CANCEL,
+                ...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
             ]);
 
             // Set a value on the content component to make isValid true
@@ -260,7 +260,7 @@ describe('DialogShellComponent', () => {
 
         it('should include content value in output on affirm', () => {
             const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [
-                ...BUTTONS_OK_CANCEL,
+                ...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
             ]);
             const dialogRef = getDialogRef(fixture);
 
@@ -277,7 +277,7 @@ describe('DialogShellComponent', () => {
 
             expect(dialogRef.close).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    result: DialogResultType.Affirm,
+                    result: TbxMatDialogDismissReason.Affirm,
                     data: 'My Value',
                 })
             );
@@ -285,7 +285,7 @@ describe('DialogShellComponent', () => {
 
         it('should not include content value in output on cancel', () => {
             const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [
-                ...BUTTONS_OK_CANCEL,
+                ...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
             ]);
             const dialogRef = getDialogRef(fixture);
 
@@ -302,7 +302,7 @@ describe('DialogShellComponent', () => {
 
             expect(dialogRef.close).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    result: DialogResultType.Cancel,
+                    result: TbxMatDialogDismissReason.Cancel,
                     data: undefined,
                 })
             );
@@ -327,7 +327,7 @@ describe('DialogShellComponent', () => {
         });
 
         it('should render footer separator when items exist', () => {
-            const fixture = createFixture({ title: 'Test' }, [...BUTTONS_OK]);
+            const fixture = createFixture({ title: 'Test' }, [...TBX_MAT_DIALOG_BUTTONS_OK]);
 
             const separators = fixture.debugElement.queryAll(
                 By.css('mat-divider.dialog-separator')
@@ -338,7 +338,7 @@ describe('DialogShellComponent', () => {
 
     describe('footer buttons', () => {
         it('should render button labels', () => {
-            const fixture = createFixture({ title: 'Test' }, [...BUTTONS_YES_NO]);
+            const fixture = createFixture({ title: 'Test' }, [...TBX_MAT_DIALOG_BUTTONS_YES_NO]);
 
             const buttons = fixture.debugElement.queryAll(By.css('mat-dialog-actions button'));
             expect(buttons.length).toBe(2);
@@ -347,7 +347,7 @@ describe('DialogShellComponent', () => {
         });
 
         it('should close dialog with button result on click', () => {
-            const fixture = createFixture({ title: 'Test' }, [...BUTTONS_OK]);
+            const fixture = createFixture({ title: 'Test' }, [...TBX_MAT_DIALOG_BUTTONS_OK]);
             const dialogRef = getDialogRef(fixture);
 
             const button = fixture.debugElement.query(By.css('mat-dialog-actions button'));
@@ -355,13 +355,13 @@ describe('DialogShellComponent', () => {
 
             expect(dialogRef.close).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    result: DialogResultType.Affirm,
+                    result: TbxMatDialogDismissReason.Affirm,
                 })
             );
         });
 
         it('should not close dialog when button has no result', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 buildButton({ key: 'custom', label: 'Custom', result: undefined }),
             ];
             const fixture = createFixture({ title: 'Test' }, footer);
@@ -374,12 +374,12 @@ describe('DialogShellComponent', () => {
         });
 
         it('should render button with icon', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 buildButton({
                     key: 'delete',
                     label: 'Delete',
                     icon: 'delete',
-                    result: DialogResultType.Affirm,
+                    result: TbxMatDialogDismissReason.Affirm,
                     emphasis: 'destructive',
                 }),
             ];
@@ -391,12 +391,12 @@ describe('DialogShellComponent', () => {
         });
 
         it('should place icon before label by default (no iconPositionEnd)', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 buildButton({
                     key: 'save',
                     label: 'Save',
                     icon: 'save',
-                    result: DialogResultType.Affirm,
+                    result: TbxMatDialogDismissReason.Affirm,
                     emphasis: 'primary',
                 }),
             ];
@@ -407,13 +407,13 @@ describe('DialogShellComponent', () => {
         });
 
         it('should place icon after label when iconPosition is after (iconPositionEnd)', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 buildButton({
                     key: 'next',
                     label: 'Next',
                     icon: 'arrow_forward',
                     iconPosition: 'after',
-                    result: DialogResultType.Affirm,
+                    result: TbxMatDialogDismissReason.Affirm,
                     emphasis: 'primary',
                 }),
             ];
@@ -424,11 +424,11 @@ describe('DialogShellComponent', () => {
         });
 
         it('should disable button when disabled is true', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 buildButton({
                     key: 'ok',
                     label: 'OK',
-                    result: DialogResultType.Affirm,
+                    result: TbxMatDialogDismissReason.Affirm,
                     disabled: true,
                 }),
             ];
@@ -439,11 +439,11 @@ describe('DialogShellComponent', () => {
         });
 
         it('should not disable button when disabled is false', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 buildButton({
                     key: 'ok',
                     label: 'OK',
-                    result: DialogResultType.Affirm,
+                    result: TbxMatDialogDismissReason.Affirm,
                     disabled: false,
                 }),
             ];
@@ -455,11 +455,11 @@ describe('DialogShellComponent', () => {
 
         it('should disable button when disabled is a Signal returning true', () => {
             const disabledSignal = signal(true);
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 buildButton({
                     key: 'ok',
                     label: 'OK',
-                    result: DialogResultType.Affirm,
+                    result: TbxMatDialogDismissReason.Affirm,
                     disabled: disabledSignal,
                 }),
             ];
@@ -471,11 +471,11 @@ describe('DialogShellComponent', () => {
 
         it('should enable button when disabled Signal returns false', () => {
             const disabledSignal = signal(false);
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 buildButton({
                     key: 'ok',
                     label: 'OK',
-                    result: DialogResultType.Affirm,
+                    result: TbxMatDialogDismissReason.Affirm,
                     disabled: disabledSignal,
                 }),
             ];
@@ -488,7 +488,7 @@ describe('DialogShellComponent', () => {
 
     describe('footer controls', () => {
         it('should render checkbox with label', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 { key: 'remember', type: 'checkbox', label: 'Remember me', align: 'start' },
             ];
             const fixture = createFixture({ title: 'Test' }, footer);
@@ -499,7 +499,7 @@ describe('DialogShellComponent', () => {
         });
 
         it('should initialize checkbox from initialValue', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 {
                     key: 'opt',
                     type: 'checkbox',
@@ -514,7 +514,7 @@ describe('DialogShellComponent', () => {
         });
 
         it('should default checkbox to false when initialValue omitted', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 { key: 'opt', type: 'checkbox', label: 'Opt in', align: 'start' },
             ];
             const fixture = createFixture({ title: 'Test' }, footer);
@@ -523,7 +523,7 @@ describe('DialogShellComponent', () => {
         });
 
         it('should render slide toggle with label', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 { key: 'dark', type: 'toggle', label: 'Dark mode', align: 'start' },
             ];
             const fixture = createFixture({ title: 'Test' }, footer);
@@ -534,7 +534,7 @@ describe('DialogShellComponent', () => {
         });
 
         it('should initialize radio-group from initialValue', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 {
                     key: 'size',
                     type: 'radio-group',
@@ -552,7 +552,7 @@ describe('DialogShellComponent', () => {
         });
 
         it('should default radio-group to null when initialValue omitted', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 {
                     key: 'size',
                     type: 'radio-group',
@@ -569,7 +569,7 @@ describe('DialogShellComponent', () => {
         });
 
         it('should initialize toggle-group from initialValue', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 {
                     key: 'view',
                     type: 'toggle-group',
@@ -587,7 +587,7 @@ describe('DialogShellComponent', () => {
         });
 
         it('should default single-select toggle-group to null when initialValue omitted', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 {
                     key: 'view',
                     type: 'toggle-group',
@@ -604,7 +604,7 @@ describe('DialogShellComponent', () => {
         });
 
         it('should default multi-select toggle-group to empty array when initialValue omitted', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 {
                     key: 'tags',
                     type: 'toggle-group',
@@ -622,14 +622,14 @@ describe('DialogShellComponent', () => {
         });
 
         it('should include updated footer values when button closes dialog', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 {
                     key: 'dontAsk',
                     type: 'checkbox',
                     label: "Don't ask again",
                     align: 'start',
                 },
-                ...BUTTONS_OK,
+                ...TBX_MAT_DIALOG_BUTTONS_OK,
             ];
             const fixture = createFixture({ title: 'Test' }, footer);
             const dialogRef = getDialogRef(fixture);
@@ -643,7 +643,7 @@ describe('DialogShellComponent', () => {
 
             expect(dialogRef.close).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    result: DialogResultType.Affirm,
+                    result: TbxMatDialogDismissReason.Affirm,
                     footerValues: { dontAsk: true },
                 })
             );
@@ -652,13 +652,15 @@ describe('DialogShellComponent', () => {
 
     describe('footer layout', () => {
         it('should apply margin-left auto to first end-aligned item', () => {
-            const fixture = createFixture({ title: 'Test' }, [...BUTTONS_YES_NO_CANCEL]);
+            const fixture = createFixture({ title: 'Test' }, [
+                ...TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL,
+            ]);
 
             expect(fixture.componentInstance.firstEndIndex()).toBe(1);
         });
 
         it('should return -1 when all items are start-aligned', () => {
-            const footer: DialogFooterControlType[] = [
+            const footer: TbxMatDialogFooterControlType[] = [
                 { key: 'a', type: 'checkbox', label: 'A', align: 'start' },
                 { key: 'b', type: 'checkbox', label: 'B', align: 'start' },
             ];
@@ -668,7 +670,7 @@ describe('DialogShellComponent', () => {
         });
 
         it('should return 0 when all items are end-aligned', () => {
-            const fixture = createFixture({ title: 'Test' }, [...BUTTONS_YES_NO]);
+            const fixture = createFixture({ title: 'Test' }, [...TBX_MAT_DIALOG_BUTTONS_YES_NO]);
 
             expect(fixture.componentInstance.firstEndIndex()).toBe(0);
         });
@@ -679,7 +681,7 @@ describe('DialogShellComponent', () => {
             const fixture = createFixture({
                 title: 'Test',
                 icon: 'info',
-                emphasis: DialogEmphasisType.Default,
+                emphasis: TbxMatDialogEmphasisType.Default,
             });
 
             const host = fixture.nativeElement as HTMLElement;
@@ -690,7 +692,7 @@ describe('DialogShellComponent', () => {
             const fixture = createFixture({
                 title: 'Test',
                 icon: 'warning',
-                emphasis: DialogEmphasisType.Destructive,
+                emphasis: TbxMatDialogEmphasisType.Destructive,
             });
 
             const host = fixture.nativeElement as HTMLElement;
@@ -701,7 +703,7 @@ describe('DialogShellComponent', () => {
             const fixture = createFixture({
                 title: 'Test',
                 icon: 'warning',
-                emphasis: DialogEmphasisType.Warning,
+                emphasis: TbxMatDialogEmphasisType.Warning,
             });
 
             const host = fixture.nativeElement as HTMLElement;
@@ -712,7 +714,7 @@ describe('DialogShellComponent', () => {
             const fixture = createFixture({
                 title: 'Test',
                 icon: 'info',
-                emphasis: DialogEmphasisType.Informational,
+                emphasis: TbxMatDialogEmphasisType.Informational,
             });
 
             const host = fixture.nativeElement as HTMLElement;
@@ -730,7 +732,7 @@ describe('DialogShellComponent', () => {
             const fixture = createFixture({
                 title: 'Test',
                 icon: 'info',
-                emphasis: DialogEmphasisType.Destructive,
+                emphasis: TbxMatDialogEmphasisType.Destructive,
             });
 
             const container = fixture.debugElement.query(By.css('.header-icon-container'));
@@ -743,8 +745,8 @@ describe('DialogShellComponent', () => {
 
     describe('button emphasis rendering', () => {
         it('should render primary button as filled', () => {
-            const footer: DialogFooterControlType[] = [
-                buildButton({ emphasis: 'primary', result: DialogResultType.Affirm }),
+            const footer: TbxMatDialogFooterControlType[] = [
+                buildButton({ emphasis: 'primary', result: TbxMatDialogDismissReason.Affirm }),
             ];
             const fixture = createFixture({ title: 'Test' }, footer);
 
@@ -755,8 +757,8 @@ describe('DialogShellComponent', () => {
         });
 
         it('should render destructive button as filled', () => {
-            const footer: DialogFooterControlType[] = [
-                buildButton({ emphasis: 'destructive', result: DialogResultType.Affirm }),
+            const footer: TbxMatDialogFooterControlType[] = [
+                buildButton({ emphasis: 'destructive', result: TbxMatDialogDismissReason.Affirm }),
             ];
             const fixture = createFixture({ title: 'Test' }, footer);
 
@@ -767,8 +769,8 @@ describe('DialogShellComponent', () => {
         });
 
         it('should render text button as text', () => {
-            const footer: DialogFooterControlType[] = [
-                buildButton({ emphasis: 'text', result: DialogResultType.Cancel }),
+            const footer: TbxMatDialogFooterControlType[] = [
+                buildButton({ emphasis: 'text', result: TbxMatDialogDismissReason.Cancel }),
             ];
             const fixture = createFixture({ title: 'Test' }, footer);
 
@@ -779,8 +781,8 @@ describe('DialogShellComponent', () => {
         });
 
         it('should render button without emphasis as text', () => {
-            const footer: DialogFooterControlType[] = [
-                buildButton({ result: DialogResultType.Cancel }),
+            const footer: TbxMatDialogFooterControlType[] = [
+                buildButton({ result: TbxMatDialogDismissReason.Cancel }),
             ];
             const fixture = createFixture({ title: 'Test' }, footer);
 
@@ -791,11 +793,11 @@ describe('DialogShellComponent', () => {
         });
 
         it('should apply dialog-btn-primary class to primary button', () => {
-            const footer: DialogFooterControlType[] = [
-                buildButton({ emphasis: 'primary', result: DialogResultType.Affirm }),
+            const footer: TbxMatDialogFooterControlType[] = [
+                buildButton({ emphasis: 'primary', result: TbxMatDialogDismissReason.Affirm }),
             ];
             const fixture = createFixture(
-                { title: 'Test', emphasis: DialogEmphasisType.Warning },
+                { title: 'Test', emphasis: TbxMatDialogEmphasisType.Warning },
                 footer
             );
 
@@ -805,11 +807,11 @@ describe('DialogShellComponent', () => {
         });
 
         it('should apply dialog-btn-destructive class to destructive button', () => {
-            const footer: DialogFooterControlType[] = [
-                buildButton({ emphasis: 'destructive', result: DialogResultType.Affirm }),
+            const footer: TbxMatDialogFooterControlType[] = [
+                buildButton({ emphasis: 'destructive', result: TbxMatDialogDismissReason.Affirm }),
             ];
             const fixture = createFixture(
-                { title: 'Test', emphasis: DialogEmphasisType.Default },
+                { title: 'Test', emphasis: TbxMatDialogEmphasisType.Default },
                 footer
             );
 
@@ -819,8 +821,8 @@ describe('DialogShellComponent', () => {
         });
 
         it('should not apply emphasis class to text buttons', () => {
-            const footer: DialogFooterControlType[] = [
-                buildButton({ emphasis: 'text', result: DialogResultType.Cancel }),
+            const footer: TbxMatDialogFooterControlType[] = [
+                buildButton({ emphasis: 'text', result: TbxMatDialogDismissReason.Cancel }),
             ];
             const fixture = createFixture({ title: 'Test' }, footer);
 

@@ -5,7 +5,7 @@
  * Universal defaults are defined on `html` in `_dialog-panels.scss`.
  * Themes can override per `html[data-theme]` block.
  */
-export enum DialogEmphasisType {
+export enum TbxMatDialogEmphasisType {
     Default = 'default',
     Destructive = 'destructive',
     Warning = 'warning',

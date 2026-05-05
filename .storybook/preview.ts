@@ -2,8 +2,8 @@ import type { Preview } from '@storybook/angular';
 import { applicationConfig } from '@storybook/angular';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
-import { DIALOG_ICON_SERVICE } from '../src/tokens/dialog-icon-service.token';
-import { DialogIconService } from '../src/services/dialog-icon.service';
+import { TBX_MAT_DIALOG_ICON_SERVICE } from '../src/tokens/dialog-icon-service.token';
+import { TbxMatDialogIconService } from '../src/services/dialog-icon.service';
 
 // M3 theme generated via mat.theme() with light-dark() support, dark mode
 // bridge rules, dialog emphasis tokens, and global panel styles.
@@ -49,7 +49,7 @@ const preview: Preview = {
         applicationConfig({
             providers: [
                 provideAnimationsAsync(),
-                { provide: DIALOG_ICON_SERVICE, useClass: DialogIconService },
+                { provide: TBX_MAT_DIALOG_ICON_SERVICE, useClass: TbxMatDialogIconService },
                 {
                     provide: MAT_ICON_DEFAULT_OPTIONS,
                     useValue: { fontSet: 'material-symbols-rounded' },

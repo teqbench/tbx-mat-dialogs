@@ -3,21 +3,21 @@ import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import type { TbxMatSeverityResolver } from '@teqbench/tbx-mat-severity-theme';
-import { DialogIconService } from './dialog-icon.service';
-import { DIALOG_ICON_SERVICE } from '../tokens/dialog-icon-service.token';
-import { DialogService } from './dialog.service';
+import { TbxMatDialogIconService } from './dialog-icon.service';
+import { TBX_MAT_DIALOG_ICON_SERVICE } from '../tokens/dialog-icon-service.token';
+import { TbxMatDialogService } from './dialog.service';
 import { DialogShellComponent } from '../components/dialog-shell.component';
-import { DialogResultType } from '../types/dialog-result.type';
-import { DialogEmphasisType } from '../types/dialog-emphasis.type';
+import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
+import { TbxMatDialogEmphasisType } from '../types/dialog-emphasis.type';
 import {
-    BUTTONS_OK,
-    BUTTONS_OK_CANCEL,
-    BUTTONS_YES_NO,
-    DIALOG_DEFAULT_WIDTH,
+    TBX_MAT_DIALOG_BUTTONS_OK,
+    TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
+    TBX_MAT_DIALOG_BUTTONS_YES_NO,
+    TBX_MAT_DIALOG_DEFAULT_WIDTH,
 } from '../constants/dialog.constants';
 
-describe('DialogService', () => {
-    let service: DialogService;
+describe('TbxMatDialogService', () => {
+    let service: TbxMatDialogService;
     let icons: TbxMatSeverityResolver;
     let dialogSpy: { open: ReturnType<typeof vi.fn> };
     let afterClosed$: Subject<unknown>;
@@ -33,17 +33,17 @@ describe('DialogService', () => {
 
         TestBed.configureTestingModule({
             providers: [
-                DialogService,
+                TbxMatDialogService,
                 { provide: MatDialog, useValue: dialogSpy },
                 {
-                    provide: DIALOG_ICON_SERVICE,
-                    useFactory: () => new DialogIconService('material-symbols-rounded'),
+                    provide: TBX_MAT_DIALOG_ICON_SERVICE,
+                    useFactory: () => new TbxMatDialogIconService('material-symbols-rounded'),
                 },
             ],
         });
 
-        service = TestBed.inject(DialogService);
-        icons = TestBed.inject(DIALOG_ICON_SERVICE);
+        service = TestBed.inject(TbxMatDialogService);
+        icons = TestBed.inject(TBX_MAT_DIALOG_ICON_SERVICE);
     }
 
     /** Resolve the pending dialog with a result. */
@@ -58,10 +58,10 @@ describe('DialogService', () => {
     }
 
     describe('information()', () => {
-        it('should default to info icon from DIALOG_ICON_SERVICE', async () => {
+        it('should default to info icon from TBX_MAT_DIALOG_ICON_SERVICE', async () => {
             setupTestBed();
             const promise = service.information({ title: 'Test' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(getShellData().config['icon']).toBe(icons.information());
@@ -70,25 +70,25 @@ describe('DialogService', () => {
         it('should default to Informational emphasis', async () => {
             setupTestBed();
             const promise = service.information({ title: 'Test' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(getShellData().config['emphasis']).toBe(DialogEmphasisType.Informational);
+            expect(getShellData().config['emphasis']).toBe(TbxMatDialogEmphasisType.Informational);
         });
 
-        it('should default to BUTTONS_OK footer', async () => {
+        it('should default to TBX_MAT_DIALOG_BUTTONS_OK footer', async () => {
             setupTestBed();
             const promise = service.information({ title: 'Test' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(getShellData().resolvedFooter).toEqual(BUTTONS_OK);
+            expect(getShellData().resolvedFooter).toEqual(TBX_MAT_DIALOG_BUTTONS_OK);
         });
 
         it('should allow overriding icon', async () => {
             setupTestBed();
             const promise = service.information({ title: 'Test', icon: 'celebration' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(getShellData().config['icon']).toBe('celebration');
@@ -98,12 +98,12 @@ describe('DialogService', () => {
             setupTestBed();
             const promise = service.information({
                 title: 'Test',
-                emphasis: DialogEmphasisType.Warning,
+                emphasis: TbxMatDialogEmphasisType.Warning,
             });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(getShellData().config['emphasis']).toBe(DialogEmphasisType.Warning);
+            expect(getShellData().config['emphasis']).toBe(TbxMatDialogEmphasisType.Warning);
         });
 
         it('should allow overriding footer', async () => {
@@ -113,32 +113,32 @@ describe('DialogService', () => {
                     key: 'close',
                     type: 'button' as const,
                     label: 'Close',
-                    result: DialogResultType.Close,
+                    result: TbxMatDialogDismissReason.Close,
                     align: 'end' as const,
                 },
             ];
             const promise = service.information({ title: 'Test', footer: customFooter });
-            resolveDialog({ result: DialogResultType.Close, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Close, footerValues: {} });
             await promise;
 
             expect(getShellData().resolvedFooter).toEqual(customFooter);
         });
 
-        it('should return DialogOutput when resolved', async () => {
+        it('should return TbxMatDialogResult when resolved', async () => {
             setupTestBed();
             const promise = service.information({ title: 'Test' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
 
             const output = await promise;
-            expect(output.result).toBe(DialogResultType.Affirm);
+            expect(output.result).toBe(TbxMatDialogDismissReason.Affirm);
         });
     });
 
     describe('warning()', () => {
-        it('should default to warning icon from DIALOG_ICON_SERVICE', async () => {
+        it('should default to warning icon from TBX_MAT_DIALOG_ICON_SERVICE', async () => {
             setupTestBed();
             const promise = service.warning({ title: 'Caution' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(getShellData().config['icon']).toBe(icons.warning());
@@ -147,27 +147,27 @@ describe('DialogService', () => {
         it('should default to Warning emphasis', async () => {
             setupTestBed();
             const promise = service.warning({ title: 'Caution' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(getShellData().config['emphasis']).toBe(DialogEmphasisType.Warning);
+            expect(getShellData().config['emphasis']).toBe(TbxMatDialogEmphasisType.Warning);
         });
 
-        it('should default to BUTTONS_OK footer', async () => {
+        it('should default to TBX_MAT_DIALOG_BUTTONS_OK footer', async () => {
             setupTestBed();
             const promise = service.warning({ title: 'Caution' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(getShellData().resolvedFooter).toEqual(BUTTONS_OK);
+            expect(getShellData().resolvedFooter).toEqual(TBX_MAT_DIALOG_BUTTONS_OK);
         });
     });
 
     describe('error()', () => {
-        it('should default to error icon from DIALOG_ICON_SERVICE', async () => {
+        it('should default to error icon from TBX_MAT_DIALOG_ICON_SERVICE', async () => {
             setupTestBed();
             const promise = service.error({ title: 'Failed' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(getShellData().config['icon']).toBe(icons.error());
@@ -176,27 +176,27 @@ describe('DialogService', () => {
         it('should default to Destructive emphasis', async () => {
             setupTestBed();
             const promise = service.error({ title: 'Failed' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(getShellData().config['emphasis']).toBe(DialogEmphasisType.Destructive);
+            expect(getShellData().config['emphasis']).toBe(TbxMatDialogEmphasisType.Destructive);
         });
 
-        it('should default to BUTTONS_OK footer', async () => {
+        it('should default to TBX_MAT_DIALOG_BUTTONS_OK footer', async () => {
             setupTestBed();
             const promise = service.error({ title: 'Failed' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(getShellData().resolvedFooter).toEqual(BUTTONS_OK);
+            expect(getShellData().resolvedFooter).toEqual(TBX_MAT_DIALOG_BUTTONS_OK);
         });
     });
 
     describe('confirm()', () => {
-        it('should default to help icon from DIALOG_ICON_SERVICE', async () => {
+        it('should default to help icon from TBX_MAT_DIALOG_ICON_SERVICE', async () => {
             setupTestBed();
             const promise = service.confirm({ title: 'Continue?' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(getShellData().config['icon']).toBe(icons.help());
@@ -205,37 +205,37 @@ describe('DialogService', () => {
         it('should default to Default emphasis', async () => {
             setupTestBed();
             const promise = service.confirm({ title: 'Continue?' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(getShellData().config['emphasis']).toBe(DialogEmphasisType.Default);
+            expect(getShellData().config['emphasis']).toBe(TbxMatDialogEmphasisType.Default);
         });
 
-        it('should default to BUTTONS_YES_NO footer', async () => {
+        it('should default to TBX_MAT_DIALOG_BUTTONS_YES_NO footer', async () => {
             setupTestBed();
             const promise = service.confirm({ title: 'Continue?' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(getShellData().resolvedFooter).toEqual(BUTTONS_YES_NO);
+            expect(getShellData().resolvedFooter).toEqual(TBX_MAT_DIALOG_BUTTONS_YES_NO);
         });
 
         it('should return Affirm result when user confirms', async () => {
             setupTestBed();
             const promise = service.confirm({ title: 'Delete?' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
 
             const output = await promise;
-            expect(output.result).toBe(DialogResultType.Affirm);
+            expect(output.result).toBe(TbxMatDialogDismissReason.Affirm);
         });
 
         it('should return Deny result when user declines', async () => {
             setupTestBed();
             const promise = service.confirm({ title: 'Delete?' });
-            resolveDialog({ result: DialogResultType.Deny, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Deny, footerValues: {} });
 
             const output = await promise;
-            expect(output.result).toBe(DialogResultType.Deny);
+            expect(output.result).toBe(TbxMatDialogDismissReason.Deny);
         });
 
         it('should return typed footer values', async () => {
@@ -248,13 +248,16 @@ describe('DialogService', () => {
                         key: 'yes',
                         type: 'button',
                         label: 'Yes',
-                        result: DialogResultType.Affirm,
+                        result: TbxMatDialogDismissReason.Affirm,
                         emphasis: 'primary',
                         align: 'end',
                     },
                 ],
             });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: { dontAsk: true } });
+            resolveDialog({
+                result: TbxMatDialogDismissReason.Affirm,
+                footerValues: { dontAsk: true },
+            });
 
             const output = await promise;
             expect(output.footerValues.dontAsk).toBe(true);
@@ -262,10 +265,10 @@ describe('DialogService', () => {
     });
 
     describe('input()', () => {
-        it('should default to info icon from DIALOG_ICON_SERVICE', async () => {
+        it('should default to info icon from TBX_MAT_DIALOG_ICON_SERVICE', async () => {
             setupTestBed();
             const promise = service.input({ title: 'Rename' });
-            resolveDialog({ result: DialogResultType.Cancel, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Cancel, footerValues: {} });
             await promise;
 
             expect(getShellData().config['icon']).toBe(icons.information());
@@ -274,38 +277,42 @@ describe('DialogService', () => {
         it('should default to Default emphasis', async () => {
             setupTestBed();
             const promise = service.input({ title: 'Rename' });
-            resolveDialog({ result: DialogResultType.Cancel, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Cancel, footerValues: {} });
             await promise;
 
-            expect(getShellData().config['emphasis']).toBe(DialogEmphasisType.Default);
+            expect(getShellData().config['emphasis']).toBe(TbxMatDialogEmphasisType.Default);
         });
 
-        it('should default to BUTTONS_OK_CANCEL footer', async () => {
+        it('should default to TBX_MAT_DIALOG_BUTTONS_OK_CANCEL footer', async () => {
             setupTestBed();
             const promise = service.input({ title: 'Rename' });
-            resolveDialog({ result: DialogResultType.Cancel, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Cancel, footerValues: {} });
             await promise;
 
-            expect(getShellData().resolvedFooter).toEqual(BUTTONS_OK_CANCEL);
+            expect(getShellData().resolvedFooter).toEqual(TBX_MAT_DIALOG_BUTTONS_OK_CANCEL);
         });
 
         it('should return typed data on affirm', async () => {
             setupTestBed();
             const promise = service.input<string>({ title: 'Rename' });
-            resolveDialog({ result: DialogResultType.Affirm, data: 'New Name', footerValues: {} });
+            resolveDialog({
+                result: TbxMatDialogDismissReason.Affirm,
+                data: 'New Name',
+                footerValues: {},
+            });
 
             const output = await promise;
-            expect(output.result).toBe(DialogResultType.Affirm);
+            expect(output.result).toBe(TbxMatDialogDismissReason.Affirm);
             expect(output.data).toBe('New Name');
         });
 
         it('should return undefined data on cancel', async () => {
             setupTestBed();
             const promise = service.input<string>({ title: 'Rename' });
-            resolveDialog({ result: DialogResultType.Cancel, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Cancel, footerValues: {} });
 
             const output = await promise;
-            expect(output.result).toBe(DialogResultType.Cancel);
+            expect(output.result).toBe(TbxMatDialogDismissReason.Cancel);
             expect(output.data).toBeUndefined();
         });
     });
@@ -316,23 +323,23 @@ describe('DialogService', () => {
             const promise = service.show({
                 title: 'Custom',
                 icon: 'build',
-                emphasis: DialogEmphasisType.Warning,
+                emphasis: TbxMatDialogEmphasisType.Warning,
                 message: 'Full control.',
             });
-            resolveDialog({ result: DialogResultType.Close, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Close, footerValues: {} });
             await promise;
 
             const shellData = getShellData();
             expect(shellData.config['title']).toBe('Custom');
             expect(shellData.config['icon']).toBe('build');
-            expect(shellData.config['emphasis']).toBe(DialogEmphasisType.Warning);
+            expect(shellData.config['emphasis']).toBe(TbxMatDialogEmphasisType.Warning);
             expect(shellData.config['message']).toBe('Full control.');
         });
 
         it('should not apply default icon when omitted', async () => {
             setupTestBed();
             const promise = service.show({ title: 'No Icon' });
-            resolveDialog({ result: DialogResultType.Close, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Close, footerValues: {} });
             await promise;
 
             expect(getShellData().config['icon']).toBeUndefined();
@@ -341,7 +348,7 @@ describe('DialogService', () => {
         it('should not apply default emphasis when omitted', async () => {
             setupTestBed();
             const promise = service.show({ title: 'No Emphasis' });
-            resolveDialog({ result: DialogResultType.Close, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Close, footerValues: {} });
             await promise;
 
             expect(getShellData().config['emphasis']).toBeUndefined();
@@ -350,7 +357,7 @@ describe('DialogService', () => {
         it('should use empty footer when no footer provided', async () => {
             setupTestBed();
             const promise = service.show({ title: 'Bare' });
-            resolveDialog({ result: DialogResultType.Close, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Close, footerValues: {} });
             await promise;
 
             expect(getShellData().resolvedFooter).toEqual([]);
@@ -360,12 +367,12 @@ describe('DialogService', () => {
             setupTestBed();
             const promise = service.show({
                 title: 'Custom',
-                footer: [...BUTTONS_OK],
+                footer: [...TBX_MAT_DIALOG_BUTTONS_OK],
             });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(getShellData().resolvedFooter).toEqual(BUTTONS_OK);
+            expect(getShellData().resolvedFooter).toEqual(TBX_MAT_DIALOG_BUTTONS_OK);
         });
     });
 
@@ -373,19 +380,19 @@ describe('DialogService', () => {
         it('should use default width when not specified', async () => {
             setupTestBed();
             const promise = service.information({ title: 'Test' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(dialogSpy.open).toHaveBeenCalledWith(
                 DialogShellComponent,
-                expect.objectContaining({ width: DIALOG_DEFAULT_WIDTH })
+                expect.objectContaining({ width: TBX_MAT_DIALOG_DEFAULT_WIDTH })
             );
         });
 
         it('should use custom width when specified', async () => {
             setupTestBed();
             const promise = service.information({ title: 'Test', width: '600px' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(dialogSpy.open).toHaveBeenCalledWith(
@@ -397,7 +404,7 @@ describe('DialogService', () => {
         it('should set disableClose to false by default', async () => {
             setupTestBed();
             const promise = service.information({ title: 'Test' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(dialogSpy.open).toHaveBeenCalledWith(
@@ -409,7 +416,7 @@ describe('DialogService', () => {
         it('should pass disableClose true when specified', async () => {
             setupTestBed();
             const promise = service.confirm({ title: 'Critical', disableClose: true });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(dialogSpy.open).toHaveBeenCalledWith(
@@ -421,7 +428,7 @@ describe('DialogService', () => {
         it('should apply tbx-dialog-panel panelClass', async () => {
             setupTestBed();
             const promise = service.information({ title: 'Test' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(dialogSpy.open).toHaveBeenCalledWith(
@@ -433,7 +440,7 @@ describe('DialogService', () => {
         it('should set autoFocus to first-tabbable', async () => {
             setupTestBed();
             const promise = service.information({ title: 'Test' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(dialogSpy.open).toHaveBeenCalledWith(
@@ -445,7 +452,7 @@ describe('DialogService', () => {
         it('should set ariaModal to true', async () => {
             setupTestBed();
             const promise = service.information({ title: 'Test' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(dialogSpy.open).toHaveBeenCalledWith(
@@ -457,7 +464,7 @@ describe('DialogService', () => {
         it('should pass title and message through to shell data', async () => {
             setupTestBed();
             const promise = service.information({ title: 'Hello', message: 'World' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             const shellData = getShellData();
@@ -466,7 +473,7 @@ describe('DialogService', () => {
         });
     });
 
-    describe('fallback icons when DIALOG_ICON_SERVICE is not provided', () => {
+    describe('fallback icons when TBX_MAT_DIALOG_ICON_SERVICE is not provided', () => {
         function setupWithoutIconService(): void {
             afterClosed$ = new Subject<unknown>();
             dialogSpy = {
@@ -475,15 +482,15 @@ describe('DialogService', () => {
                 }),
             };
             TestBed.configureTestingModule({
-                providers: [DialogService, { provide: MatDialog, useValue: dialogSpy }],
+                providers: [TbxMatDialogService, { provide: MatDialog, useValue: dialogSpy }],
             });
-            service = TestBed.inject(DialogService);
+            service = TestBed.inject(TbxMatDialogService);
         }
 
         it('should use fallback icon for info() when icon service is missing', async () => {
             setupWithoutIconService();
             const promise = service.information({ title: 'Test' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(getShellData().config['icon']).toBe('info_i');
@@ -492,7 +499,7 @@ describe('DialogService', () => {
         it('should use fallback icon for warning() when icon service is missing', async () => {
             setupWithoutIconService();
             const promise = service.warning({ title: 'Test' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(getShellData().config['icon']).toBe('exclamation');
@@ -501,7 +508,7 @@ describe('DialogService', () => {
         it('should use fallback icon for error() when icon service is missing', async () => {
             setupWithoutIconService();
             const promise = service.error({ title: 'Test' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(getShellData().config['icon']).toBe('exclamation');
@@ -510,7 +517,7 @@ describe('DialogService', () => {
         it('should use fallback icon for confirm() when icon service is missing', async () => {
             setupWithoutIconService();
             const promise = service.confirm({ title: 'Test' });
-            resolveDialog({ result: DialogResultType.Affirm, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
             expect(getShellData().config['icon']).toBe('question_mark');
@@ -519,7 +526,7 @@ describe('DialogService', () => {
         it('should use fallback icon for input() when icon service is missing', async () => {
             setupWithoutIconService();
             const promise = service.input({ title: 'Test' });
-            resolveDialog({ result: DialogResultType.Cancel, footerValues: {} });
+            resolveDialog({ result: TbxMatDialogDismissReason.Cancel, footerValues: {} });
             await promise;
 
             expect(getShellData().config['icon']).toBe('info_i');
@@ -533,7 +540,7 @@ describe('DialogService', () => {
             resolveDialog(undefined);
 
             const output = await promise;
-            expect(output.result).toBe(DialogResultType.Close);
+            expect(output.result).toBe(TbxMatDialogDismissReason.Close);
             expect(output.footerValues).toEqual({});
         });
 
@@ -543,7 +550,7 @@ describe('DialogService', () => {
             resolveDialog(null);
 
             const output = await promise;
-            expect(output.result).toBe(DialogResultType.Close);
+            expect(output.result).toBe(TbxMatDialogDismissReason.Close);
             expect(output.footerValues).toEqual({});
         });
     });

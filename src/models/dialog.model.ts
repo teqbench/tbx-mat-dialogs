@@ -1,12 +1,12 @@
 import { type Signal, Type } from '@angular/core';
-import { DialogResultType } from '../types/dialog-result.type';
-import { DialogEmphasisType } from '../types/dialog-emphasis.type';
-import { type DialogFooterControlType } from '../types/dialog-footer-control.type';
+import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
+import { TbxMatDialogEmphasisType } from '../types/dialog-emphasis.type';
+import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
 
 /**
  * Typed output returned when a dialog closes.
  *
- * @typeParam T - Type of data returned by input dialogs (from DialogContent<T>.value).
+ * @typeParam T - Type of data returned by input dialogs (from TbxMatDialogData<T>.value).
  *               Defaults to `void` for informational and confirmation dialogs.
  * @typeParam F - Type of footer control values. Defaults to `Record<string, unknown>`.
  *               Callers that need typed footer values specify an interface as the
@@ -15,37 +15,37 @@ import { type DialogFooterControlType } from '../types/dialog-footer-control.typ
  * Usage:
  * ```typescript
  * // Simple confirmation — both generics use defaults
- * const output: DialogOutput = await dialog.confirm({ ... });
+ * const output: TbxMatDialogResult = await dialog.confirm({ ... });
  *
  * // Input dialog with typed data
- * const output: DialogOutput<string> = await dialog.input<string>({ ... });
+ * const output: TbxMatDialogResult<string> = await dialog.input<string>({ ... });
  *
  * // Confirmation with typed footer values
  * interface MyFooter { dontAskAgain: boolean; }
- * const output: DialogOutput<void, MyFooter> = await dialog.confirm<MyFooter>({ ... });
+ * const output: TbxMatDialogResult<void, MyFooter> = await dialog.confirm<MyFooter>({ ... });
  * ```
  */
-export interface DialogOutput<
+export interface TbxMatDialogResult<
     T = void,
     F extends Record<string, unknown> = Record<string, unknown>,
 > {
     /** Which action closed the dialog. */
-    readonly result: DialogResultType;
+    readonly result: TbxMatDialogDismissReason;
 
     /** Data from input dialog content component. Undefined for non-input dialogs or Cancel/Close. */
     readonly data?: T;
 
-    /** Values from footer controls, keyed by DialogFooterControlType.key. */
+    /** Values from footer controls, keyed by TbxMatDialogFooterControlType.key. */
     readonly footerValues: F;
 }
 
 /**
- * Configuration for opening a dialog via DialogService.
+ * Configuration for opening a dialog via TbxMatDialogService.
  *
  * @typeParam T - Type of data for input dialogs. Defaults to `void`.
  * @typeParam F - Type of footer control values. Defaults to `Record<string, unknown>`.
  */
-export interface DialogConfig<T = void> {
+export interface TbxMatDialogConfig<T = void> {
     /** Dialog title displayed in the header. Required. */
     readonly title: string;
 
@@ -65,23 +65,23 @@ export interface DialogConfig<T = void> {
     readonly message?: string;
 
     /** Visual emphasis — determines accent color for icon, buttons, and separators. */
-    readonly emphasis?: DialogEmphasisType;
+    readonly emphasis?: TbxMatDialogEmphasisType;
 
     /**
      * Component class to render in the dialog body for input dialogs.
-     * Must implement DialogContent<T>.
+     * Must implement TbxMatDialogData<T>.
      * When provided, `message` is ignored.
      */
-    readonly content?: Type<DialogContent<T>>;
+    readonly content?: Type<TbxMatDialogData<T>>;
 
     /**
      * Footer items — buttons and controls rendered in a single flex row.
      * Items render in array order. First `align: 'end'` item gets `margin-left: auto`.
-     * When omitted, DialogService applies a default button preset based on the dialog type.
+     * When omitted, TbxMatDialogService applies a default button preset based on the dialog type.
      */
-    readonly footer?: readonly DialogFooterControlType[];
+    readonly footer?: readonly TbxMatDialogFooterControlType[];
 
-    /** Dialog width. Defaults to DIALOG_DEFAULT_WIDTH. */
+    /** Dialog width. Defaults to TBX_MAT_DIALOG_DEFAULT_WIDTH. */
     readonly width?: string;
 
     /** Minimum width constraint. Mapped directly to MatDialogConfig.minWidth. */
@@ -108,7 +108,7 @@ export interface DialogConfig<T = void> {
  * Contract for components rendered in dialog bodies.
  *
  * The dialog shell reads `isValid` to drive the affirm button's disabled state
- * and reads `value` to include in DialogOutput.data when the user confirms.
+ * and reads `value` to include in TbxMatDialogResult.data when the user confirms.
  *
  * Content components own their own form layout, validation, and state.
  * The dialog system never inspects the content — it only reads these two signals.
@@ -126,7 +126,7 @@ export interface DialogConfig<T = void> {
  *         </mat-form-field>
  *     `,
  * })
- * export class RenameFormComponent implements DialogContent<string> {
+ * export class RenameFormComponent implements TbxMatDialogData<string> {
  *     readonly name = signal('');
  *     readonly isValid = computed(() => this.name().trim().length > 0);
  *     readonly value = this.name;
@@ -140,8 +140,7 @@ export interface DialogConfig<T = void> {
  * header close button — not the first form field. Content components should
  * apply the `cdkFocusInitial` attribute to the element that should receive
  * initial focus. This is a plain HTML attribute recognized by the CDK focus
- * trap — no directive import needed. See `SampleInputComponent` for a
- * reference implementation.
+ * trap — no directive import needed.
  *
  * ## Non-input components (display-only content)
  *
@@ -151,21 +150,21 @@ export interface DialogConfig<T = void> {
  *
  * ```typescript
  * @Component({ ... })
- * export class UserSettingsComponent implements DialogContent<void> {
+ * export class UserSettingsComponent implements TbxMatDialogData<void> {
  *     readonly isValid = signal(true);
  *     readonly value = signal<void>(undefined);
  * }
  * ```
  *
- * This allows any component to be hosted in a dialog via `DialogService.show()`
+ * This allows any component to be hosted in a dialog via `TbxMatDialogService.show()`
  * without type casts. The shell's affirm button is never disabled (isValid is true),
- * and DialogOutput.data is undefined (no form value). If the dialog has `footer: []`
+ * and TbxMatDialogResult.data is undefined (no form value). If the dialog has `footer: []`
  * (no buttons), neither signal is ever read — the user closes via the header close button.
  */
-export interface DialogContent<T> {
+export interface TbxMatDialogData<T> {
     /** Whether the form content is in a valid state. Drives affirm button disabled. */
     readonly isValid: Signal<boolean>;
 
-    /** Current value of the form content. Included in DialogOutput.data on affirm. */
+    /** Current value of the form content. Included in TbxMatDialogResult.data on affirm. */
     readonly value: Signal<T>;
 }

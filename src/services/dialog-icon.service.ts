@@ -9,10 +9,10 @@ import {
  *
  * Provides icon ligatures for each severity level. Consumers can use this
  * implementation directly or provide their own service via the
- * DIALOG_ICON_SERVICE injection token.
+ * TBX_MAT_DIALOG_ICON_SERVICE injection token.
  */
 @Injectable()
-export class DialogIconService extends TbxMatSeverityFontIconService {
+export class TbxMatDialogIconService extends TbxMatSeverityFontIconService {
     constructor(fontSet?: string) {
         super(fontSet);
     }

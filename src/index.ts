@@ -2,20 +2,18 @@
  * Dialog system — typed modal dialogs with emphasis, footer controls, and input content.
  *
  * Public API:
- *   - DialogService            — inject and call show(), info(), warning(), error(), confirm(), input()
- *   - DialogConfigOverrideType  — Partial config with required title (for opinionated methods)
- *   - DialogResultType         — result enum (Affirm, Deny, Cancel, Close)
- *   - DialogEmphasisType       — emphasis enum (Default, Destructive, Warning, Informational)
- *   - DialogOutput<T, F>       — typed return value
- *   - DialogConfig<T>          — full configuration for show()
- *   - DialogContent<T>         — contract for input dialog content components
- *   - DialogFooterControlType  — discriminated union of footer items
- *   - BUTTONS_OK/OK_CANCEL/YES_NO/YES_NO_CANCEL — button presets
- *   - DIALOG_DEFAULT_WIDTH     — default width constant
- *   - DIALOG_ICON_SERVICE      — injection token for pluggable icon resolution
- *   - DialogIconService        — default icon service (Material Symbols Rounded)
- *   - SampleInputComponent     — reference DialogContent<SampleInputData> implementation
- *   - SampleInputData          — data type returned by SampleInputComponent
+ *   - TbxMatDialogService            — inject and call show(), information(), warning(), error(), confirm(), input()
+ *   - TbxMatDialogConfigArgs         — Partial config with required title (for opinionated methods)
+ *   - TbxMatDialogDismissReason      — result enum (Affirm, Deny, Cancel, Close)
+ *   - TbxMatDialogEmphasisType       — emphasis enum (Default, Destructive, Warning, Informational)
+ *   - TbxMatDialogResult<T, F>       — typed return value
+ *   - TbxMatDialogConfig<T>          — full configuration for show()
+ *   - TbxMatDialogData<T>            — contract for input dialog content components
+ *   - TbxMatDialogFooterControlType  — discriminated union of footer items
+ *   - TBX_MAT_DIALOG_BUTTONS_OK / OK_CANCEL / YES_NO / YES_NO_CANCEL — button presets
+ *   - TBX_MAT_DIALOG_DEFAULT_WIDTH   — default width constant
+ *   - TBX_MAT_DIALOG_ICON_SERVICE    — injection token for pluggable icon resolution
+ *   - TbxMatDialogIconService        — default icon service (Material Symbols Rounded)
  *
  * Internal (not re-exported):
  *   - DialogShellComponent     — common chrome
@@ -23,44 +21,44 @@
  */
 
 // Types — enum values
-export { DialogResultType } from './types/dialog-result.type';
-export { DialogEmphasisType } from './types/dialog-emphasis.type';
+export { TbxMatDialogDismissReason } from './types/dialog-result.type';
+export { TbxMatDialogEmphasisType } from './types/dialog-emphasis.type';
 
 // Models — dialog types
-export type { DialogOutput, DialogConfig, DialogContent } from './models/dialog.model';
+export type {
+    TbxMatDialogResult,
+    TbxMatDialogConfig,
+    TbxMatDialogData,
+} from './models/dialog.model';
 
 // Types — type aliases
-export type { DialogFooterControlType } from './types/dialog-footer-control.type';
-export type { DialogConfigOverrideType } from './types/dialog-config-override.type';
+export type { TbxMatDialogFooterControlType } from './types/dialog-footer-control.type';
+export type { TbxMatDialogConfigArgs } from './types/dialog-config-override.type';
 
 // Models — footer controls
 export type {
-    DialogFooterItem,
-    DialogFooterButton,
-    DialogFooterCheckbox,
-    DialogFooterToggle,
-    DialogFooterRadioGroup,
-    DialogFooterRadioOption,
-    DialogFooterToggleGroup,
-    DialogFooterToggleOption,
+    TbxMatDialogFooterItem,
+    TbxMatDialogFooterButton,
+    TbxMatDialogFooterCheckbox,
+    TbxMatDialogFooterToggle,
+    TbxMatDialogFooterRadioGroup,
+    TbxMatDialogFooterRadioOption,
+    TbxMatDialogFooterToggleGroup,
+    TbxMatDialogFooterToggleOption,
 } from './models/dialog-footer.model';
 
 // Constants — button presets and defaults
 export {
-    DIALOG_DEFAULT_WIDTH,
-    BUTTONS_OK,
-    BUTTONS_OK_CANCEL,
-    BUTTONS_YES_NO,
-    BUTTONS_YES_NO_CANCEL,
+    TBX_MAT_DIALOG_DEFAULT_WIDTH,
+    TBX_MAT_DIALOG_BUTTONS_OK,
+    TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
+    TBX_MAT_DIALOG_BUTTONS_YES_NO,
+    TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL,
 } from './constants/dialog.constants';
 
 // Tokens — pluggable DI
-export { DIALOG_ICON_SERVICE } from './tokens/dialog-icon-service.token';
+export { TBX_MAT_DIALOG_ICON_SERVICE } from './tokens/dialog-icon-service.token';
 
 // Services
-export { DialogService } from './services/dialog.service';
-export { DialogIconService } from './services/dialog-icon.service';
-
-// Components — sample/reference implementations
-export { SampleInputComponent } from './components/sample-input.component';
-export type { SampleInputData } from './components/sample-input.component';
+export { TbxMatDialogService } from './services/dialog.service';
+export { TbxMatDialogIconService } from './services/dialog-icon.service';

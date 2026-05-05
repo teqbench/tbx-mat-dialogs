@@ -1,18 +1,105 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
-import { DialogService } from '../services/dialog.service';
-import { DialogEmphasisType } from '../types/dialog-emphasis.type';
-import { DialogResultType } from '../types/dialog-result.type';
-import { BUTTONS_OK, BUTTONS_YES_NO, BUTTONS_YES_NO_CANCEL } from '../constants/dialog.constants';
-import { type DialogFooterControlType } from '../types/dialog-footer-control.type';
-import { SampleInputComponent } from './sample-input.component';
+import { TbxMatDialogService } from '../services/dialog.service';
+import { TbxMatDialogEmphasisType } from '../types/dialog-emphasis.type';
+import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
+import {
+    TBX_MAT_DIALOG_BUTTONS_OK,
+    TBX_MAT_DIALOG_BUTTONS_YES_NO,
+    TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL,
+} from '../constants/dialog.constants';
+import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
+import { type TbxMatDialogData } from '../models/dialog.model';
+
+/**
+ * Demo input component implementing TbxMatDialogData<StoryInputData>.
+ *
+ * Lives inside the stories file (not exported from the package) so the
+ * Input story can demonstrate the input dialog flow without exposing a
+ * sample/reference component on the public API surface — matching how
+ * tbx-mat-banners and tbx-mat-notifications keep example UI inside their
+ * stories files.
+ */
+interface StoryInputData {
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly address: string;
+}
+
+@Component({
+    selector: 'tbx-story-input',
+    imports: [FormsModule, MatFormFieldModule, MatInputModule],
+    template: `
+        <div class="story-input-form">
+            <mat-form-field appearance="outline">
+                <mat-label>First Name</mat-label>
+                <input
+                    matInput
+                    cdkFocusInitial
+                    required
+                    [ngModel]="firstName()"
+                    (ngModelChange)="firstName.set($event)"
+                    placeholder="Enter first name"
+                />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Last Name</mat-label>
+                <input
+                    matInput
+                    required
+                    [ngModel]="lastName()"
+                    (ngModelChange)="lastName.set($event)"
+                    placeholder="Enter last name"
+                />
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Address</mat-label>
+                <input
+                    matInput
+                    [ngModel]="address()"
+                    (ngModelChange)="address.set($event)"
+                    placeholder="Enter address (optional)"
+                />
+            </mat-form-field>
+        </div>
+    `,
+    styles: `
+        .story-input-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .story-input-form mat-form-field {
+            width: 100%;
+        }
+    `,
+})
+class StoryInputComponent implements TbxMatDialogData<StoryInputData> {
+    readonly firstName = signal('');
+    readonly lastName = signal('');
+    readonly address = signal('');
+
+    readonly isValid = computed(
+        () => this.firstName().trim().length > 0 && this.lastName().trim().length > 0
+    );
+
+    readonly value = computed<StoryInputData>(() => ({
+        firstName: this.firstName().trim(),
+        lastName: this.lastName().trim(),
+        address: this.address().trim(),
+    }));
+}
 
 /**
  * Wrapper component that exposes buttons to trigger dialogs.
  * Dialogs render in the CDK overlay (outside the component tree),
- * so we trigger them programmatically via DialogService.
+ * so we trigger them programmatically via TbxMatDialogService.
  */
 @Component({
     selector: 'tbx-dialog-harness',
@@ -101,7 +188,7 @@ import { SampleInputComponent } from './sample-input.component';
     `,
 })
 class DialogHarnessComponent {
-    private readonly dialog = inject(DialogService);
+    private readonly dialog = inject(TbxMatDialogService);
     readonly lastResult = signal('');
 
     async showInformation(): Promise<void> {
@@ -140,16 +227,12 @@ class DialogHarnessComponent {
     }
 
     async showInput(): Promise<void> {
-        const output = await this.dialog.input<{
-            firstName: string;
-            lastName: string;
-            address: string;
-        }>({
+        const output = await this.dialog.input<StoryInputData>({
             title: 'Enter Details',
-            content: SampleInputComponent,
+            content: StoryInputComponent,
         });
         this.lastResult.set(
-            output.result === DialogResultType.Affirm
+            output.result === TbxMatDialogDismissReason.Affirm
                 ? `${output.result}: ${JSON.stringify(output.data)}`
                 : output.result
         );
@@ -179,18 +262,18 @@ class DialogHarnessComponent {
         const output = await this.dialog.confirm({
             title: 'Discard Draft?',
             message: 'You have an unsaved draft. Would you like to save it before closing?',
-            footer: BUTTONS_YES_NO_CANCEL,
+            footer: TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL,
         });
         this.lastResult.set(output.result);
     }
 
     async showDestructive(): Promise<void> {
-        const destructiveButtons: readonly DialogFooterControlType[] = [
+        const destructiveButtons: readonly TbxMatDialogFooterControlType[] = [
             {
                 key: 'cancel',
                 type: 'button',
                 label: 'Cancel',
-                result: DialogResultType.Cancel,
+                result: TbxMatDialogDismissReason.Cancel,
                 emphasis: 'text',
                 align: 'start',
             },
@@ -200,7 +283,7 @@ class DialogHarnessComponent {
                 label: 'Delete',
                 icon: 'delete',
                 iconPosition: 'before',
-                result: DialogResultType.Affirm,
+                result: TbxMatDialogDismissReason.Affirm,
                 emphasis: 'destructive',
                 align: 'end',
             },
@@ -208,7 +291,7 @@ class DialogHarnessComponent {
         const output = await this.dialog.show({
             title: 'Delete Account',
             icon: 'error',
-            emphasis: DialogEmphasisType.Destructive,
+            emphasis: TbxMatDialogEmphasisType.Destructive,
             message:
                 'This will permanently delete your account and all associated data. This action cannot be undone.',
             footer: destructiveButtons,
@@ -217,14 +300,14 @@ class DialogHarnessComponent {
     }
 
     async showWithCheckbox(): Promise<void> {
-        const footer: readonly DialogFooterControlType[] = [
+        const footer: readonly TbxMatDialogFooterControlType[] = [
             {
                 key: 'dontAskAgain',
                 type: 'checkbox',
                 label: "Don't ask me again",
                 align: 'start',
             },
-            ...BUTTONS_YES_NO,
+            ...TBX_MAT_DIALOG_BUTTONS_YES_NO,
         ];
         const output = await this.dialog.confirm({
             title: 'Enable Notifications?',
@@ -235,14 +318,14 @@ class DialogHarnessComponent {
     }
 
     async showWithToggle(): Promise<void> {
-        const footer: readonly DialogFooterControlType[] = [
+        const footer: readonly TbxMatDialogFooterControlType[] = [
             {
                 key: 'verbose',
                 type: 'toggle',
                 label: 'Verbose output',
                 align: 'start',
             },
-            ...BUTTONS_OK,
+            ...TBX_MAT_DIALOG_BUTTONS_OK,
         ];
         const output = await this.dialog.information({
             title: 'Export Settings',
@@ -253,7 +336,7 @@ class DialogHarnessComponent {
     }
 
     async showWithRadio(): Promise<void> {
-        const footer: readonly DialogFooterControlType[] = [
+        const footer: readonly TbxMatDialogFooterControlType[] = [
             {
                 key: 'format',
                 type: 'radio-group',
@@ -265,7 +348,7 @@ class DialogHarnessComponent {
                 initialValue: 'json',
                 align: 'start',
             },
-            ...BUTTONS_OK,
+            ...TBX_MAT_DIALOG_BUTTONS_OK,
         ];
         const output = await this.dialog.information({
             title: 'Export Format',
@@ -281,7 +364,7 @@ class DialogHarnessComponent {
             icon: 'build',
             subtitle: 'Using show() for full control',
             contextBadge: 'v2',
-            emphasis: DialogEmphasisType.Warning,
+            emphasis: TbxMatDialogEmphasisType.Warning,
             message:
                 'This dialog was opened via the show() method with all options configured manually.',
             footer: [
@@ -295,7 +378,7 @@ class DialogHarnessComponent {
                     key: 'cancel',
                     type: 'button',
                     label: 'Cancel',
-                    result: DialogResultType.Cancel,
+                    result: TbxMatDialogDismissReason.Cancel,
                     emphasis: 'text',
                     align: 'end',
                 },
@@ -305,7 +388,7 @@ class DialogHarnessComponent {
                     label: 'Proceed',
                     icon: 'arrow_forward',
                     iconPosition: 'after',
-                    result: DialogResultType.Affirm,
+                    result: TbxMatDialogDismissReason.Affirm,
                     emphasis: 'primary',
                     align: 'end',
                 },
