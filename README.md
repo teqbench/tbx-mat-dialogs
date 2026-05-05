@@ -85,4 +85,4 @@ Content components should apply the `cdkFocusInitial` attribute to the element t
 
 ## License
 
-[Apache-2.0](LICENSE) — Copyright 2025 TeqBench
+[AGPL-3.0](LICENSE) — Copyright 2026 TeqBench
