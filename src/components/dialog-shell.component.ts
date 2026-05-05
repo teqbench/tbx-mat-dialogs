@@ -25,40 +25,40 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDivider } from '@angular/material/divider';
 import { MatChipSet, MatChip } from '@angular/material/chips';
-import { DialogResultType } from '../types/dialog-result.type';
-import { DialogEmphasisType } from '../types/dialog-emphasis.type';
-import { type DialogConfig, type DialogContent } from '../models/dialog.model';
+import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
+import { TbxMatDialogEmphasisType } from '../types/dialog-emphasis.type';
+import { type TbxMatDialogConfig, type TbxMatDialogData } from '../models/dialog.model';
 import {
-    type DialogFooterButton,
-    type DialogFooterCheckbox,
-    type DialogFooterToggle,
-    type DialogFooterRadioGroup,
-    type DialogFooterToggleGroup,
+    type TbxMatDialogFooterButton,
+    type TbxMatDialogFooterCheckbox,
+    type TbxMatDialogFooterToggle,
+    type TbxMatDialogFooterRadioGroup,
+    type TbxMatDialogFooterToggleGroup,
 } from '../models/dialog-footer.model';
-import { type DialogFooterControlType } from '../types/dialog-footer-control.type';
+import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
 
 /**
  * Emphasis CSS variable prefix mapping.
- * Maps DialogEmphasisType enum values to the --tbx-dialog-* token prefix
+ * Maps TbxMatDialogEmphasisType enum values to the --tbx-dialog-* token prefix
  * used in _dialog-panels.scss.
  */
-const EMPHASIS_TOKEN_MAP: Readonly<Record<DialogEmphasisType, string>> = {
-    [DialogEmphasisType.Default]: 'default',
-    [DialogEmphasisType.Destructive]: 'destructive',
-    [DialogEmphasisType.Warning]: 'warning',
-    [DialogEmphasisType.Informational]: 'info',
+const EMPHASIS_TOKEN_MAP: Readonly<Record<TbxMatDialogEmphasisType, string>> = {
+    [TbxMatDialogEmphasisType.Default]: 'default',
+    [TbxMatDialogEmphasisType.Destructive]: 'destructive',
+    [TbxMatDialogEmphasisType.Warning]: 'warning',
+    [TbxMatDialogEmphasisType.Informational]: 'info',
 };
 
 /**
  * Internal data payload injected into DialogShellComponent via MAT_DIALOG_DATA.
  *
- * This is the shape the DialogService passes when opening the shell.
- * It extends DialogConfig with the resolved footer (service applies default
+ * This is the shape the TbxMatDialogService passes when opening the shell.
+ * It extends TbxMatDialogConfig with the resolved footer (service applies default
  * button presets when the caller omits footer).
  */
 export interface DialogShellData {
-    readonly config: DialogConfig<unknown>;
-    readonly resolvedFooter: readonly DialogFooterControlType[];
+    readonly config: TbxMatDialogConfig<unknown>;
+    readonly resolvedFooter: readonly TbxMatDialogFooterControlType[];
 }
 
 /**
@@ -75,7 +75,7 @@ export interface DialogShellData {
  *   - Footer (mat-dialog-actions): single flex row of buttons and controls
  *
  * The shell is internal to the dialog system — consumers never reference it directly.
- * They interact with DialogService, which opens this component via MatDialog.
+ * They interact with TbxMatDialogService, which opens this component via MatDialog.
  *
  * For input dialogs, the shell dynamically creates the content component from
  * config.content and reads its isValid/value signals. The affirm button's
@@ -437,7 +437,7 @@ export class DialogShellComponent {
      * content component is created in afterNextRender — no manual change
      * detection needed.
      */
-    private readonly contentRef = signal<DialogContent<unknown> | null>(null);
+    private readonly contentRef = signal<TbxMatDialogData<unknown> | null>(null);
 
     /** ViewContainerRef for the content host — used to dynamically create input dialog content. */
     readonly contentHost = viewChild('contentHost', { read: ViewContainerRef });
@@ -445,7 +445,7 @@ export class DialogShellComponent {
     /**
      * Current values of all footer controls, keyed by control.key.
      * Initialized from initialValue on each control, updated on user interaction.
-     * Included in DialogOutput.footerValues when the dialog closes.
+     * Included in TbxMatDialogResult.footerValues when the dialog closes.
      */
     private readonly footerValues = signal<Record<string, unknown>>(
         this.buildInitialFooterValues()
@@ -454,7 +454,7 @@ export class DialogShellComponent {
     /**
      * The resolved emphasis — defaults to Default when not specified.
      */
-    private readonly emphasis = this.config.emphasis ?? DialogEmphasisType.Default;
+    private readonly emphasis = this.config.emphasis ?? TbxMatDialogEmphasisType.Default;
 
     /**
      * Token suffix for the current emphasis — used by the host data-emphasis
@@ -480,29 +480,29 @@ export class DialogShellComponent {
     //
     // The @switch guarantees the discriminant matches — the cast is safe.
 
-    /** Cast for @case ('button') — provides DialogFooterButton type in template. */
-    protected asButton(control: DialogFooterControlType): DialogFooterButton {
-        return control as DialogFooterButton;
+    /** Cast for @case ('button') — provides TbxMatDialogFooterButton type in template. */
+    protected asButton(control: TbxMatDialogFooterControlType): TbxMatDialogFooterButton {
+        return control as TbxMatDialogFooterButton;
     }
 
-    /** Cast for @case ('checkbox') — provides DialogFooterCheckbox type in template. */
-    protected asCheckbox(control: DialogFooterControlType): DialogFooterCheckbox {
-        return control as DialogFooterCheckbox;
+    /** Cast for @case ('checkbox') — provides TbxMatDialogFooterCheckbox type in template. */
+    protected asCheckbox(control: TbxMatDialogFooterControlType): TbxMatDialogFooterCheckbox {
+        return control as TbxMatDialogFooterCheckbox;
     }
 
-    /** Cast for @case ('toggle') — provides DialogFooterToggle type in template. */
-    protected asToggle(control: DialogFooterControlType): DialogFooterToggle {
-        return control as DialogFooterToggle;
+    /** Cast for @case ('toggle') — provides TbxMatDialogFooterToggle type in template. */
+    protected asToggle(control: TbxMatDialogFooterControlType): TbxMatDialogFooterToggle {
+        return control as TbxMatDialogFooterToggle;
     }
 
-    /** Cast for @case ('radio-group') — provides DialogFooterRadioGroup type in template. */
-    protected asRadioGroup(control: DialogFooterControlType): DialogFooterRadioGroup {
-        return control as DialogFooterRadioGroup;
+    /** Cast for @case ('radio-group') — provides TbxMatDialogFooterRadioGroup type in template. */
+    protected asRadioGroup(control: TbxMatDialogFooterControlType): TbxMatDialogFooterRadioGroup {
+        return control as TbxMatDialogFooterRadioGroup;
     }
 
-    /** Cast for @case ('toggle-group') — provides DialogFooterToggleGroup type in template. */
-    protected asToggleGroup(control: DialogFooterControlType): DialogFooterToggleGroup {
-        return control as DialogFooterToggleGroup;
+    /** Cast for @case ('toggle-group') — provides TbxMatDialogFooterToggleGroup type in template. */
+    protected asToggleGroup(control: TbxMatDialogFooterControlType): TbxMatDialogFooterToggleGroup {
+        return control as TbxMatDialogFooterToggleGroup;
     }
 
     constructor() {
@@ -519,7 +519,7 @@ export class DialogShellComponent {
             const host = this.contentHost();
 
             if (this.config.content && host) {
-                const ref: ComponentRef<DialogContent<unknown>> = host.createComponent(
+                const ref: ComponentRef<TbxMatDialogData<unknown>> = host.createComponent(
                     this.config.content
                 );
                 this.contentRef.set(ref.instance);
@@ -527,10 +527,10 @@ export class DialogShellComponent {
         });
     }
 
-    /** Close the dialog with DialogResultType.Close (dismiss without choosing). */
+    /** Close the dialog with TbxMatDialogDismissReason.Close (dismiss without choosing). */
     close(): void {
         this.dialogRef.close({
-            result: DialogResultType.Close,
+            result: TbxMatDialogDismissReason.Close,
             footerValues: {},
         });
     }
@@ -542,12 +542,12 @@ export class DialogShellComponent {
      * dialog's content. Deny, Cancel, and Close are negative actions;
      * returning footer state alongside them would be a mixed signal.
      */
-    onButtonClick(button: DialogFooterButton): void {
+    onButtonClick(button: TbxMatDialogFooterButton): void {
         if (button.result === undefined) {
             return;
         }
 
-        const isAffirm = button.result === DialogResultType.Affirm;
+        const isAffirm = button.result === TbxMatDialogDismissReason.Affirm;
 
         this.dialogRef.close({
             result: button.result,
@@ -564,18 +564,18 @@ export class DialogShellComponent {
      * the content component manages its own focus via cdkFocusInitial on the
      * appropriate form element.
      */
-    shouldAutoFocus(button: DialogFooterButton): boolean {
-        return !this.config.content && button.result === DialogResultType.Affirm;
+    shouldAutoFocus(button: TbxMatDialogFooterButton): boolean {
+        return !this.config.content && button.result === TbxMatDialogDismissReason.Affirm;
     }
 
     /**
      * Resolve a button's disabled state.
      * For affirm buttons in input dialogs, also checks content.isValid.
      */
-    isButtonDisabled(button: DialogFooterButton): boolean {
+    isButtonDisabled(button: TbxMatDialogFooterButton): boolean {
         const content = this.contentRef();
 
-        if (button.result === DialogResultType.Affirm && content && !content.isValid()) {
+        if (button.result === TbxMatDialogDismissReason.Affirm && content && !content.isValid()) {
             return true;
         }
 

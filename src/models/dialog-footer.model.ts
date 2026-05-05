@@ -1,5 +1,5 @@
 import { type Signal } from '@angular/core';
-import { type DialogResultType } from '../types/dialog-result.type';
+import { type TbxMatDialogDismissReason } from '../types/dialog-result.type';
 
 /**
  * Base interface for all dialog footer items — buttons and form controls alike.
@@ -11,8 +11,8 @@ import { type DialogResultType } from '../types/dialog-result.type';
  * The first `align: 'end'` item receives `margin-left: auto`, pushing it and
  * all subsequent items to the right side.
  */
-export interface DialogFooterItem {
-    /** Unique identifier. Used as the property name in DialogOutput.footerValues. */
+export interface TbxMatDialogFooterItem {
+    /** Unique identifier. Used as the property name in TbxMatDialogResult.footerValues. */
     readonly key: string;
 
     /** Position within the footer row. 'start' flows left, 'end' flows right. */
@@ -21,9 +21,9 @@ export interface DialogFooterItem {
 
 /**
  * Button footer item. Clicking a button with a `result` closes the dialog
- * and returns that result in DialogOutput.
+ * and returns that result in TbxMatDialogResult.
  */
-export interface DialogFooterButton extends DialogFooterItem {
+export interface TbxMatDialogFooterButton extends TbxMatDialogFooterItem {
     readonly type: 'button';
 
     /** Button label text. */
@@ -48,22 +48,22 @@ export interface DialogFooterButton extends DialogFooterItem {
      */
     readonly emphasis?: 'primary' | 'destructive' | 'text';
 
-    /** DialogResultType returned when this button is clicked. Closes the dialog. */
-    readonly result?: DialogResultType;
+    /** TbxMatDialogDismissReason returned when this button is clicked. Closes the dialog. */
+    readonly result?: TbxMatDialogDismissReason;
 
     /**
      * Whether the button is disabled.
      * Accepts a static boolean or a Signal<boolean> for reactive binding
-     * (e.g., driven by DialogContent.isValid).
+     * (e.g., driven by TbxMatDialogData.isValid).
      */
     readonly disabled?: boolean | Signal<boolean>;
 }
 
 /**
- * Checkbox footer control. Value is tracked in DialogOutput.footerValues
+ * Checkbox footer control. Value is tracked in TbxMatDialogResult.footerValues
  * as a boolean under the item's key.
  */
-export interface DialogFooterCheckbox extends DialogFooterItem {
+export interface TbxMatDialogFooterCheckbox extends TbxMatDialogFooterItem {
     readonly type: 'checkbox';
 
     /** Label displayed next to the checkbox. */
@@ -74,10 +74,10 @@ export interface DialogFooterCheckbox extends DialogFooterItem {
 }
 
 /**
- * Slide toggle footer control. Value is tracked in DialogOutput.footerValues
+ * Slide toggle footer control. Value is tracked in TbxMatDialogResult.footerValues
  * as a boolean under the item's key.
  */
-export interface DialogFooterToggle extends DialogFooterItem {
+export interface TbxMatDialogFooterToggle extends TbxMatDialogFooterItem {
     readonly type: 'toggle';
 
     /** Label displayed next to the toggle. */
@@ -87,8 +87,8 @@ export interface DialogFooterToggle extends DialogFooterItem {
     readonly initialValue?: boolean;
 }
 
-/** Individual option within a DialogFooterRadioGroup. */
-export interface DialogFooterRadioOption {
+/** Individual option within a TbxMatDialogFooterRadioGroup. */
+export interface TbxMatDialogFooterRadioOption {
     /** Display label for the radio button. */
     readonly label: string;
 
@@ -98,20 +98,20 @@ export interface DialogFooterRadioOption {
 
 /**
  * Radio group footer control. Single-select from a set of options.
- * Value is tracked in DialogOutput.footerValues as a string under the item's key.
+ * Value is tracked in TbxMatDialogResult.footerValues as a string under the item's key.
  */
-export interface DialogFooterRadioGroup extends DialogFooterItem {
+export interface TbxMatDialogFooterRadioGroup extends TbxMatDialogFooterItem {
     readonly type: 'radio-group';
 
     /** Available options. */
-    readonly options: readonly DialogFooterRadioOption[];
+    readonly options: readonly TbxMatDialogFooterRadioOption[];
 
     /** Initially selected option value. */
     readonly initialValue?: string;
 }
 
-/** Individual option within a DialogFooterToggleGroup. */
-export interface DialogFooterToggleOption {
+/** Individual option within a TbxMatDialogFooterToggleGroup. */
+export interface TbxMatDialogFooterToggleOption {
     /** Display label for the toggle button. */
     readonly label: string;
 
@@ -124,14 +124,14 @@ export interface DialogFooterToggleOption {
 
 /**
  * Button toggle group footer control. Single-select or multi-select.
- * Value is tracked in DialogOutput.footerValues as a string (single-select)
+ * Value is tracked in TbxMatDialogResult.footerValues as a string (single-select)
  * or string[] (multi-select) under the item's key.
  */
-export interface DialogFooterToggleGroup extends DialogFooterItem {
+export interface TbxMatDialogFooterToggleGroup extends TbxMatDialogFooterItem {
     readonly type: 'toggle-group';
 
     /** Available options. */
-    readonly options: readonly DialogFooterToggleOption[];
+    readonly options: readonly TbxMatDialogFooterToggleOption[];
 
     /** Allow multiple selections. Defaults to false (single-select). */
     readonly multiple?: boolean;

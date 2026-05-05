@@ -1,5 +1,5 @@
 /**
- * Result of a dialog interaction. Returned as part of DialogOutput
+ * Result of a dialog interaction. Returned as part of TbxMatDialogResult
  * when the dialog closes.
  *
  * - Affirm: User confirmed the action (OK, Yes, Save, Delete, etc.)
@@ -7,7 +7,7 @@
  * - Cancel: User aborted the interaction (Cancel button)
  * - Close: User dismissed without choosing (close button, Escape, backdrop)
  */
-export enum DialogResultType {
+export enum TbxMatDialogDismissReason {
     Affirm = 'affirm',
     Deny = 'deny',
     Cancel = 'cancel',

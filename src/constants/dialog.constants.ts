@@ -1,5 +1,5 @@
-import { DialogResultType } from '../types/dialog-result.type';
-import { type DialogFooterButton } from '../models/dialog-footer.model';
+import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
+import { type TbxMatDialogFooterButton } from '../models/dialog-footer.model';
 
 /**
  * Dialog system constants.
@@ -8,19 +8,19 @@ import { type DialogFooterButton } from '../models/dialog-footer.model';
  * presets directly or override with custom footer arrays.
  */
 
-/** Default dialog width when not specified in DialogConfig. */
-export const DIALOG_DEFAULT_WIDTH = '30rem';
+/** Default dialog width when not specified in TbxMatDialogConfig. */
+export const TBX_MAT_DIALOG_DEFAULT_WIDTH = '30rem';
 
 /**
  * Single OK button — right-aligned, primary emphasis.
  * Default for informational dialogs.
  */
-export const BUTTONS_OK: readonly DialogFooterButton[] = [
+export const TBX_MAT_DIALOG_BUTTONS_OK: readonly TbxMatDialogFooterButton[] = [
     {
         key: 'ok',
         type: 'button',
         label: 'OK',
-        result: DialogResultType.Affirm,
+        result: TbxMatDialogDismissReason.Affirm,
         emphasis: 'primary',
         align: 'end',
     },
@@ -30,12 +30,12 @@ export const BUTTONS_OK: readonly DialogFooterButton[] = [
  * OK + Cancel buttons — Cancel left, OK right.
  * Default for input dialogs.
  */
-export const BUTTONS_OK_CANCEL: readonly DialogFooterButton[] = [
+export const TBX_MAT_DIALOG_BUTTONS_OK_CANCEL: readonly TbxMatDialogFooterButton[] = [
     {
         key: 'cancel',
         type: 'button',
         label: 'Cancel',
-        result: DialogResultType.Cancel,
+        result: TbxMatDialogDismissReason.Cancel,
         emphasis: 'text',
         align: 'start',
     },
@@ -43,7 +43,7 @@ export const BUTTONS_OK_CANCEL: readonly DialogFooterButton[] = [
         key: 'ok',
         type: 'button',
         label: 'OK',
-        result: DialogResultType.Affirm,
+        result: TbxMatDialogDismissReason.Affirm,
         emphasis: 'primary',
         align: 'end',
     },
@@ -53,12 +53,12 @@ export const BUTTONS_OK_CANCEL: readonly DialogFooterButton[] = [
  * Yes + No buttons — both right-aligned, Yes primary.
  * Default for confirmation dialogs.
  */
-export const BUTTONS_YES_NO: readonly DialogFooterButton[] = [
+export const TBX_MAT_DIALOG_BUTTONS_YES_NO: readonly TbxMatDialogFooterButton[] = [
     {
         key: 'no',
         type: 'button',
         label: 'No',
-        result: DialogResultType.Deny,
+        result: TbxMatDialogDismissReason.Deny,
         emphasis: 'text',
         align: 'end',
     },
@@ -66,7 +66,7 @@ export const BUTTONS_YES_NO: readonly DialogFooterButton[] = [
         key: 'yes',
         type: 'button',
         label: 'Yes',
-        result: DialogResultType.Affirm,
+        result: TbxMatDialogDismissReason.Affirm,
         emphasis: 'primary',
         align: 'end',
     },
@@ -75,12 +75,12 @@ export const BUTTONS_YES_NO: readonly DialogFooterButton[] = [
 /**
  * Yes + No + Cancel buttons — Cancel left, No and Yes right.
  */
-export const BUTTONS_YES_NO_CANCEL: readonly DialogFooterButton[] = [
+export const TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL: readonly TbxMatDialogFooterButton[] = [
     {
         key: 'cancel',
         type: 'button',
         label: 'Cancel',
-        result: DialogResultType.Cancel,
+        result: TbxMatDialogDismissReason.Cancel,
         emphasis: 'text',
         align: 'start',
     },
@@ -88,7 +88,7 @@ export const BUTTONS_YES_NO_CANCEL: readonly DialogFooterButton[] = [
         key: 'no',
         type: 'button',
         label: 'No',
-        result: DialogResultType.Deny,
+        result: TbxMatDialogDismissReason.Deny,
         emphasis: 'text',
         align: 'end',
     },
@@ -96,7 +96,7 @@ export const BUTTONS_YES_NO_CANCEL: readonly DialogFooterButton[] = [
         key: 'yes',
         type: 'button',
         label: 'Yes',
-        result: DialogResultType.Affirm,
+        result: TbxMatDialogDismissReason.Affirm,
         emphasis: 'primary',
         align: 'end',
     },

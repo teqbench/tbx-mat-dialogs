@@ -2,18 +2,18 @@ import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
 import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
-import { DIALOG_ICON_SERVICE } from '../tokens/dialog-icon-service.token';
+import { TBX_MAT_DIALOG_ICON_SERVICE } from '../tokens/dialog-icon-service.token';
 import { DialogShellComponent, type DialogShellData } from '../components/dialog-shell.component';
-import { DialogResultType } from '../types/dialog-result.type';
-import { DialogEmphasisType } from '../types/dialog-emphasis.type';
-import { type DialogConfig, type DialogOutput } from '../models/dialog.model';
-import { type DialogFooterControlType } from '../types/dialog-footer-control.type';
-import { type DialogConfigOverrideType } from '../types/dialog-config-override.type';
+import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
+import { TbxMatDialogEmphasisType } from '../types/dialog-emphasis.type';
+import { type TbxMatDialogConfig, type TbxMatDialogResult } from '../models/dialog.model';
+import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
+import { type TbxMatDialogConfigArgs } from '../types/dialog-config-override.type';
 import {
-    BUTTONS_OK,
-    BUTTONS_OK_CANCEL,
-    BUTTONS_YES_NO,
-    DIALOG_DEFAULT_WIDTH,
+    TBX_MAT_DIALOG_BUTTONS_OK,
+    TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
+    TBX_MAT_DIALOG_BUTTONS_YES_NO,
+    TBX_MAT_DIALOG_DEFAULT_WIDTH,
 } from '../constants/dialog.constants';
 
 /**
@@ -41,15 +41,15 @@ enum DialogSeverityLevelType {
  * All methods return a Promise that resolves when the dialog closes,
  * so consumers use async/await with no subscription management.
  *
- * Icons are resolved via the injected DIALOG_ICON_SERVICE token, ensuring
+ * Icons are resolved via the injected TBX_MAT_DIALOG_ICON_SERVICE token, ensuring
  * dialogs use icons optimized for their visual context (filled variants
  * inside colored circle containers by default). Downstream apps swap the
- * icon set via { provide: DIALOG_ICON_SERVICE, useClass: ... } in app.config.ts.
+ * icon set via { provide: TBX_MAT_DIALOG_ICON_SERVICE, useClass: ... } in app.config.ts.
  *
  * Opinionated methods — each provides defaults for icon, emphasis, and footer:
  *
  * ```typescript
- * private readonly dialog = inject(DialogService);
+ * private readonly dialog = inject(TbxMatDialogService);
  *
  * // Simplest — just title and message, everything else defaulted
  * await this.dialog.info({ title: 'Session Expired', message: 'Please sign in again.' });
@@ -65,7 +65,7 @@ enum DialogSeverityLevelType {
  *
  * // Confirmation — default emphasis, help icon, Yes/No buttons
  * const output = await this.dialog.confirm({ title: 'Continue?', message: 'Proceed?' });
- * if (output.result === DialogResultType.Affirm) { ... }
+ * if (output.result === TbxMatDialogDismissReason.Affirm) { ... }
  *
  * // Input — default emphasis, info icon, OK/Cancel buttons
  * const output = await this.dialog.input<string>({
@@ -80,7 +80,7 @@ enum DialogSeverityLevelType {
  *     message: 'Are you sure?',
  *     footer: [
  *         { key: 'dontAskAgain', type: 'checkbox', label: "Don't ask again", align: 'start' },
- *         ...BUTTONS_YES_NO,
+ *         ...TBX_MAT_DIALOG_BUTTONS_YES_NO,
  *     ],
  * });
  * ```
@@ -91,18 +91,18 @@ enum DialogSeverityLevelType {
  * const output = await this.dialog.show({
  *     title: 'Custom',
  *     icon: 'build',
- *     emphasis: DialogEmphasisType.Warning,
+ *     emphasis: TbxMatDialogEmphasisType.Warning,
  *     message: 'Full control over every option.',
  *     footer: [...customFooter],
  * });
  * ```
  */
 @Injectable({ providedIn: 'root' })
-export class DialogService {
+export class TbxMatDialogService {
     private readonly dialog = inject(MatDialog);
-    private readonly icons = inject(DIALOG_ICON_SERVICE, { optional: true });
+    private readonly icons = inject(TBX_MAT_DIALOG_ICON_SERVICE, { optional: true });
 
-    /** Hardcoded fallbacks when DIALOG_ICON_SERVICE is not provided. */
+    /** Hardcoded fallbacks when TBX_MAT_DIALOG_ICON_SERVICE is not provided. */
     private static readonly FALLBACK_ICONS: Record<DialogSeverityLevelType, string> = {
         [DialogSeverityLevelType.Information]: 'info_i',
         [DialogSeverityLevelType.Warning]: 'exclamation',
@@ -121,8 +121,8 @@ export class DialogService {
      * @typeParam F - Type of footer control values. Defaults to Record<string, unknown>.
      */
     async show<T = void, F extends Record<string, unknown> = Record<string, unknown>>(
-        config: DialogConfig<T>
-    ): Promise<DialogOutput<T, F>> {
+        config: TbxMatDialogConfig<T>
+    ): Promise<TbxMatDialogResult<T, F>> {
         return this.open<T, F>(config, config.footer ?? []);
     }
 
@@ -135,15 +135,15 @@ export class DialogService {
      * @typeParam F - Type of footer control values. Defaults to Record<string, unknown>.
      */
     async information<F extends Record<string, unknown> = Record<string, unknown>>(
-        config: DialogConfigOverrideType<void>
-    ): Promise<DialogOutput<void, F>> {
+        config: TbxMatDialogConfigArgs<void>
+    ): Promise<TbxMatDialogResult<void, F>> {
         return this.open<void, F>(
             this.mergeDefaults(
                 config,
                 this.resolveIcon(DialogSeverityLevelType.Information),
-                DialogEmphasisType.Informational
+                TbxMatDialogEmphasisType.Informational
             ),
-            config.footer ?? BUTTONS_OK
+            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
         );
     }
 
@@ -156,15 +156,15 @@ export class DialogService {
      * @typeParam F - Type of footer control values. Defaults to Record<string, unknown>.
      */
     async warning<F extends Record<string, unknown> = Record<string, unknown>>(
-        config: DialogConfigOverrideType<void>
-    ): Promise<DialogOutput<void, F>> {
+        config: TbxMatDialogConfigArgs<void>
+    ): Promise<TbxMatDialogResult<void, F>> {
         return this.open<void, F>(
             this.mergeDefaults(
                 config,
                 this.resolveIcon(DialogSeverityLevelType.Warning),
-                DialogEmphasisType.Warning
+                TbxMatDialogEmphasisType.Warning
             ),
-            config.footer ?? BUTTONS_OK
+            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
         );
     }
 
@@ -177,15 +177,15 @@ export class DialogService {
      * @typeParam F - Type of footer control values. Defaults to Record<string, unknown>.
      */
     async error<F extends Record<string, unknown> = Record<string, unknown>>(
-        config: DialogConfigOverrideType<void>
-    ): Promise<DialogOutput<void, F>> {
+        config: TbxMatDialogConfigArgs<void>
+    ): Promise<TbxMatDialogResult<void, F>> {
         return this.open<void, F>(
             this.mergeDefaults(
                 config,
                 this.resolveIcon(DialogSeverityLevelType.Error),
-                DialogEmphasisType.Destructive
+                TbxMatDialogEmphasisType.Destructive
             ),
-            config.footer ?? BUTTONS_OK
+            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
         );
     }
 
@@ -198,15 +198,15 @@ export class DialogService {
      * @typeParam F - Type of footer control values. Defaults to Record<string, unknown>.
      */
     async confirm<F extends Record<string, unknown> = Record<string, unknown>>(
-        config: DialogConfigOverrideType<void>
-    ): Promise<DialogOutput<void, F>> {
+        config: TbxMatDialogConfigArgs<void>
+    ): Promise<TbxMatDialogResult<void, F>> {
         return this.open<void, F>(
             this.mergeDefaults(
                 config,
                 this.resolveIcon(DialogSeverityLevelType.Help),
-                DialogEmphasisType.Default
+                TbxMatDialogEmphasisType.Default
             ),
-            config.footer ?? BUTTONS_YES_NO
+            config.footer ?? TBX_MAT_DIALOG_BUTTONS_YES_NO
         );
     }
 
@@ -214,7 +214,7 @@ export class DialogService {
      * Open an input dialog.
      *
      * Renders a content component in the dialog body. The content component
-     * must implement DialogContent<T>. Returns typed data on affirm.
+     * must implement TbxMatDialogData<T>. Returns typed data on affirm.
      *
      * Defaults: info icon, Default emphasis, OK/Cancel buttons.
      * All defaults can be overridden via config properties.
@@ -223,15 +223,15 @@ export class DialogService {
      * @typeParam F - Type of footer control values. Defaults to Record<string, unknown>.
      */
     async input<T, F extends Record<string, unknown> = Record<string, unknown>>(
-        config: DialogConfigOverrideType<T>
-    ): Promise<DialogOutput<T, F>> {
+        config: TbxMatDialogConfigArgs<T>
+    ): Promise<TbxMatDialogResult<T, F>> {
         return this.open<T, F>(
             this.mergeDefaults(
                 config,
                 this.resolveIcon(DialogSeverityLevelType.Information),
-                DialogEmphasisType.Default
+                TbxMatDialogEmphasisType.Default
             ),
-            config.footer ?? BUTTONS_OK_CANCEL
+            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK_CANCEL
         );
     }
 
@@ -241,7 +241,7 @@ export class DialogService {
      */
     private resolveIcon(method: DialogSeverityLevelType): string {
         const fromService = this.icons?.[method]();
-        return fromService || DialogService.FALLBACK_ICONS[method];
+        return fromService || TbxMatDialogService.FALLBACK_ICONS[method];
     }
 
     /**
@@ -253,15 +253,15 @@ export class DialogService {
      * `icon` uses the default.
      */
     private mergeDefaults<T>(
-        config: DialogConfigOverrideType<T>,
+        config: TbxMatDialogConfigArgs<T>,
         defaultIcon: string,
-        defaultEmphasis: DialogEmphasisType
-    ): DialogConfig<T> {
+        defaultEmphasis: TbxMatDialogEmphasisType
+    ): TbxMatDialogConfig<T> {
         return {
             ...config,
             icon: config.icon ?? defaultIcon,
             emphasis: config.emphasis ?? defaultEmphasis,
-        } as DialogConfig<T>;
+        } as TbxMatDialogConfig<T>;
     }
 
     /**
@@ -282,17 +282,17 @@ export class DialogService {
      * (e.g., backdrop click when disableClose is false).
      */
     private async open<T, F extends Record<string, unknown>>(
-        config: DialogConfig<T>,
-        resolvedFooter: readonly DialogFooterControlType[]
-    ): Promise<DialogOutput<T, F>> {
+        config: TbxMatDialogConfig<T>,
+        resolvedFooter: readonly TbxMatDialogFooterControlType[]
+    ): Promise<TbxMatDialogResult<T, F>> {
         const shellData: DialogShellData = {
-            config: config as DialogConfig<unknown>,
+            config: config as TbxMatDialogConfig<unknown>,
             resolvedFooter,
         };
 
         const dialogRef = this.dialog.open(DialogShellComponent, {
             data: shellData,
-            width: config.width ?? DIALOG_DEFAULT_WIDTH,
+            width: config.width ?? TBX_MAT_DIALOG_DEFAULT_WIDTH,
             minWidth: config.minWidth,
             maxWidth: config.maxWidth,
             minHeight: config.minHeight,
@@ -310,11 +310,11 @@ export class DialogService {
         // footer values — dismissal is a negative action like Cancel/Deny.
         if (!output) {
             return {
-                result: DialogResultType.Close,
+                result: TbxMatDialogDismissReason.Close,
                 footerValues: {} as F,
             };
         }
 
-        return output as DialogOutput<T, F>;
+        return output as TbxMatDialogResult<T, F>;
     }
 }

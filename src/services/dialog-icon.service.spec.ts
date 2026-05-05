@@ -1,21 +1,21 @@
 import { describe, it, expect } from 'vitest';
 import { TestBed } from '@angular/core/testing';
-import { DialogIconService } from './dialog-icon.service';
+import { TbxMatDialogIconService } from './dialog-icon.service';
 
-describe('DialogIconService', () => {
-    let service: DialogIconService;
+describe('TbxMatDialogIconService', () => {
+    let service: TbxMatDialogIconService;
 
     function setupTestBed(): void {
         TestBed.configureTestingModule({
             providers: [
                 {
-                    provide: DialogIconService,
-                    useFactory: () => new DialogIconService('material-symbols-rounded'),
+                    provide: TbxMatDialogIconService,
+                    useFactory: () => new TbxMatDialogIconService('material-symbols-rounded'),
                 },
             ],
         });
 
-        service = TestBed.inject(DialogIconService);
+        service = TestBed.inject(TbxMatDialogIconService);
     }
 
     it('should be created', () => {

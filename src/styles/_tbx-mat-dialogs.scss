@@ -45,7 +45,7 @@ html {
  * and any emphasis-driven overrides that require global specificity.
  *
  * Emphasis classes (tbx-dialog-default, tbx-dialog-destructive, etc.) are
- * applied to the MatDialog panelClass by DialogService and consumed here.
+ * applied to the MatDialog panelClass by TbxMatDialogService and consumed here.
  * ─────────────────────────────────────────────────────────────────────────── */
 
 /* Remove default MatDialog padding — the shell component manages its own padding

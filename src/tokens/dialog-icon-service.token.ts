@@ -9,10 +9,10 @@ import type { TbxMatSeverityResolver } from '@teqbench/tbx-mat-severity-theme';
  *
  * ```typescript
  * providers: [
- *     { provide: DIALOG_ICON_SERVICE, useClass: DialogIconService },
+ *     { provide: TBX_MAT_DIALOG_ICON_SERVICE, useClass: TbxMatDialogIconService },
  * ]
  * ```
  */
-export const DIALOG_ICON_SERVICE = new InjectionToken<TbxMatSeverityResolver>(
-    'DIALOG_ICON_SERVICE'
+export const TBX_MAT_DIALOG_ICON_SERVICE = new InjectionToken<TbxMatSeverityResolver>(
+    'TBX_MAT_DIALOG_ICON_SERVICE'
 );
