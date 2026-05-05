@@ -1,79 +1,148 @@
 @use '@angular/material' as mat;
+@use '@teqbench/tbx-mat-severity-theme/styles/tbx-mat-severity-theme' as severity;
 
-/* ─── Dialog Emphasis Tokens ─────────────────────────────────────────────────
+/* ━━━ Dialog Color Tokens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  *
- * Default dialog emphasis colors follow universal UX conventions:
- *   default = primary (neutral action), destructive = red (delete/remove),
- *   warning = amber (irreversible), informational = blue (FYI)
+ * Emits `--tbx-mat-dialog-<level>-background` and
+ * `--tbx-mat-dialog-<level>-text` custom properties for all six severity
+ * tiers (default, success, error, warning, information, help), each
+ * aliasing the corresponding `--tbx-mat-severity-<level>-*` token defined
+ * by `@teqbench/tbx-mat-severity-theme`.
  *
- * Each emphasis has an accent (background/icon color) and on-accent (text color)
- * pair, guaranteeing readable contrast. These color the header icon, primary
- * action button, and separator highlight in the dialog shell.
- *
- * These are intentionally NOT tied to --mat-sys-* palette tokens because
- * emphasis colors must be immediately recognizable regardless of theme.
- * A purple-themed app still needs red destructive dialogs.
- *
- * Themes can optionally override these via html[data-theme="id"] blocks
- * in _theme-registry.scss by redefining the --tbx-mat-dialog-* properties.
- * Same pattern as --tbx-notification-* tokens.
- * ─────────────────────────────────────────────────────────────────────────── */
+ * The shared theme package owns the actual color values (and the
+ * `.tbx-mat-severity-inverted` variant). Themes in consuming applications
+ * can override either the shared tokens (affects every severity-aware
+ * package) or the dialog-prefixed aliases (dialogs only) via
+ * `html[data-theme="id"]` blocks.
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 html {
-    /* Default — primary action (delegates to M3 system tokens) */
-    --tbx-mat-dialog-default-accent: var(--mat-sys-primary);
-    --tbx-mat-dialog-default-on-accent: var(--mat-sys-on-primary);
-
-    /* Destructive — delete, remove, revoke */
-    --tbx-mat-dialog-destructive-accent: #c62828;
-    --tbx-mat-dialog-destructive-on-accent: #ffffff;
-
-    /* Warning — irreversible but not destructive */
-    --tbx-mat-dialog-warning-accent: #f9a825;
-    --tbx-mat-dialog-warning-on-accent: #1a1a1a;
-
-    /* Informational — FYI, read-only */
-    --tbx-mat-dialog-info-accent: #1565c0;
-    --tbx-mat-dialog-info-on-accent: #ffffff;
+    @include severity.tbx-mat-severity-theme('tbx-mat-dialog');
 }
 
-/* ─── Global Dialog Styles ──────────────────────────────────────────────────
+/* ━━━ Action Button Opacity Tokens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  *
- * MatDialog renders overlays outside component scope, so styles that need
- * to reach into the dialog container must be global. The shell component
- * handles its own internal layout; these rules handle the overlay container
- * and any emphasis-driven overrides that require global specificity.
+ * Centralized opacity values for severity-driven action button variants.
+ * Mirrors the set used by `@teqbench/tbx-mat-banners` and
+ * `@teqbench/tbx-mat-notifications` so consumers can override globally
+ * without touching individual severity classes.
  *
- * Emphasis classes (tbx-mat-dialog-default, tbx-mat-dialog-destructive, etc.) are
- * applied to the MatDialog panelClass by TbxMatDialogService and consumed here.
- * ─────────────────────────────────────────────────────────────────────────── */
+ * The slight transparency differentiates action buttons from message text.
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-/* Remove default MatDialog padding — the shell component manages its own padding
- * via --dialog-padding-inline so sections (header, body, footer) and divider
- * insets are always aligned. */
+html {
+    --tbx-mat-dialog-action-text-opacity: 0.8;
+
+    --tbx-mat-dialog-action-filled-container-opacity: var(--tbx-mat-dialog-action-text-opacity);
+    --tbx-mat-dialog-action-tonal-container-opacity: 0.55;
+
+    --tbx-mat-dialog-action-outlined-opacity: var(--tbx-mat-dialog-action-text-opacity);
+    --tbx-mat-dialog-action-elevated-opacity: var(--tbx-mat-dialog-action-text-opacity);
+    --tbx-mat-dialog-action-icon-opacity: var(--tbx-mat-dialog-action-text-opacity);
+    --tbx-mat-dialog-close-icon-opacity: var(--tbx-mat-dialog-action-text-opacity);
+
+    --tbx-mat-dialog-action-filled-hover-state-layer-opacity: 0.3;
+    --tbx-mat-dialog-action-tonal-hover-state-layer-opacity: var(--tbx-mat-dialog-action-filled-hover-state-layer-opacity);
+}
+
+/* ━━━ Dialog Panel Surface ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ *
+ * MatDialog renders overlays outside component scope. The
+ * `.tbx-mat-dialog-panel` class is applied via MatDialog's `panelClass`
+ * by `TbxMatDialogService`. Structural padding/border-radius adjustments
+ * are scoped via descendant selectors to MatDialog's surface element.
+ *
+ * The dialog surface stays neutral (Material theme background); severity
+ * colors drive the header icon container and primary action button only.
+ * This is the structural difference from banners/notifications, where
+ * the entire panel takes the severity background — dialogs are modal
+ * overlays where neutral chrome is the convention.
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
 .tbx-mat-dialog-panel .mat-mdc-dialog-container .mat-mdc-dialog-surface {
     padding: 0;
     border-radius: 1rem;
 }
 
-/* ─── Button Emphasis Overrides ─────────────────────────────────────────────
+/* ━━━ Severity Panel Classes ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  *
- * Applied via [class.tbx-mat-dialog-btn-primary] and [class.tbx-mat-dialog-btn-destructive]
- * in the dialog shell template. Uses Angular Material's recommended override
- * mixin API — same pattern as _snackbar-panels.scss.
+ * Six panel classes, one per severity level. Each class exposes the
+ * active severity's background/text tokens as
+ * `--tbx-mat-dialog-current-{background,text}` for descendant consumption
+ * (header icon container, primary button via the `.tbx-mat-dialog-btn-primary`
+ * opt-in class). The component template stays severity-agnostic and reads
+ * from the `current-*` tokens.
  *
- * Primary buttons read --tbx-mat-dialog-current-accent/on-accent from the :host
- * element (set by the component's data-emphasis attribute). Destructive
- * buttons always use --tbx-mat-dialog-destructive-* regardless of dialog emphasis.
+ * `.tbx-mat-severity-inverted` flip support is inherited automatically
+ * via the shared severity-theme mixin emitted on `html` above.
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+@mixin _severity-panel($bg, $text) {
+    --tbx-mat-dialog-current-background: #{$bg};
+    --tbx-mat-dialog-current-text: #{$text};
+}
+
+.tbx-mat-dialog-panel-default {
+    @include _severity-panel(
+        var(--tbx-mat-dialog-default-background),
+        var(--tbx-mat-dialog-default-text)
+    );
+}
+
+.tbx-mat-dialog-panel-success {
+    @include _severity-panel(
+        var(--tbx-mat-dialog-success-background),
+        var(--tbx-mat-dialog-success-text)
+    );
+}
+
+.tbx-mat-dialog-panel-error {
+    @include _severity-panel(
+        var(--tbx-mat-dialog-error-background),
+        var(--tbx-mat-dialog-error-text)
+    );
+}
+
+.tbx-mat-dialog-panel-warning {
+    @include _severity-panel(
+        var(--tbx-mat-dialog-warning-background),
+        var(--tbx-mat-dialog-warning-text)
+    );
+}
+
+.tbx-mat-dialog-panel-information {
+    @include _severity-panel(
+        var(--tbx-mat-dialog-information-background),
+        var(--tbx-mat-dialog-information-text)
+    );
+}
+
+.tbx-mat-dialog-panel-help {
+    @include _severity-panel(
+        var(--tbx-mat-dialog-help-background),
+        var(--tbx-mat-dialog-help-text)
+    );
+}
+
+/* ━━━ Button Severity Overrides ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  *
- * The .tbx-mat-dialog-panel prefix scopes these overrides to dialog overlays.
- * ─────────────────────────────────────────────────────────────────────────── */
+ * Applied via `[class.tbx-mat-dialog-btn-primary]` /
+ * `[class.tbx-mat-dialog-btn-destructive]` in the dialog shell template.
+ *
+ * - **Primary button** — takes the active panel's severity tokens via
+ *   `--tbx-mat-dialog-current-*`, so the primary action matches the
+ *   dialog's overall severity.
+ * - **Destructive button** — always uses the Error severity tokens
+ *   regardless of the dialog's severity. "Destructive" is a UX intent,
+ *   not a severity (e.g., a "Delete" button inside a Help-severity
+ *   dialog should still read as destructive).
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 .tbx-mat-dialog-panel .tbx-mat-dialog-btn-primary {
     @include mat.button-overrides(
         (
-            filled-container-color: var(--tbx-mat-dialog-current-accent),
-            filled-label-text-color: var(--tbx-mat-dialog-current-on-accent),
+            filled-container-color: var(--tbx-mat-dialog-current-background),
+            filled-label-text-color: var(--tbx-mat-dialog-current-text),
         )
     );
 }
@@ -81,8 +150,8 @@ html {
 .tbx-mat-dialog-panel .tbx-mat-dialog-btn-destructive {
     @include mat.button-overrides(
         (
-            filled-container-color: var(--tbx-mat-dialog-destructive-accent),
-            filled-label-text-color: var(--tbx-mat-dialog-destructive-on-accent),
+            filled-container-color: var(--tbx-mat-dialog-error-background),
+            filled-label-text-color: var(--tbx-mat-dialog-error-text),
         )
     );
 }

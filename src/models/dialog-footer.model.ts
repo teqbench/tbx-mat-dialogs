@@ -41,7 +41,7 @@ export interface TbxMatDialogFooterButton extends TbxMatDialogFooterItem {
     /**
      * Visual emphasis of the button:
      * - 'primary' → matButton="filled" with emphasis accent color
-     * - 'destructive' → matButton="filled" with --tbx-mat-dialog-destructive-accent
+     * - 'destructive' → matButton="filled" with the Error severity tokens (--tbx-mat-dialog-error-{background,text})
      * - 'text' → matButton="text" (no background)
      *
      * Defaults to 'text' when omitted.

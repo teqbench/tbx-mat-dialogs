@@ -43,27 +43,6 @@ import { TBX_MAT_DIALOG_PROVIDER_CONFIG } from '../tokens/dialog-provider-config
 import { TbxMatDialogCloseFontIconService } from '../services/dialog-close-font-icon.service';
 
 /**
- * Placeholder mapping from `TbxMatSeverityLevel` to the legacy `data-emphasis`
- * attribute token consumed by `_tbx-mat-dialogs.scss`.
- *
- * The four-tier emphasis token system (default / destructive / warning / info)
- * is interim: it survives until the SCSS rewrite (#46) replaces it with the
- * six-tier severity-theme panel class system used by `tbx-mat-banners` and
- * `tbx-mat-notifications`. Until then, severities that have no legacy
- * equivalent (`Success`, `Help`) collapse to `default`, and the existing
- * `:host([data-emphasis='X'])` CSS rules continue to drive accent colors
- * for the four mapped severities.
- */
-const SEVERITY_TO_EMPHASIS_TOKEN: Readonly<Record<TbxMatSeverityLevel, string>> = {
-    [TbxMatSeverityLevel.Default]: 'default',
-    [TbxMatSeverityLevel.Success]: 'default',
-    [TbxMatSeverityLevel.Error]: 'destructive',
-    [TbxMatSeverityLevel.Warning]: 'warning',
-    [TbxMatSeverityLevel.Information]: 'info',
-    [TbxMatSeverityLevel.Help]: 'default',
-};
-
-/**
  * Internal data payload injected into DialogShellComponent via MAT_DIALOG_DATA.
  *
  * This is the shape the TbxMatDialogService passes when opening the shell.
@@ -102,12 +81,15 @@ export interface DialogShellData {
  *   - 'primary' / 'destructive' → matButton="filled" with CSS class emphasis
  *   - 'text' / undefined → matButton="text"
  *
- * Emphasis colors are driven by CSS custom properties set on :host via the
- * data-emphasis attribute. The header icon container, icon glyph, and primary/
- * destructive button classes all consume --tbx-mat-dialog-current-accent and
- * --tbx-mat-dialog-current-on-accent — no inline style bindings. Button emphasis
- * overrides use Angular Material's mat.button-overrides() mixin in the global
- * _dialog-panels.scss (same pattern as _snackbar-panels.scss).
+ * Severity colors are driven by the per-severity panel class
+ * (`tbx-mat-dialog-panel-{level}`) applied to the MatDialog overlay by
+ * `TbxMatDialogService`. Each panel class exposes
+ * `--tbx-mat-dialog-current-{background,text}` tokens via the
+ * `_severity-panel` mixin in `_tbx-mat-dialogs.scss`. The header icon
+ * container and primary/destructive button classes consume those tokens
+ * directly — no host attribute binding or inline style bindings needed.
+ * Button overrides use Angular Material's `mat.button-overrides()` mixin
+ * in the global stylesheet.
  *
  * Icon position uses Material's `iconPositionEnd` attribute on `mat-icon`.
  * Material's button template has separate content projection slots for
@@ -122,9 +104,6 @@ export interface DialogShellData {
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
     selector: 'tbx-mat-dialog-shell',
-    host: {
-        '[attr.data-emphasis]': 'emphasisToken',
-    },
     imports: [
         MatButtonModule,
         MatIconModule,
@@ -308,33 +287,6 @@ export interface DialogShellData {
             --dialog-padding-inline: 1.25rem;
         }
 
-        /* ── Emphasis ──────────────────────────────────────── */
-
-        /* Each emphasis sets --tbx-mat-dialog-current-accent and --tbx-mat-dialog-current-on-accent
-         * on :host via the data-emphasis attribute. These cascade to all descendants —
-         * the icon container, icon glyph, and button emphasis classes all consume them.
-         * Default is the fallback when data-emphasis is not set. */
-        :host,
-        :host([data-emphasis='default']) {
-            --tbx-mat-dialog-current-accent: var(--tbx-mat-dialog-default-accent);
-            --tbx-mat-dialog-current-on-accent: var(--tbx-mat-dialog-default-on-accent);
-        }
-
-        :host([data-emphasis='destructive']) {
-            --tbx-mat-dialog-current-accent: var(--tbx-mat-dialog-destructive-accent);
-            --tbx-mat-dialog-current-on-accent: var(--tbx-mat-dialog-destructive-on-accent);
-        }
-
-        :host([data-emphasis='warning']) {
-            --tbx-mat-dialog-current-accent: var(--tbx-mat-dialog-warning-accent);
-            --tbx-mat-dialog-current-on-accent: var(--tbx-mat-dialog-warning-on-accent);
-        }
-
-        :host([data-emphasis='info']) {
-            --tbx-mat-dialog-current-accent: var(--tbx-mat-dialog-info-accent);
-            --tbx-mat-dialog-current-on-accent: var(--tbx-mat-dialog-info-on-accent);
-        }
-
         /* ── Header ────────────────────────────────────────── */
 
         .dialog-header {
@@ -355,8 +307,10 @@ export interface DialogShellData {
 
         /* Circular container for the header icon — matches the 2.5rem touch target
          * of the close button (matIconButton). The icon glyph is centered within.
-         * Background and icon color consume the emphasis host variables set by
-         * :host([data-emphasis]) — no inline style bindings needed. */
+         * Background and icon color consume the severity tokens set by the
+         * .tbx-mat-dialog-panel-{level} class on the MatDialog overlay (see
+         * _tbx-mat-dialogs.scss). The tokens cascade to all descendants — no
+         * inline style bindings or host attribute needed. */
         .header-icon-container {
             flex-shrink: 0;
             width: 2.5rem;
@@ -365,14 +319,14 @@ export interface DialogShellData {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--tbx-mat-dialog-current-accent);
+            background: var(--tbx-mat-dialog-current-background);
         }
 
         .header-icon {
             font-size: 1.25rem;
             width: 1.25rem;
             height: 1.25rem;
-            color: var(--tbx-mat-dialog-current-on-accent);
+            color: var(--tbx-mat-dialog-current-text);
         }
 
         .header-text {
@@ -498,16 +452,12 @@ export class DialogShellComponent {
 
     /**
      * The resolved severity — defaults to Default when not specified.
+     * Used by `severityIcon` to look up the right icon from the resolver.
+     * The per-severity panel class on the MatDialog overlay drives all
+     * color tokens; the component does not bind the severity to any
+     * host attribute.
      */
     private readonly type = this.config.type ?? TbxMatSeverityLevel.Default;
-
-    /**
-     * Token suffix mapped from the current severity to the legacy four-tier
-     * emphasis tokens consumed by the host `data-emphasis` attribute binding
-     * and the `:host([data-emphasis])` CSS selectors. Replaced by per-severity
-     * panel classes in #46.
-     */
-    readonly emphasisToken = SEVERITY_TO_EMPHASIS_TOKEN[this.type];
 
     /**
      * Resolved severity icon for the header.

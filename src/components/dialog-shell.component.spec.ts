@@ -725,80 +725,24 @@ describe('DialogShellComponent', () => {
     });
 
     describe('severity', () => {
-        it('should set data-emphasis to default for Default severity', () => {
+        // Severity-driven color tokens are now applied via the per-severity
+        // panel class on the MatDialog overlay (set by `TbxMatDialogService`),
+        // not via a host attribute on the shell component. The component
+        // surfaces severity only through `severityIcon` resolution. The
+        // panelClass-per-severity behavior is covered in dialog.service.spec.
+
+        it('should not bind a data-emphasis attribute on the host', () => {
             const fixture = createFixture({
                 title: 'Test',
                 icon: 'info',
-                type: TbxMatSeverityLevel.Default,
-            });
-
-            const host = fixture.nativeElement as HTMLElement;
-            expect(host.getAttribute('data-emphasis')).toBe('default');
-        });
-
-        it('should set data-emphasis to destructive for Error severity', () => {
-            const fixture = createFixture({
-                title: 'Test',
-                icon: 'warning',
                 type: TbxMatSeverityLevel.Error,
             });
 
             const host = fixture.nativeElement as HTMLElement;
-            expect(host.getAttribute('data-emphasis')).toBe('destructive');
+            expect(host.hasAttribute('data-emphasis')).toBe(false);
         });
 
-        it('should set data-emphasis to warning for Warning severity', () => {
-            const fixture = createFixture({
-                title: 'Test',
-                icon: 'warning',
-                type: TbxMatSeverityLevel.Warning,
-            });
-
-            const host = fixture.nativeElement as HTMLElement;
-            expect(host.getAttribute('data-emphasis')).toBe('warning');
-        });
-
-        it('should set data-emphasis to info for Information severity', () => {
-            const fixture = createFixture({
-                title: 'Test',
-                icon: 'info',
-                type: TbxMatSeverityLevel.Information,
-            });
-
-            const host = fixture.nativeElement as HTMLElement;
-            expect(host.getAttribute('data-emphasis')).toBe('info');
-        });
-
-        it('should default to default severity when not specified', () => {
-            const fixture = createFixture({ title: 'Test', icon: 'info' });
-
-            const host = fixture.nativeElement as HTMLElement;
-            expect(host.getAttribute('data-emphasis')).toBe('default');
-        });
-
-        it('should map Success severity to data-emphasis default (placeholder until #46)', () => {
-            const fixture = createFixture({
-                title: 'Test',
-                icon: 'check',
-                type: TbxMatSeverityLevel.Success,
-            });
-
-            const host = fixture.nativeElement as HTMLElement;
-            expect(host.getAttribute('data-emphasis')).toBe('default');
-        });
-
-        it('should map Help severity to data-emphasis default (placeholder until #46)', () => {
-            const fixture = createFixture({
-                title: 'Test',
-                icon: 'help',
-                type: TbxMatSeverityLevel.Help,
-            });
-
-            const host = fixture.nativeElement as HTMLElement;
-            expect(host.getAttribute('data-emphasis')).toBe('default');
-        });
-
-        it('should render icon container when icon is provided', () => {
+        it('should render the icon container when an icon is resolved', () => {
             const fixture = createFixture({
                 title: 'Test',
                 icon: 'info',
