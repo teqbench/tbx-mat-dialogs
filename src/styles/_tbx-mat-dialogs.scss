@@ -15,26 +15,26 @@
  * A purple-themed app still needs red destructive dialogs.
  *
  * Themes can optionally override these via html[data-theme="id"] blocks
- * in _theme-registry.scss by redefining the --tbx-dialog-* properties.
+ * in _theme-registry.scss by redefining the --tbx-mat-dialog-* properties.
  * Same pattern as --tbx-notification-* tokens.
  * ─────────────────────────────────────────────────────────────────────────── */
 
 html {
     /* Default — primary action (delegates to M3 system tokens) */
-    --tbx-dialog-default-accent: var(--mat-sys-primary);
-    --tbx-dialog-default-on-accent: var(--mat-sys-on-primary);
+    --tbx-mat-dialog-default-accent: var(--mat-sys-primary);
+    --tbx-mat-dialog-default-on-accent: var(--mat-sys-on-primary);
 
     /* Destructive — delete, remove, revoke */
-    --tbx-dialog-destructive-accent: #c62828;
-    --tbx-dialog-destructive-on-accent: #ffffff;
+    --tbx-mat-dialog-destructive-accent: #c62828;
+    --tbx-mat-dialog-destructive-on-accent: #ffffff;
 
     /* Warning — irreversible but not destructive */
-    --tbx-dialog-warning-accent: #f9a825;
-    --tbx-dialog-warning-on-accent: #1a1a1a;
+    --tbx-mat-dialog-warning-accent: #f9a825;
+    --tbx-mat-dialog-warning-on-accent: #1a1a1a;
 
     /* Informational — FYI, read-only */
-    --tbx-dialog-info-accent: #1565c0;
-    --tbx-dialog-info-on-accent: #ffffff;
+    --tbx-mat-dialog-info-accent: #1565c0;
+    --tbx-mat-dialog-info-on-accent: #ffffff;
 }
 
 /* ─── Global Dialog Styles ──────────────────────────────────────────────────
@@ -44,45 +44,45 @@ html {
  * handles its own internal layout; these rules handle the overlay container
  * and any emphasis-driven overrides that require global specificity.
  *
- * Emphasis classes (tbx-dialog-default, tbx-dialog-destructive, etc.) are
+ * Emphasis classes (tbx-mat-dialog-default, tbx-mat-dialog-destructive, etc.) are
  * applied to the MatDialog panelClass by TbxMatDialogService and consumed here.
  * ─────────────────────────────────────────────────────────────────────────── */
 
 /* Remove default MatDialog padding — the shell component manages its own padding
  * via --dialog-padding-inline so sections (header, body, footer) and divider
  * insets are always aligned. */
-.tbx-dialog-panel .mat-mdc-dialog-container .mat-mdc-dialog-surface {
+.tbx-mat-dialog-panel .mat-mdc-dialog-container .mat-mdc-dialog-surface {
     padding: 0;
     border-radius: 1rem;
 }
 
 /* ─── Button Emphasis Overrides ─────────────────────────────────────────────
  *
- * Applied via [class.dialog-btn-primary] and [class.dialog-btn-destructive]
+ * Applied via [class.tbx-mat-dialog-btn-primary] and [class.tbx-mat-dialog-btn-destructive]
  * in the dialog shell template. Uses Angular Material's recommended override
  * mixin API — same pattern as _snackbar-panels.scss.
  *
- * Primary buttons read --tbx-dialog-current-accent/on-accent from the :host
+ * Primary buttons read --tbx-mat-dialog-current-accent/on-accent from the :host
  * element (set by the component's data-emphasis attribute). Destructive
- * buttons always use --tbx-dialog-destructive-* regardless of dialog emphasis.
+ * buttons always use --tbx-mat-dialog-destructive-* regardless of dialog emphasis.
  *
- * The .tbx-dialog-panel prefix scopes these overrides to dialog overlays.
+ * The .tbx-mat-dialog-panel prefix scopes these overrides to dialog overlays.
  * ─────────────────────────────────────────────────────────────────────────── */
 
-.tbx-dialog-panel .dialog-btn-primary {
+.tbx-mat-dialog-panel .tbx-mat-dialog-btn-primary {
     @include mat.button-overrides(
         (
-            filled-container-color: var(--tbx-dialog-current-accent),
-            filled-label-text-color: var(--tbx-dialog-current-on-accent),
+            filled-container-color: var(--tbx-mat-dialog-current-accent),
+            filled-label-text-color: var(--tbx-mat-dialog-current-on-accent),
         )
     );
 }
 
-.tbx-dialog-panel .dialog-btn-destructive {
+.tbx-mat-dialog-panel .tbx-mat-dialog-btn-destructive {
     @include mat.button-overrides(
         (
-            filled-container-color: var(--tbx-dialog-destructive-accent),
-            filled-label-text-color: var(--tbx-dialog-destructive-on-accent),
+            filled-container-color: var(--tbx-mat-dialog-destructive-accent),
+            filled-label-text-color: var(--tbx-mat-dialog-destructive-on-accent),
         )
     );
 }

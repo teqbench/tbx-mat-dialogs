@@ -792,7 +792,7 @@ describe('DialogShellComponent', () => {
             expect(button).not.toBeNull();
         });
 
-        it('should apply dialog-btn-primary class to primary button', () => {
+        it('should apply tbx-mat-dialog-btn-primary class to primary button', () => {
             const footer: TbxMatDialogFooterControlType[] = [
                 buildButton({ emphasis: 'primary', result: TbxMatDialogDismissReason.Affirm }),
             ];
@@ -802,11 +802,15 @@ describe('DialogShellComponent', () => {
             );
 
             const button = fixture.debugElement.query(By.css('mat-dialog-actions button'));
-            expect(button.nativeElement.classList.contains('dialog-btn-primary')).toBe(true);
-            expect(button.nativeElement.classList.contains('dialog-btn-destructive')).toBe(false);
+            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-primary')).toBe(
+                true
+            );
+            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(
+                false
+            );
         });
 
-        it('should apply dialog-btn-destructive class to destructive button', () => {
+        it('should apply tbx-mat-dialog-btn-destructive class to destructive button', () => {
             const footer: TbxMatDialogFooterControlType[] = [
                 buildButton({ emphasis: 'destructive', result: TbxMatDialogDismissReason.Affirm }),
             ];
@@ -816,8 +820,12 @@ describe('DialogShellComponent', () => {
             );
 
             const button = fixture.debugElement.query(By.css('mat-dialog-actions button'));
-            expect(button.nativeElement.classList.contains('dialog-btn-destructive')).toBe(true);
-            expect(button.nativeElement.classList.contains('dialog-btn-primary')).toBe(false);
+            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(
+                true
+            );
+            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-primary')).toBe(
+                false
+            );
         });
 
         it('should not apply emphasis class to text buttons', () => {
@@ -827,8 +835,12 @@ describe('DialogShellComponent', () => {
             const fixture = createFixture({ title: 'Test' }, footer);
 
             const button = fixture.debugElement.query(By.css('mat-dialog-actions button'));
-            expect(button.nativeElement.classList.contains('dialog-btn-primary')).toBe(false);
-            expect(button.nativeElement.classList.contains('dialog-btn-destructive')).toBe(false);
+            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-primary')).toBe(
+                false
+            );
+            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(
+                false
+            );
         });
     });
 });

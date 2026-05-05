@@ -298,7 +298,7 @@ export class TbxMatDialogService {
             minHeight: config.minHeight,
             maxHeight: config.maxHeight,
             disableClose: config.disableClose ?? false,
-            panelClass: 'tbx-dialog-panel',
+            panelClass: 'tbx-mat-dialog-panel',
             autoFocus: 'first-tabbable',
             ariaModal: true,
         });

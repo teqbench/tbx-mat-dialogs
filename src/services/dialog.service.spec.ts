@@ -425,7 +425,7 @@ describe('TbxMatDialogService', () => {
             );
         });
 
-        it('should apply tbx-dialog-panel panelClass', async () => {
+        it('should apply tbx-mat-dialog-panel panelClass', async () => {
             setupTestBed();
             const promise = service.information({ title: 'Test' });
             resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
@@ -433,7 +433,7 @@ describe('TbxMatDialogService', () => {
 
             expect(dialogSpy.open).toHaveBeenCalledWith(
                 DialogShellComponent,
-                expect.objectContaining({ panelClass: 'tbx-dialog-panel' })
+                expect.objectContaining({ panelClass: 'tbx-mat-dialog-panel' })
             );
         });
 

@@ -39,7 +39,7 @@ import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-contr
 
 /**
  * Emphasis CSS variable prefix mapping.
- * Maps TbxMatDialogEmphasisType enum values to the --tbx-dialog-* token prefix
+ * Maps TbxMatDialogEmphasisType enum values to the --tbx-mat-dialog-* token prefix
  * used in _dialog-panels.scss.
  */
 const EMPHASIS_TOKEN_MAP: Readonly<Record<TbxMatDialogEmphasisType, string>> = {
@@ -90,8 +90,8 @@ export interface DialogShellData {
  *
  * Emphasis colors are driven by CSS custom properties set on :host via the
  * data-emphasis attribute. The header icon container, icon glyph, and primary/
- * destructive button classes all consume --tbx-dialog-current-accent and
- * --tbx-dialog-current-on-accent — no inline style bindings. Button emphasis
+ * destructive button classes all consume --tbx-mat-dialog-current-accent and
+ * --tbx-mat-dialog-current-on-accent — no inline style bindings. Button emphasis
  * overrides use Angular Material's mat.button-overrides() mixin in the global
  * _dialog-panels.scss (same pattern as _snackbar-panels.scss).
  *
@@ -107,7 +107,7 @@ export interface DialogShellData {
  */
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
-    selector: 'tbx-dialog-shell',
+    selector: 'tbx-mat-dialog-shell',
     host: {
         '[attr.data-emphasis]': 'emphasisToken',
     },
@@ -183,8 +183,10 @@ export interface DialogShellData {
                                 @if (btn.emphasis === 'primary' || btn.emphasis === 'destructive') {
                                     <button
                                         matButton="filled"
-                                        [class.dialog-btn-primary]="btn.emphasis === 'primary'"
-                                        [class.dialog-btn-destructive]="
+                                        [class.tbx-mat-dialog-btn-primary]="
+                                            btn.emphasis === 'primary'
+                                        "
+                                        [class.tbx-mat-dialog-btn-destructive]="
                                             btn.emphasis === 'destructive'
                                         "
                                         [attr.cdkFocusInitial]="shouldAutoFocus(btn) ? '' : null"
@@ -276,29 +278,29 @@ export interface DialogShellData {
 
         /* ── Emphasis ──────────────────────────────────────── */
 
-        /* Each emphasis sets --tbx-dialog-current-accent and --tbx-dialog-current-on-accent
+        /* Each emphasis sets --tbx-mat-dialog-current-accent and --tbx-mat-dialog-current-on-accent
          * on :host via the data-emphasis attribute. These cascade to all descendants —
          * the icon container, icon glyph, and button emphasis classes all consume them.
          * Default is the fallback when data-emphasis is not set. */
         :host,
         :host([data-emphasis='default']) {
-            --tbx-dialog-current-accent: var(--tbx-dialog-default-accent);
-            --tbx-dialog-current-on-accent: var(--tbx-dialog-default-on-accent);
+            --tbx-mat-dialog-current-accent: var(--tbx-mat-dialog-default-accent);
+            --tbx-mat-dialog-current-on-accent: var(--tbx-mat-dialog-default-on-accent);
         }
 
         :host([data-emphasis='destructive']) {
-            --tbx-dialog-current-accent: var(--tbx-dialog-destructive-accent);
-            --tbx-dialog-current-on-accent: var(--tbx-dialog-destructive-on-accent);
+            --tbx-mat-dialog-current-accent: var(--tbx-mat-dialog-destructive-accent);
+            --tbx-mat-dialog-current-on-accent: var(--tbx-mat-dialog-destructive-on-accent);
         }
 
         :host([data-emphasis='warning']) {
-            --tbx-dialog-current-accent: var(--tbx-dialog-warning-accent);
-            --tbx-dialog-current-on-accent: var(--tbx-dialog-warning-on-accent);
+            --tbx-mat-dialog-current-accent: var(--tbx-mat-dialog-warning-accent);
+            --tbx-mat-dialog-current-on-accent: var(--tbx-mat-dialog-warning-on-accent);
         }
 
         :host([data-emphasis='info']) {
-            --tbx-dialog-current-accent: var(--tbx-dialog-info-accent);
-            --tbx-dialog-current-on-accent: var(--tbx-dialog-info-on-accent);
+            --tbx-mat-dialog-current-accent: var(--tbx-mat-dialog-info-accent);
+            --tbx-mat-dialog-current-on-accent: var(--tbx-mat-dialog-info-on-accent);
         }
 
         /* ── Header ────────────────────────────────────────── */
@@ -331,14 +333,14 @@ export interface DialogShellData {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--tbx-dialog-current-accent);
+            background: var(--tbx-mat-dialog-current-accent);
         }
 
         .header-icon {
             font-size: 1.25rem;
             width: 1.25rem;
             height: 1.25rem;
-            color: var(--tbx-dialog-current-on-accent);
+            color: var(--tbx-mat-dialog-current-on-accent);
         }
 
         .header-text {
