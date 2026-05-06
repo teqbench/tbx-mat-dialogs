@@ -13,9 +13,10 @@ The Release workflow automates versioning, changelog generation, [GitHub Release
 
 ## Triggers
 
-| Event  | Branches |
-| ------ | -------- |
-| `push` | `main`   |
+<dl>
+    <dt><code>push</code></dt>
+    <dd>Branches: <code>main</code>.</dd>
+</dl>
 
 Runs on every push to `main`, including merges from release branches, badge commits (though these have no releasable commits), and Release PR merges.
 
@@ -34,10 +35,12 @@ Separate from CI and Sync to prevent cross-workflow cancellation.
 
 ## Secrets Used
 
-| Secret            | Purpose                                  |
-| ----------------- | ---------------------------------------- |
-| `APP_ID`          | GitHub App ID for generating a bot token |
-| `APP_PRIVATE_KEY` | GitHub App private key                   |
+<dl>
+    <dt><code>APP_ID</code></dt>
+    <dd><a href="https://docs.github.com/en/apps">GitHub App ↗</a> ID for generating a bot token.</dd>
+    <dt><code>APP_PRIVATE_KEY</code></dt>
+    <dd><a href="https://docs.github.com/en/apps">GitHub App ↗</a> private key.</dd>
+</dl>
 
 The app token is used instead of `GITHUB_TOKEN` so that Release PRs and release commits can trigger downstream workflows (CI, Sync). [GitHub ↗](https://github.com)'s security policy prevents `GITHUB_TOKEN` from triggering other workflows.
 
@@ -184,8 +187,11 @@ Tracks the current released version. Updated automatically by [Release Please �
 
 ## Interaction with Other Workflows
 
-| Event                                                                                            | Triggers                                                                                                                                                               |
-| ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Release PR opened/updated                                                                        | CI runs as status check on the PR                                                                                                                                      |
-| Release PR merged (push to main)                                                                 | CI (badge update), Release (creates [GitHub Release ↗](https://docs.github.com/en/repositories/releasing-projects-on-github) + publishes), Sync (merges main into dev) |
-| [GitHub Release ↗](https://docs.github.com/en/repositories/releasing-projects-on-github) created | No additional workflow triggers                                                                                                                                        |
+<dl>
+    <dt>Release PR opened/updated</dt>
+    <dd>CI runs as status check on the PR.</dd>
+    <dt>Release PR merged (push to main)</dt>
+    <dd>CI (badge update), Release (creates <a href="https://docs.github.com/en/repositories/releasing-projects-on-github">GitHub Release ↗</a> + publishes), Sync (merges main into dev).</dd>
+    <dt><a href="https://docs.github.com/en/repositories/releasing-projects-on-github">GitHub Release ↗</a> created</dt>
+    <dd>No additional workflow triggers.</dd>
+</dl>
