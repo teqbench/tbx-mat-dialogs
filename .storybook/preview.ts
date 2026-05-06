@@ -41,7 +41,23 @@ const preview: Preview = {
         }),
     ],
     parameters: {
+        options: {
+            // Custom sort so stories within the Dialogs group appear in the
+            // intended narrative order (overview → confirm → input → custom)
+            // rather than the default alphabetical order. Mirrors the sort
+            // used by tbx-mat-banners.
+            storySort: (a, b) => {
+                const ORDER = ['dialogs--dialogs', 'dialogs--confirm', 'dialogs--input', 'dialogs--custom'];
+                const aIdx = ORDER.indexOf(a.id);
+                const bIdx = ORDER.indexOf(b.id);
+                if (aIdx === -1 && bIdx === -1) return a.id.localeCompare(b.id);
+                if (aIdx === -1) return 1;
+                if (bIdx === -1) return -1;
+                return aIdx - bIdx;
+            },
+        },
         controls: {
+            disableSaveFromUI: true,
             matchers: {
                 color: /(background|color)$/i,
                 date: /Date$/i,
