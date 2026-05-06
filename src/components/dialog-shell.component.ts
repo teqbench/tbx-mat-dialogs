@@ -45,9 +45,12 @@ import { TbxMatDialogCloseFontIconService } from '../services/dialog-close-font-
 /**
  * Internal data payload injected into DialogShellComponent via MAT_DIALOG_DATA.
  *
- * This is the shape the TbxMatDialogService passes when opening the shell.
- * It extends TbxMatDialogConfig with the resolved footer (service applies default
+ * @remarks
+ * This is the shape the {@link TbxMatDialogService} passes when opening the shell.
+ * It extends {@link TbxMatDialogConfig} with the resolved footer (service applies default
  * button presets when the caller omits footer).
+ *
+ * @internal
  */
 export interface DialogShellData {
     readonly config: TbxMatDialogConfig<unknown>;
@@ -55,9 +58,12 @@ export interface DialogShellData {
 }
 
 /**
- * Common dialog chrome shared by all three dialog types (info, confirm, input).
+ * Render the common dialog chrome shared by all dialog types (info, confirm, input).
  *
- * Renders a consistent layout using Material dialog structural directives:
+ * @remarks
+ * Renders a consistent layout using
+ * {@link https://material.angular.dev/components/dialog/api | Angular Material} dialog
+ * structural directives:
  *   - Header: icon in circular container (optional), title (matDialogTitle for
  *     aria-labelledby accessibility), context badge (mat-chip, optional),
  *     subtitle (optional), close button — all vertically centered
@@ -68,7 +74,8 @@ export interface DialogShellData {
  *   - Footer (mat-dialog-actions): single flex row of buttons and controls
  *
  * The shell is internal to the dialog system — consumers never reference it directly.
- * They interact with TbxMatDialogService, which opens this component via MatDialog.
+ * They interact with {@link TbxMatDialogService}, which opens this component via
+ * {@link https://material.angular.dev/components/dialog/api | MatDialog}.
  *
  * For input dialogs, the shell dynamically creates the content component from
  * config.content and reads its isValid/value signals. The affirm button's

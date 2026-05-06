@@ -7,7 +7,7 @@
 
 ## Purpose
 
-After release-please merges a Release PR to `main`, the `dev` branch falls behind — it's missing the version bump in `package.json`, the updated `CHANGELOG.md`, and the new `.release-please-manifest.json`. This workflow automatically merges `main` back into `dev` to keep the branches in sync.
+After [Release Please ↗](https://github.com/googleapis/release-please) merges a Release PR to `main`, the `dev` branch falls behind — it's missing the version bump in `package.json`, the updated `CHANGELOG.md`, and the new `.release-please-manifest.json`. This workflow automatically merges `main` back into `dev` to keep the branches in sync.
 
 ---
 
@@ -68,7 +68,7 @@ timeout-minutes: 10
 
 #### 1. Generate App Token
 
-Uses `actions/create-github-app-token@v3` to create a short-lived token from the `teqbench-automation` GitHub App.
+Uses `actions/create-github-app-token@v3` to create a short-lived token from the `teqbench-automation` [GitHub App ↗](https://docs.github.com/en/apps).
 
 #### 2. Checkout Repository
 
@@ -98,7 +98,7 @@ git push origin dev
 
 **Step-by-step:**
 
-1. **Configure git identity** — uses the bot's identity so commits are attributed correctly.
+1. **Configure [git ↗](https://git-scm.com) identity** — uses the bot's identity so commits are attributed correctly.
 2. **Checkout dev and pull latest** — ensures we have the most recent state of `dev`.
 3. **Merge `origin/main` into `dev`** — brings all changes from main (releases, docs, CI fixes).
 4. **Pull with rebase** — handles race conditions where another push landed on `dev` between the merge and push.
@@ -113,7 +113,7 @@ git push origin dev
 
 ## Interaction with Other Workflows
 
-| What Happens                 | Result                                                                                                                                          |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sync pushes to `dev`         | CI on `dev` is **skipped** — the `[skip ci]` tag in the merge commit message suppresses the `push` trigger per the GitHub Actions specification |
-| Sync races with another push | Handled by `git pull --rebase` before pushing                                                                                                   |
+| What Happens                 | Result                                                                                                                                                                                  |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sync pushes to `dev`         | CI on `dev` is **skipped** — the `[skip ci]` tag in the merge commit message suppresses the `push` trigger per the [GitHub Actions ↗](https://docs.github.com/en/actions) specification |
+| Sync races with another push | Handled by `git pull --rebase` before pushing                                                                                                                                           |

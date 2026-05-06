@@ -1,44 +1,52 @@
 /**
- * Dialog system — typed modal dialogs with severity, footer controls, and input content.
+ * Opinionated modal dialog service for {@link https://angular.dev | Angular}
  *
- * Public API:
- *   - TbxMatDialogService                     — inject and call show(), success(), error(), warning(), information(), help(), default(), confirm(), input()
- *   - TbxMatDialogConfigArgs                  — Partial config with required title (for opinionated methods)
- *   - TbxMatDialogDismissReason               — result enum (Affirm, Deny, Cancel, Close)
- *   - TbxMatDialogResult<T, F>                — typed return value
- *   - TbxMatDialogConfig<T>                   — full configuration for show()
- *   - TbxMatDialogData<T>                     — contract for input dialog content components
- *   - TbxMatDialogFooterControlType           — discriminated union of footer items
- *   - TBX_MAT_DIALOG_BUTTONS_OK / OK_CANCEL / YES_NO / YES_NO_CANCEL — button presets
- *   - TBX_MAT_DIALOG_DEFAULT_WIDTH            — default width constant
- *   - TBX_MAT_DIALOG_PROVIDER_CONFIG          — injection token for icon provider configuration
- *   - TbxMatDialogProviderConfig              — provider config interface (severity + close icon resolvers)
- *   - TbxMatDialogIconResolver                — icon resolver shape combined with the resolved icon's type
- *   - TbxMatDialogSeverityFontIconService     — default font-based severity icon service
- *   - TbxMatDialogSeveritySvgIconService      — default SVG-based severity icon service
- *   - TbxMatDialogCloseFontIconService        — default font-based close icon service
+ * @remarks
+ * Built on {@link https://material.angular.dev/components/dialog/api | Angular Material's MatDialog},
+ * this package exposes nine async dialog methods returning `Promise<TbxMatDialogResult<T, F>>`:
+ * six severity-leveled methods that mirror `tbx-mat-banners` and `tbx-mat-notifications`
+ * (`success`, `error`, `warning`, `information`, `help`, `default`), two dialog-specific UX
+ * patterns (`confirm` for Yes/No, `input` for projected form content), and `show` for
+ * full-control configuration.
  *
- * Internal (not re-exported):
- *   - DialogShellComponent     — common chrome
- *   - DialogShellData          — MAT_DIALOG_DATA payload
+ * Severity colors come from `@teqbench/tbx-mat-severity-theme`; pluggable icon resolution
+ * is wired via {@link TBX_MAT_DIALOG_PROVIDER_CONFIG} with three default services
+ * ({@link TbxMatDialogSeverityFontIconService}, {@link TbxMatDialogSeveritySvgIconService},
+ * {@link TbxMatDialogCloseFontIconService}). Footer is a single flex row of buttons and
+ * form controls (checkbox, slide-toggle, radio group, button-toggle group). Input dialog
+ * content components implement {@link TbxMatDialogData} with signal-based validation.
+ *
+ * Key exports:
+ *
+ * - {@link TbxMatDialogService} — inject and call `show()`, `success()`, `error()`, `warning()`, `information()`, `help()`, `default()`, `confirm()`, `input()`
+ * - {@link TbxMatDialogConfig} — full configuration for `show()`
+ * - {@link TbxMatDialogConfigArgs} — partial config with required title (for opinionated methods)
+ * - {@link TbxMatDialogResult} — typed return value
+ * - {@link TbxMatDialogDismissReason} — result enum (`Affirm`, `Deny`, `Cancel`, `Close`)
+ * - {@link TbxMatDialogData} — contract for input dialog content components
+ * - {@link TbxMatDialogFooterControlType} — discriminated union of footer items
+ * - {@link TbxMatDialogProviderConfig} — provider config interface (severity + close icon resolvers)
+ * - {@link TBX_MAT_DIALOG_PROVIDER_CONFIG} — injection token for icon provider configuration
+ * - {@link TBX_MAT_DIALOG_BUTTONS_OK}, {@link TBX_MAT_DIALOG_BUTTONS_OK_CANCEL}, {@link TBX_MAT_DIALOG_BUTTONS_YES_NO}, {@link TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL} — button presets
+ *
+ * @see {@link https://angular.dev | Angular}
+ * @see {@link https://material.angular.dev/components/dialog/api | Angular Material MatDialog}
+ *
+ * @packageDocumentation
  */
 
-// Types — enum values
+// Types
 export { TbxMatDialogDismissReason } from './types/dialog-result.type';
+export type { TbxMatDialogFooterControlType } from './types/dialog-footer-control.type';
+export type { TbxMatDialogConfigArgs } from './types/dialog-config-override.type';
+export type { TbxMatDialogIconResolver } from './types/dialog-icon-resolver.type';
 
-// Models — dialog types
+// Models
 export type {
     TbxMatDialogResult,
     TbxMatDialogConfig,
     TbxMatDialogData,
 } from './models/dialog.model';
-
-// Types — type aliases
-export type { TbxMatDialogFooterControlType } from './types/dialog-footer-control.type';
-export type { TbxMatDialogConfigArgs } from './types/dialog-config-override.type';
-export type { TbxMatDialogIconResolver } from './types/dialog-icon-resolver.type';
-
-// Models — provider config and footer controls
 export type { TbxMatDialogProviderConfig } from './models/dialog-provider-config.model';
 export type {
     TbxMatDialogFooterItem,
@@ -51,7 +59,7 @@ export type {
     TbxMatDialogFooterToggleOption,
 } from './models/dialog-footer.model';
 
-// Constants — button presets and defaults
+// Constants
 export {
     TBX_MAT_DIALOG_DEFAULT_WIDTH,
     TBX_MAT_DIALOG_BUTTONS_OK,
@@ -60,7 +68,7 @@ export {
     TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL,
 } from './constants/dialog.constants';
 
-// Tokens — pluggable DI
+// Tokens
 export { TBX_MAT_DIALOG_PROVIDER_CONFIG } from './tokens/dialog-provider-config.token';
 
 // Services

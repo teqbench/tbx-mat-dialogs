@@ -244,9 +244,10 @@ providers: [
 
 #### Custom close icon
 
-The close button uses a package-default `'close'` Material Symbols ligature. Override it by supplying a `closeIconResolverService`:
+The close button uses a package-default `'close'` [Material Symbols ↗](https://fonts.google.com/icons) ligature. Override it by supplying a `closeIconResolverService`:
 
 ```typescript
+// MyCustomCloseIconService is a consumer-defined service (see below).
 providers: [
     {
         provide: TBX_MAT_DIALOG_PROVIDER_CONFIG,
@@ -476,7 +477,7 @@ Contributions are welcome. See the [contributing guide ↗](https://github.com/t
 
 ## Security
 
-See the [security policy ↗](https://github.com/teqbench/.github/blob/main/SECURITY.md) for the supported-version policy and how to report a vulnerability privately.
+See the [security policy](SECURITY.md) for the supported-version policy and how to report a vulnerability privately.
 
 ## Feedback
 

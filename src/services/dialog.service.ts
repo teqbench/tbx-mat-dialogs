@@ -15,34 +15,47 @@ import {
 } from '../constants/dialog.constants';
 
 /**
- * Application-wide dialog service.
+ * Open a typed modal dialog and await the user's choice
  *
- * Provides nine opinionated dialog methods with sensible defaults and a
- * general-purpose show() method for full control. All dialogs use the
- * shared DialogShellComponent for consistent chrome (header, body, footer).
+ * @remarks
+ * Application-wide dialog service built on
+ * {@link https://material.angular.dev/components/dialog/api | Angular Material's MatDialog}.
+ * Provides nine opinionated dialog methods with sensible defaults and a general-purpose
+ * `show()` method for full control. All dialogs use the shared internal shell component
+ * for consistent chrome (header, body, footer).
  *
- * Severity-leveled methods (`success`, `error`, `warning`, `information`,
- * `help`, `default`) mirror the surface exposed by `TbxMatBannerService`
- * and `TbxMatNotificationService`. Dialog-specific patterns
- * (`confirm`, `input`) layer on top of the severity model with their own
- * default footer presets.
+ * Severity-leveled methods (`success`, `error`, `warning`, `information`, `help`,
+ * `default`) mirror the surface exposed by `TbxMatBannerService` and
+ * `TbxMatNotificationService`. Dialog-specific patterns (`confirm`, `input`) layer on top
+ * of the severity model with their own default footer presets.
  *
- * All methods return a Promise that resolves when the dialog closes,
- * so consumers use async/await with no subscription management.
+ * All methods return a Promise that resolves when the dialog closes, so consumers use
+ * `async`/`await` with no subscription management.
  *
- * Icons are resolved at render time by `DialogShellComponent` via the
- * required `TBX_MAT_DIALOG_PROVIDER_CONFIG` injection token. Consumers
- * configure the severity icon resolver (font or SVG) and an optional
- * close icon resolver in `app.config.ts`; see `TbxMatDialogProviderConfig`
- * for the full shape. Per-call `config.icon` overrides take precedence
- * over the resolved severity icon and are rendered as font ligatures.
+ * Icons are resolved at render time by the dialog shell via the required
+ * {@link TBX_MAT_DIALOG_PROVIDER_CONFIG} injection token. Consumers configure the severity
+ * icon resolver (font or SVG) and an optional close icon resolver in `app.config.ts`; see
+ * {@link TbxMatDialogProviderConfig} for the full shape. Per-call
+ * {@link TbxMatDialogConfig}.icon overrides take precedence over the resolved severity
+ * icon and are rendered as font ligatures.
  *
- * Opinionated methods — each provides defaults for icon, severity type, and footer:
+ * #### Error handling
  *
+ * When the dialog is dismissed via backdrop click or Escape without a button click, the
+ * underlying `afterClosed()` emits `undefined`. The service catches this case and returns
+ * a {@link TbxMatDialogDismissReason}.Close result with an empty `footerValues` record —
+ * dismissal is a negative action like Cancel or Deny and never carries form state.
+ *
+ * @usage
+ * Inject in any component or service that needs to prompt the user. Prefer the opinionated
+ * methods over `show()` so severity, icon, and footer defaults stay consistent across the
+ * application.
+ *
+ * @example
  * ```typescript
  * private readonly dialog = inject(TbxMatDialogService);
  *
- * // Severity methods (mirror banners/notifications)
+ * // Severity methods (mirror banners/notifications).
  * await this.dialog.success({ title: 'Saved', message: 'Your changes are saved.' });
  * await this.dialog.error({ title: 'Failed', message: 'Could not save changes.' });
  * await this.dialog.warning({ title: 'Caution', message: 'This may take a while.' });
@@ -50,17 +63,21 @@ import {
  * await this.dialog.help({ title: 'How it works', message: 'Tap to learn more.' });
  * await this.dialog.default({ title: 'Notice', message: 'Neutral surface.' });
  *
- * // Confirmation — Help severity, Yes/No buttons
+ * // Confirmation — Help severity, Yes/No buttons.
  * const output = await this.dialog.confirm({ title: 'Continue?', message: 'Proceed?' });
- * if (output.result === TbxMatDialogDismissReason.Affirm) { ... }
+ * if (output.result === TbxMatDialogDismissReason.Affirm) {
+ *     // proceed
+ * }
  *
- * // Input — Information severity, OK/Cancel buttons
+ * // Input — Information severity, OK/Cancel buttons.
+ * // RenameFormComponent is a hypothetical consumer-defined component that
+ * // implements TbxMatDialogData<string>.
  * const output = await this.dialog.input<string>({
  *     title: 'Rename',
  *     content: RenameFormComponent,
  * });
  *
- * // Typed footer values
+ * // Typed footer values.
  * interface MyFooter { dontAskAgain: boolean; }
  * const output = await this.dialog.confirm<MyFooter>({
  *     title: 'Delete',
@@ -70,11 +87,8 @@ import {
  *         ...TBX_MAT_DIALOG_BUTTONS_YES_NO,
  *     ],
  * });
- * ```
  *
- * Full control — no defaults applied:
- *
- * ```typescript
+ * // Full control — no defaults applied.
  * const output = await this.dialog.show({
  *     title: 'Custom',
  *     icon: 'build',
@@ -83,20 +97,42 @@ import {
  *     footer: [...customFooter],
  * });
  * ```
+ *
+ * @see {@link https://angular.dev | Angular}
+ * @see {@link https://material.angular.dev/components/dialog/api | Angular Material MatDialog}
+ *
+ * @category Services
+ * @displayName Dialog Service
+ * @order 1
+ * @since 0.1.0
+ * @related TbxMatDialogConfig
+ * @related TbxMatDialogConfigArgs
+ * @related TbxMatDialogResult
+ * @related TbxMatDialogDismissReason
+ * @related TBX_MAT_DIALOG_PROVIDER_CONFIG
+ *
+ * @public
  */
 @Injectable({ providedIn: 'root' })
 export class TbxMatDialogService {
     private readonly dialog = inject(MatDialog);
 
     /**
-     * Open a dialog with full control — no defaults applied.
+     * Open a dialog with full control — no defaults applied
      *
-     * Use this when none of the opinionated methods fit, or when the caller
-     * needs to specify every aspect of the dialog configuration. The config
-     * is passed through to the shell component exactly as provided.
+     * @remarks
+     * Use this when none of the opinionated methods fit, or when the caller needs to
+     * specify every aspect of the dialog configuration. The config is passed through to
+     * the shell component exactly as provided.
      *
-     * @typeParam T - Type of data for input dialogs. Defaults to void.
-     * @typeParam F - Type of footer control values. Defaults to Record<string, unknown>.
+     * @typeParam T - Type of data for input dialogs. Defaults to `void`.
+     * @typeParam F - Type of footer control values. Defaults to `Record<string, unknown>`.
+     *
+     * @param config - Full {@link TbxMatDialogConfig} for the dialog.
+     * @returns A Promise that resolves with the typed {@link TbxMatDialogResult} when the
+     *   dialog closes.
+     *
+     * @public
      */
     async show<T = void, F extends Record<string, unknown> = Record<string, unknown>>(
         config: TbxMatDialogConfig<T>
@@ -105,9 +141,18 @@ export class TbxMatDialogService {
     }
 
     /**
-     * Open a success dialog.
+     * Open a success dialog
      *
+     * @remarks
      * Defaults: success icon, Success severity, OK button.
+     *
+     * @typeParam F - Type of footer control values. Defaults to `Record<string, unknown>`.
+     *
+     * @param config - Caller config; merged with the method's defaults.
+     * @returns A Promise that resolves with the {@link TbxMatDialogResult} when the dialog
+     *   closes.
+     *
+     * @public
      */
     async success<F extends Record<string, unknown> = Record<string, unknown>>(
         config: TbxMatDialogConfigArgs<void>
@@ -119,9 +164,18 @@ export class TbxMatDialogService {
     }
 
     /**
-     * Open an error dialog.
+     * Open an error dialog
      *
+     * @remarks
      * Defaults: error icon, Error severity, OK button.
+     *
+     * @typeParam F - Type of footer control values. Defaults to `Record<string, unknown>`.
+     *
+     * @param config - Caller config; merged with the method's defaults.
+     * @returns A Promise that resolves with the {@link TbxMatDialogResult} when the dialog
+     *   closes.
+     *
+     * @public
      */
     async error<F extends Record<string, unknown> = Record<string, unknown>>(
         config: TbxMatDialogConfigArgs<void>
@@ -133,9 +187,18 @@ export class TbxMatDialogService {
     }
 
     /**
-     * Open a warning dialog.
+     * Open a warning dialog
      *
+     * @remarks
      * Defaults: warning icon, Warning severity, OK button.
+     *
+     * @typeParam F - Type of footer control values. Defaults to `Record<string, unknown>`.
+     *
+     * @param config - Caller config; merged with the method's defaults.
+     * @returns A Promise that resolves with the {@link TbxMatDialogResult} when the dialog
+     *   closes.
+     *
+     * @public
      */
     async warning<F extends Record<string, unknown> = Record<string, unknown>>(
         config: TbxMatDialogConfigArgs<void>
@@ -147,9 +210,18 @@ export class TbxMatDialogService {
     }
 
     /**
-     * Open an informational dialog.
+     * Open an informational dialog
      *
+     * @remarks
      * Defaults: info icon, Information severity, OK button.
+     *
+     * @typeParam F - Type of footer control values. Defaults to `Record<string, unknown>`.
+     *
+     * @param config - Caller config; merged with the method's defaults.
+     * @returns A Promise that resolves with the {@link TbxMatDialogResult} when the dialog
+     *   closes.
+     *
+     * @public
      */
     async information<F extends Record<string, unknown> = Record<string, unknown>>(
         config: TbxMatDialogConfigArgs<void>
@@ -161,9 +233,18 @@ export class TbxMatDialogService {
     }
 
     /**
-     * Open a help dialog.
+     * Open a help dialog
      *
+     * @remarks
      * Defaults: help icon, Help severity, OK button.
+     *
+     * @typeParam F - Type of footer control values. Defaults to `Record<string, unknown>`.
+     *
+     * @param config - Caller config; merged with the method's defaults.
+     * @returns A Promise that resolves with the {@link TbxMatDialogResult} when the dialog
+     *   closes.
+     *
+     * @public
      */
     async help<F extends Record<string, unknown> = Record<string, unknown>>(
         config: TbxMatDialogConfigArgs<void>
@@ -175,9 +256,18 @@ export class TbxMatDialogService {
     }
 
     /**
-     * Open a default-severity (neutral) dialog.
+     * Open a default-severity (neutral) dialog
      *
+     * @remarks
      * Defaults: default icon, Default severity, OK button.
+     *
+     * @typeParam F - Type of footer control values. Defaults to `Record<string, unknown>`.
+     *
+     * @param config - Caller config; merged with the method's defaults.
+     * @returns A Promise that resolves with the {@link TbxMatDialogResult} when the dialog
+     *   closes.
+     *
+     * @public
      */
     async default<F extends Record<string, unknown> = Record<string, unknown>>(
         config: TbxMatDialogConfigArgs<void>
@@ -189,10 +279,19 @@ export class TbxMatDialogService {
     }
 
     /**
-     * Open a confirmation dialog.
+     * Open a confirmation dialog
      *
-     * Dialog-specific UX pattern layered on top of the severity model.
-     * Defaults: help icon, Help severity, Yes/No buttons.
+     * @remarks
+     * Dialog-specific UX pattern layered on top of the severity model. Defaults: help
+     * icon, Help severity, Yes/No buttons.
+     *
+     * @typeParam F - Type of footer control values. Defaults to `Record<string, unknown>`.
+     *
+     * @param config - Caller config; merged with the method's defaults.
+     * @returns A Promise that resolves with the {@link TbxMatDialogResult} when the dialog
+     *   closes.
+     *
+     * @public
      */
     async confirm<F extends Record<string, unknown> = Record<string, unknown>>(
         config: TbxMatDialogConfigArgs<void>
@@ -204,15 +303,23 @@ export class TbxMatDialogService {
     }
 
     /**
-     * Open an input dialog.
+     * Open an input dialog
      *
-     * Renders a content component in the dialog body. The content component
-     * must implement TbxMatDialogData<T>. Returns typed data on affirm.
+     * @remarks
+     * Renders a content component in the dialog body. The content component must implement
+     * {@link TbxMatDialogData}. Returns typed data on Affirm.
      *
-     * Dialog-specific UX pattern layered on top of the severity model.
-     * Defaults: info icon, Information severity, OK/Cancel buttons.
+     * Dialog-specific UX pattern layered on top of the severity model. Defaults: info icon,
+     * Information severity, OK/Cancel buttons.
      *
      * @typeParam T - Type of data returned by the content component.
+     * @typeParam F - Type of footer control values. Defaults to `Record<string, unknown>`.
+     *
+     * @param config - Caller config; merged with the method's defaults.
+     * @returns A Promise that resolves with the {@link TbxMatDialogResult} when the dialog
+     *   closes.
+     *
+     * @public
      */
     async input<T, F extends Record<string, unknown> = Record<string, unknown>>(
         config: TbxMatDialogConfigArgs<T>
@@ -224,14 +331,16 @@ export class TbxMatDialogService {
     }
 
     /**
-     * Merge caller overrides with method defaults.
+     * Merge caller overrides with method defaults
      *
-     * Sets `type` to the method's default severity when the caller did
-     * not specify one. Icon resolution happens at render time in
-     * `DialogShellComponent` based on `config.type` and the provider
-     * config — the service no longer pre-computes icon strings. A
-     * caller-provided `config.icon` is preserved as-is and rendered as
-     * a font ligature, taking precedence over severity resolution.
+     * @remarks
+     * Sets `type` to the method's default severity when the caller did not specify one.
+     * Icon resolution happens at render time in the dialog shell based on `config.type`
+     * and the provider config — the service does not pre-compute icon strings. A
+     * caller-provided `config.icon` is preserved as-is and rendered as a font ligature,
+     * taking precedence over severity resolution.
+     *
+     * @internal
      */
     private mergeDefaults<T>(
         config: TbxMatDialogConfigArgs<T>,
@@ -244,27 +353,26 @@ export class TbxMatDialogService {
     }
 
     /**
-     * Internal: open the dialog shell with resolved config.
+     * Open the dialog shell with resolved config
      *
-     * Applies default width when not specified. Wires disableClose.
-     * Sets ariaModal for screen reader modal semantics. Uses
-     * 'first-tabbable' autoFocus (Material default). Content components
-     * that need a specific element focused should apply cdkFocusInitial
-     * to that element — the CDK focus trap honors it.
+     * @remarks
+     * Applies default width when not specified. Wires `disableClose`. Sets `ariaModal`
+     * for screen reader modal semantics. Uses `'first-tabbable'` `autoFocus` (Material
+     * default). Content components that need a specific element focused should apply
+     * `cdkFocusInitial` to that element — the CDK focus trap honors it.
      *
-     * Footer values and content data are only included in the output
-     * when the user affirms. Deny, Cancel, Close, ESC, and backdrop
-     * dismiss all return empty footerValues — negative actions should
-     * not carry state that implies confirmation.
+     * Footer values and content data are only included in the output when the user
+     * affirms. Deny, Cancel, Close, Escape, and backdrop dismiss all return empty
+     * `footerValues` — negative actions never carry state that implies confirmation.
      *
-     * The panelClass list includes the per-severity placeholder
-     * `tbx-mat-dialog-panel-{level}` class. CSS rules for those classes
-     * land in the SCSS rewrite (#46) that adopts the shared severity-theme
-     * mixin; until then, they're applied but inert.
+     * The `panelClass` list includes the per-severity `tbx-mat-dialog-panel-{level}`
+     * class consumed by the shared severity-theme SCSS mixin.
      *
-     * Returns a Promise that resolves with the dialog output, or a
-     * fallback Close result if the dialog is dismissed without a result
-     * (e.g., backdrop click when disableClose is false).
+     * Returns a Promise that resolves with the dialog output, or a fallback Close result
+     * if the dialog is dismissed without a result (e.g., backdrop click when
+     * `disableClose` is `false`).
+     *
+     * @internal
      */
     private async open<T, F extends Record<string, unknown>>(
         config: TbxMatDialogConfig<T>,
@@ -293,8 +401,7 @@ export class TbxMatDialogService {
         const output = await firstValueFrom(dialogRef.afterClosed());
 
         // When dialog is dismissed via backdrop/Escape without a button click,
-        // afterClosed() emits undefined. Return a Close result with empty
-        // footer values — dismissal is a negative action like Cancel/Deny.
+        // afterClosed() emits undefined. Return a Close result with empty footer values.
         if (!output) {
             return {
                 result: TbxMatDialogDismissReason.Close,
