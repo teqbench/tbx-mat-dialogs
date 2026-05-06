@@ -269,6 +269,31 @@ describe('DialogShellComponent', () => {
             expect(affirmButton!.nativeElement.disabled).toBe(false);
         });
 
+        it('should disable affirm button again when isValid transitions back to false', () => {
+            const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL]);
+
+            const testInput = fixture.debugElement.query(By.directive(TestInputComponent));
+            testInput.componentInstance.name.set('hello');
+            fixture.detectChanges();
+
+            // Now clear the value — isValid flips back to false
+            testInput.componentInstance.name.set('');
+            fixture.detectChanges();
+
+            const affirmButton = fixture.debugElement.queryAll(By.css('mat-dialog-actions button')).find((btn) => btn.nativeElement.textContent.trim() === 'OK');
+
+            expect(affirmButton!.nativeElement.disabled).toBe(true);
+        });
+
+        it('should not auto-disable affirm button when no content component is configured', () => {
+            const fixture = createFixture({ title: 'Plain' }, [...TBX_MAT_DIALOG_BUTTONS_OK]);
+
+            const affirmButton = fixture.debugElement.queryAll(By.css('mat-dialog-actions button')).find((btn) => btn.nativeElement.textContent.trim() === 'OK');
+
+            expect(affirmButton).not.toBeUndefined();
+            expect(affirmButton!.nativeElement.disabled).toBe(false);
+        });
+
         it('should include content value in output on affirm', () => {
             const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL]);
             const dialogRef = getDialogRef(fixture);
@@ -481,6 +506,30 @@ describe('DialogShellComponent', () => {
             const button = fixture.debugElement.query(By.css('mat-dialog-actions button'));
             expect(button.nativeElement.disabled).toBe(false);
         });
+
+        it('should reactively update button disabled state when signal value changes', () => {
+            const disabledSignal = signal(true);
+            const footer: TbxMatDialogFooterControlType[] = [
+                buildButton({
+                    key: 'ok',
+                    label: 'OK',
+                    result: TbxMatDialogDismissReason.Affirm,
+                    disabled: disabledSignal,
+                }),
+            ];
+            const fixture = createFixture({ title: 'Test' }, footer);
+
+            const button = fixture.debugElement.query(By.css('mat-dialog-actions button'));
+            expect(button.nativeElement.disabled).toBe(true);
+
+            disabledSignal.set(false);
+            fixture.detectChanges();
+            expect(button.nativeElement.disabled).toBe(false);
+
+            disabledSignal.set(true);
+            fixture.detectChanges();
+            expect(button.nativeElement.disabled).toBe(true);
+        });
     });
 
     describe('footer controls', () => {
@@ -522,6 +571,28 @@ describe('DialogShellComponent', () => {
             const toggle = fixture.debugElement.query(By.css('mat-slide-toggle'));
             expect(toggle).not.toBeNull();
             expect(toggle.nativeElement.textContent.trim()).toContain('Dark mode');
+        });
+
+        it('should initialize slide toggle from initialValue', () => {
+            const footer: TbxMatDialogFooterControlType[] = [
+                {
+                    key: 'autoSave',
+                    type: 'toggle',
+                    label: 'Auto-save',
+                    align: 'start',
+                    initialValue: true,
+                },
+            ];
+            const fixture = createFixture({ title: 'Test' }, footer);
+
+            expect(fixture.componentInstance.getFooterValue('autoSave')).toBe(true);
+        });
+
+        it('should default slide toggle to false when initialValue omitted', () => {
+            const footer: TbxMatDialogFooterControlType[] = [{ key: 'autoSave', type: 'toggle', label: 'Auto-save', align: 'start' }];
+            const fixture = createFixture({ title: 'Test' }, footer);
+
+            expect(fixture.componentInstance.getFooterValue('autoSave')).toBe(false);
         });
 
         it('should initialize radio-group from initialValue', () => {
@@ -636,6 +707,154 @@ describe('DialogShellComponent', () => {
                 expect.objectContaining({
                     result: TbxMatDialogDismissReason.Affirm,
                     footerValues: { dontAsk: true },
+                })
+            );
+        });
+
+        it('should include updated slide toggle value in dismiss output', () => {
+            const footer: TbxMatDialogFooterControlType[] = [{ key: 'verbose', type: 'toggle', label: 'Verbose logging', align: 'start' }, ...TBX_MAT_DIALOG_BUTTONS_OK];
+            const fixture = createFixture({ title: 'Test' }, footer);
+            const dialogRef = getDialogRef(fixture);
+
+            fixture.componentInstance.setFooterValue('verbose', true);
+            fixture.detectChanges();
+
+            const buttons = fixture.debugElement.queryAll(By.css('mat-dialog-actions button'));
+            buttons[buttons.length - 1].nativeElement.click();
+
+            expect(dialogRef.close).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    result: TbxMatDialogDismissReason.Affirm,
+                    footerValues: { verbose: true },
+                })
+            );
+        });
+
+        it('should include updated radio-group value in dismiss output', () => {
+            const footer: TbxMatDialogFooterControlType[] = [
+                {
+                    key: 'format',
+                    type: 'radio-group',
+                    align: 'start',
+                    options: [
+                        { label: 'JSON', value: 'json' },
+                        { label: 'CSV', value: 'csv' },
+                    ],
+                    initialValue: 'json',
+                },
+                ...TBX_MAT_DIALOG_BUTTONS_OK,
+            ];
+            const fixture = createFixture({ title: 'Test' }, footer);
+            const dialogRef = getDialogRef(fixture);
+
+            fixture.componentInstance.setFooterValue('format', 'csv');
+            fixture.detectChanges();
+
+            const buttons = fixture.debugElement.queryAll(By.css('mat-dialog-actions button'));
+            buttons[buttons.length - 1].nativeElement.click();
+
+            expect(dialogRef.close).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    result: TbxMatDialogDismissReason.Affirm,
+                    footerValues: { format: 'csv' },
+                })
+            );
+        });
+
+        it('should include updated single-select toggle-group value in dismiss output', () => {
+            const footer: TbxMatDialogFooterControlType[] = [
+                {
+                    key: 'view',
+                    type: 'toggle-group',
+                    align: 'start',
+                    options: [
+                        { label: 'Grid', value: 'grid' },
+                        { label: 'List', value: 'list' },
+                    ],
+                    initialValue: 'grid',
+                },
+                ...TBX_MAT_DIALOG_BUTTONS_OK,
+            ];
+            const fixture = createFixture({ title: 'Test' }, footer);
+            const dialogRef = getDialogRef(fixture);
+
+            fixture.componentInstance.setFooterValue('view', 'list');
+            fixture.detectChanges();
+
+            const buttons = fixture.debugElement.queryAll(By.css('mat-dialog-actions button'));
+            buttons[buttons.length - 1].nativeElement.click();
+
+            expect(dialogRef.close).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    result: TbxMatDialogDismissReason.Affirm,
+                    footerValues: { view: 'list' },
+                })
+            );
+        });
+
+        it('should include updated multi-select toggle-group value in dismiss output', () => {
+            const footer: TbxMatDialogFooterControlType[] = [
+                {
+                    key: 'channels',
+                    type: 'toggle-group',
+                    align: 'start',
+                    multiple: true,
+                    options: [
+                        { label: 'Email', value: 'email' },
+                        { label: 'SMS', value: 'sms' },
+                        { label: 'Push', value: 'push' },
+                    ],
+                },
+                ...TBX_MAT_DIALOG_BUTTONS_OK,
+            ];
+            const fixture = createFixture({ title: 'Test' }, footer);
+            const dialogRef = getDialogRef(fixture);
+
+            fixture.componentInstance.setFooterValue('channels', ['email', 'push']);
+            fixture.detectChanges();
+
+            const buttons = fixture.debugElement.queryAll(By.css('mat-dialog-actions button'));
+            buttons[buttons.length - 1].nativeElement.click();
+
+            expect(dialogRef.close).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    result: TbxMatDialogDismissReason.Affirm,
+                    footerValues: { channels: ['email', 'push'] },
+                })
+            );
+        });
+
+        it('should aggregate values from mixed control types in dismiss output', () => {
+            const footer: TbxMatDialogFooterControlType[] = [
+                { key: 'remember', type: 'checkbox', label: 'Remember', align: 'start' },
+                { key: 'autoSave', type: 'toggle', label: 'Auto-save', align: 'start' },
+                {
+                    key: 'channel',
+                    type: 'radio-group',
+                    align: 'start',
+                    options: [
+                        { label: 'Stable', value: 'stable' },
+                        { label: 'Beta', value: 'beta' },
+                    ],
+                    initialValue: 'stable',
+                },
+                ...TBX_MAT_DIALOG_BUTTONS_OK,
+            ];
+            const fixture = createFixture({ title: 'Test' }, footer);
+            const dialogRef = getDialogRef(fixture);
+
+            fixture.componentInstance.setFooterValue('remember', true);
+            fixture.componentInstance.setFooterValue('autoSave', true);
+            fixture.componentInstance.setFooterValue('channel', 'beta');
+            fixture.detectChanges();
+
+            const buttons = fixture.debugElement.queryAll(By.css('mat-dialog-actions button'));
+            buttons[buttons.length - 1].nativeElement.click();
+
+            expect(dialogRef.close).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    result: TbxMatDialogDismissReason.Affirm,
+                    footerValues: { remember: true, autoSave: true, channel: 'beta' },
                 })
             );
         });
