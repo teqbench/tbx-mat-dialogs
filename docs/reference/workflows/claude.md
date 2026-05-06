@@ -7,7 +7,7 @@
 
 ## Purpose
 
-The Claude Code workflow provides AI-powered assistance directly in GitHub issues and pull requests. When a user mentions `@claude` in a comment or issue body, Claude reads the codebase, analyzes the request, and can implement features, fix bugs, review code, or create pull requests — all within the GitHub UI.
+The [Claude Code ↗](https://github.com/anthropics/claude-code) workflow provides AI-powered assistance directly in [GitHub ↗](https://github.com) issues and pull requests. When a user mentions `@claude` in a comment or issue body, [Claude ↗](https://www.anthropic.com/claude) reads the codebase, analyzes the request, and can implement features, fix bugs, review code, or create pull requests — all within the [GitHub ↗](https://github.com) UI.
 
 ---
 
@@ -28,7 +28,7 @@ group: claude-${{ github.event.issue.number || github.event.pull_request.number 
 cancel-in-progress: false
 ```
 
-Per-issue/PR concurrency: only one Claude run per issue or PR at a time. Uses its own group (not shared with CI/Release/Sync) so Claude runs aren't blocked by or block other workflows.
+Per-issue/PR concurrency: only one [Claude ↗](https://www.anthropic.com/claude) run per issue or PR at a time. Uses its own group (not shared with CI/Release/Sync) so [Claude ↗](https://www.anthropic.com/claude) runs aren't blocked by or block other workflows.
 
 ---
 
@@ -50,13 +50,13 @@ jobs:
 
 ## Secrets Used
 
-| Secret              | Purpose                                  |
-| ------------------- | ---------------------------------------- |
-| `APP_ID`            | GitHub App ID for generating a bot token |
-| `APP_PRIVATE_KEY`   | GitHub App private key                   |
-| `ANTHROPIC_API_KEY` | Authenticates with the Anthropic API     |
+| Secret              | Purpose                                                                       |
+| ------------------- | ----------------------------------------------------------------------------- |
+| `APP_ID`            | [GitHub App ↗](https://docs.github.com/en/apps) ID for generating a bot token |
+| `APP_PRIVATE_KEY`   | [GitHub App ↗](https://docs.github.com/en/apps) private key                   |
+| `ANTHROPIC_API_KEY` | Authenticates with the [Anthropic API ↗](https://docs.anthropic.com/en/api)   |
 
-The app token is used for checkout with submodules (Claude Code skills) and for full repository access.
+The app token is used for checkout with submodules ([Claude Code ↗](https://github.com/anthropics/claude-code) skills) and for full repository access.
 
 ---
 
@@ -83,7 +83,7 @@ timeout-minutes: 30
 
 #### 1. Generate App Token
 
-Uses `actions/create-github-app-token@v3` with `owner: teqbench` scope to generate a token that can access the skills submodule across the organization.
+Uses `actions/create-github-app-token@v3` with `owner: teqbench` scope to generate a token that can access the skills submodule across the [GitHub ↗](https://github.com) organization.
 
 #### 2. Checkout Code
 
@@ -95,7 +95,7 @@ with:
     fetch-depth: 0
 ```
 
-Full history checkout with submodules so Claude has access to the skills definitions and can inspect git log, diff against branches, etc.
+Full history checkout with submodules so [Claude ↗](https://www.anthropic.com/claude) has access to the skills definitions and can inspect [git ↗](https://git-scm.com) log, diff against branches, etc.
 
 #### 3. Run Claude Code
 
@@ -117,7 +117,7 @@ with:
 
 ## Tool Restrictions
 
-Claude's capabilities are explicitly restricted via `--allowedTools` to prevent unsafe operations:
+[Claude ↗](https://www.anthropic.com/claude)'s capabilities are explicitly restricted via `--allowedTools` to prevent unsafe operations:
 
 ### File Tools (Built-in)
 
@@ -154,26 +154,26 @@ Claude's capabilities are explicitly restricted via `--allowedTools` to prevent 
 
 ### npm Commands (Via Bash Allowlist)
 
-| Allowed   | Purpose                                 |
-| --------- | --------------------------------------- |
-| `npm run` | Run project scripts (test, lint, build) |
-| `npm ci`  | Install dependencies                    |
-| `npx`     | Run Node.js binaries                    |
+| Allowed   | Purpose                                      |
+| --------- | -------------------------------------------- |
+| `npm run` | Run project scripts (test, lint, build)      |
+| `npm ci`  | Install dependencies                         |
+| `npx`     | Run [Node.js ↗](https://nodejs.org) binaries |
 
 ---
 
 ## CLAUDE.md
 
-Claude reads the `CLAUDE.md` file in the repo root for project-specific context. This file defines:
+[Claude ↗](https://www.anthropic.com/claude) reads the `CLAUDE.md` file in the repo root for project-specific context. This file defines:
 
 - Tech stack and framework versions
 - Key commands
 - Project structure and publishing details
 - Commit conventions
 - Branching rules and workflow expectations
-- Explicit do's and don'ts for Claude's behavior
+- Explicit do's and don'ts for [Claude ↗](https://www.anthropic.com/claude)'s behavior
 
-Both the GitHub Action and the Claude Code CLI read the same `CLAUDE.md`, ensuring consistent behavior across local and CI environments.
+Both the [GitHub Action ↗](https://docs.github.com/en/actions) and the [Claude Code ↗](https://github.com/anthropics/claude-code) CLI read the same `CLAUDE.md`, ensuring consistent behavior across local and CI environments.
 
 ---
 
@@ -188,13 +188,13 @@ In any issue or PR comment:
 @claude add unit tests for the greet function
 ```
 
-Claude will:
+[Claude ↗](https://www.anthropic.com/claude) will:
 
 1. Read the codebase and `CLAUDE.md` for context
 2. Create a feature or bugfix branch off `dev`
 3. Implement the requested changes
 4. Run tests and lint to verify
-5. Commit with conventional commit messages
+5. Commit with [Conventional Commits ↗](https://www.conventionalcommits.org) messages
 6. Push and create a PR targeting `dev`
 
 ---
@@ -203,5 +203,5 @@ Claude will:
 
 - **Max turns:** 10 — prevents runaway sessions
 - **Timeout:** 30 minutes — hard cap on execution time
-- **No workflow edits** — Claude should not modify `.github/workflows/*` without explicit instruction (enforced by `CLAUDE.md` conventions)
-- **No release file edits** — Claude should not modify `release-please-config.json`, `.release-please-manifest.json`, `CHANGELOG.md`, or `.badges/*` (enforced by `CLAUDE.md` conventions)
+- **No workflow edits** — [Claude ↗](https://www.anthropic.com/claude) should not modify `.github/workflows/*` without explicit instruction (enforced by `CLAUDE.md` conventions)
+- **No release file edits** — [Claude ↗](https://www.anthropic.com/claude) should not modify `release-please-config.json`, `.release-please-manifest.json`, `CHANGELOG.md`, or `.badges/*` (enforced by `CLAUDE.md` conventions)

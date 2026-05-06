@@ -2,63 +2,62 @@ import type { Preview } from '@storybook/angular';
 import { applicationConfig } from '@storybook/angular';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
-import { DIALOG_ICON_SERVICE } from '../src/tokens/dialog-icon-service.token';
-import { DialogIconService } from '../src/services/dialog-icon.service';
+import { provideTbxMatSeverityTheme } from '@teqbench/tbx-mat-severity-theme';
+import { TBX_MAT_DIALOG_PROVIDER_CONFIG } from '../src/tokens/dialog-provider-config.token';
+import { TbxMatDialogSeverityFontIconService } from '../src/services/dialog-severity-font-icon.service';
+import { removeStoryOverrideStyleTag } from '../src/components/story-overrides';
 
-// M3 theme generated via mat.theme() with light-dark() support, dark mode
-// bridge rules, dialog emphasis tokens, and global panel styles.
-import './storybook-theme.scss';
+// M3 prebuilt theme — provides typography, shape, and state-layer tokens.
+import '@angular/material/prebuilt-themes/azure-blue.css';
+
 import '../src/styles/_tbx-mat-dialogs.scss';
 
 const preview: Preview = {
-    globalTypes: {
-        colorScheme: {
-            description: 'Color scheme',
-            toolbar: {
-                title: 'Scheme',
-                icon: 'mirror',
-                items: [
-                    { value: 'light', title: 'Light', icon: 'sun' },
-                    { value: 'dark', title: 'Dark', icon: 'moon' },
-                    { value: 'auto', title: 'Auto (OS)', icon: 'sidebyside' },
-                ],
-                dynamicTitle: true,
-            },
-        },
-    },
-    initialGlobals: {
-        colorScheme: 'auto',
-    },
     decorators: [
-        // Color scheme decorator — applies data-color-scheme to the document
-        // root, mirroring what ThemeService does at runtime. The SCSS in
-        // storybook-theme.scss bridges data-color-scheme to the CSS
-        // color-scheme property, which flips M3 light-dark() tokens.
-        (storyFn, context) => {
-            const scheme = context.globals['colorScheme'] || 'auto';
-            const root = document.documentElement;
-
-            if (scheme === 'auto') {
-                delete root.dataset['colorScheme'];
-            } else {
-                root.dataset['colorScheme'] = scheme;
-            }
-
+        // Cleanup decorator — removes any per-story `<style>` tag injected by
+        // the `withCustomProperties()` helper from
+        // `src/components/story-overrides.ts`. Runs before each story so
+        // overrides don't leak when navigating between stories. Mirrors the
+        // pattern used by `tbx-mat-banners` and `tbx-mat-notifications`.
+        (storyFn) => {
+            removeStoryOverrideStyleTag();
             return storyFn();
         },
         applicationConfig({
             providers: [
                 provideAnimationsAsync(),
-                { provide: DIALOG_ICON_SERVICE, useClass: DialogIconService },
+                provideTbxMatSeverityTheme({ invert: false, applyToRoot: true }),
                 {
                     provide: MAT_ICON_DEFAULT_OPTIONS,
                     useValue: { fontSet: 'material-symbols-rounded' },
+                },
+                {
+                    provide: TBX_MAT_DIALOG_PROVIDER_CONFIG,
+                    useFactory: () => ({
+                        severityIconResolverService: new TbxMatDialogSeverityFontIconService('material-symbols-rounded'),
+                    }),
                 },
             ],
         }),
     ],
     parameters: {
+        options: {
+            // Custom sort so stories within the Dialogs group appear in the
+            // intended narrative order (overview → confirm → input → custom)
+            // rather than the default alphabetical order. Mirrors the sort
+            // used by tbx-mat-banners.
+            storySort: (a, b) => {
+                const ORDER = ['dialogs--dialogs', 'dialogs--confirm', 'dialogs--input', 'dialogs--custom'];
+                const aIdx = ORDER.indexOf(a.id);
+                const bIdx = ORDER.indexOf(b.id);
+                if (aIdx === -1 && bIdx === -1) return a.id.localeCompare(b.id);
+                if (aIdx === -1) return 1;
+                if (bIdx === -1) return -1;
+                return aIdx - bIdx;
+            },
+        },
         controls: {
+            disableSaveFromUI: true,
             matchers: {
                 color: /(background|color)$/i,
                 date: /Date$/i,
