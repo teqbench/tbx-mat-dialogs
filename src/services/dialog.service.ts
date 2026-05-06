@@ -303,16 +303,38 @@ export class TbxMatDialogService {
     }
 
     /**
+     * Whether the dialog has a focus target that can claim `cdkFocusInitial`
+     *
+     * @remarks
+     * Used to decide between `'first-tabbable'` and `'dialog'` for `autoFocus`.
+     * Returns `true` when a content component is projected (the consumer's
+     * `cdkFocusInitial` will land focus on a form field) or when the resolved
+     * footer contains a button with `result: Affirm` (the shell applies
+     * `cdkFocusInitial` to it via {@link DialogShellComponent.shouldAutoFocus}).
+     * Otherwise the dialog has no actionable element to receive initial focus
+     * besides the header close button, which the package opts to skip.
+     *
+     * @internal
+     */
+    private hasFocusTarget<T>(config: TbxMatDialogConfig<T>, resolvedFooter: readonly TbxMatDialogFooterControlType[]): boolean {
+        if (config.content) {
+            return true;
+        }
+        return resolvedFooter.some((item) => item.type === 'button' && item.result === TbxMatDialogDismissReason.Affirm);
+    }
+
+    /**
      * Open the dialog shell with resolved config
      *
      * @remarks
      * Applies default width when not specified. Wires `disableClose`. Sets `ariaModal`
-     * for screen reader modal semantics. `autoFocus` is set to `'first-tabbable'` for
-     * input dialogs (so the consumer's `cdkFocusInitial` on a content-component form
-     * field takes precedence) and `'first-heading'` for every other dialog (so the title
-     * receives initial focus instead of the close button — the close button is first in
-     * DOM order and would otherwise win `'first-tabbable'`). The close button remains in
-     * the tab order in both cases.
+     * for screen reader modal semantics. `autoFocus` is set to `'first-tabbable'` when
+     * the dialog has a focus target that can claim `cdkFocusInitial` — either a content
+     * component (consumer's `cdkFocusInitial` on a form field) or an affirm button in the
+     * footer (the shell applies `cdkFocusInitial` via `shouldAutoFocus()`). Otherwise
+     * `autoFocus` falls back to `'dialog'` so initial focus lands on the dialog container
+     * rather than the close button. The close button remains in the tab order in every
+     * case; only initial focus changes.
      *
      * Footer values and content data are only included in the output when the user
      * affirms. Deny, Cancel, Close, Escape, and backdrop dismiss all return empty
@@ -344,15 +366,24 @@ export class TbxMatDialogService {
             maxHeight: config.maxHeight,
             disableClose: config.disableClose ?? false,
             panelClass: ['tbx-mat-dialog-panel', `tbx-mat-dialog-panel-${severity}`],
-            // Input dialogs use `'first-tabbable'` so the consumer's
-            // `cdkFocusInitial` attribute on a form field inside the projected
-            // content component takes precedence. For every other dialog (no
-            // content component), use `'first-heading'` to focus the title
-            // instead of the close button — the close button is first in DOM
-            // order and would otherwise win `'first-tabbable'`. The close
-            // button stays in the tab order in both cases; only initial focus
-            // changes.
-            autoFocus: config.content ? 'first-tabbable' : 'first-heading',
+            // Use `'first-tabbable'` whenever there is a focus target the dialog
+            // shell or content can claim via `cdkFocusInitial`:
+            //   - input dialogs (`config.content` set) — the consumer's
+            //     `cdkFocusInitial` on a form field inside the projected
+            //     content component takes precedence.
+            //   - dialogs with an affirm button in the footer — the shell
+            //     applies `cdkFocusInitial` to the affirm button via
+            //     `DialogShellComponent.shouldAutoFocus()`.
+            //
+            // When neither is present (footerless `show()` calls or footers
+            // that have no affirm button), fall back to `'dialog'` so initial
+            // focus goes to the dialog container rather than the close
+            // button. The close button is first in DOM order and would
+            // otherwise win `'first-tabbable'` — and the heading is not a
+            // valid focus target since headings are not actionable.
+            // The close button stays in the tab order in every case; only
+            // initial focus changes.
+            autoFocus: this.hasFocusTarget(config, resolvedFooter) ? 'first-tabbable' : 'dialog',
             ariaModal: true,
         });
 

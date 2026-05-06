@@ -354,13 +354,14 @@ describe('TbxMatDialogService', () => {
             );
         });
 
-        it('should set autoFocus to first-heading when no content component is configured', async () => {
+        it('should set autoFocus to first-tabbable when the footer has an affirm button', async () => {
             setupTestBed();
+            // Severity methods default to TBX_MAT_DIALOG_BUTTONS_OK, which has Affirm.
             const promise = service.information({ title: 'Test' });
             resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(dialogSpy.open).toHaveBeenCalledWith(DialogShellComponent, expect.objectContaining({ autoFocus: 'first-heading' }));
+            expect(dialogSpy.open).toHaveBeenCalledWith(DialogShellComponent, expect.objectContaining({ autoFocus: 'first-tabbable' }));
         });
 
         it('should set autoFocus to first-tabbable when a content component is configured', async () => {
@@ -378,6 +379,31 @@ describe('TbxMatDialogService', () => {
             await promise;
 
             expect(dialogSpy.open).toHaveBeenCalledWith(DialogShellComponent, expect.objectContaining({ autoFocus: 'first-tabbable' }));
+        });
+
+        it('should set autoFocus to dialog when there is no content component and no affirm button', async () => {
+            setupTestBed();
+            // show() with no footer — no actionable element exists besides the close
+            // button, which the package opts not to focus initially.
+            const promise = service.show({ title: 'Headless', message: 'No buttons.' });
+            resolveDialog({ result: TbxMatDialogDismissReason.Close, footerValues: {} });
+            await promise;
+
+            expect(dialogSpy.open).toHaveBeenCalledWith(DialogShellComponent, expect.objectContaining({ autoFocus: 'dialog' }));
+        });
+
+        it('should set autoFocus to dialog when the footer has only non-affirm buttons', async () => {
+            setupTestBed();
+            // A footer with a Cancel button but no Affirm button — still no focus
+            // target, since Cancel is a passive dismiss path.
+            const promise = service.show({
+                title: 'Cancel-only',
+                footer: [{ key: 'cancel', type: 'button', label: 'Cancel', result: TbxMatDialogDismissReason.Cancel, align: 'end' }],
+            });
+            resolveDialog({ result: TbxMatDialogDismissReason.Cancel, footerValues: {} });
+            await promise;
+
+            expect(dialogSpy.open).toHaveBeenCalledWith(DialogShellComponent, expect.objectContaining({ autoFocus: 'dialog' }));
         });
 
         it('should set ariaModal to true', async () => {
