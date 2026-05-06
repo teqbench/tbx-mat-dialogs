@@ -2,6 +2,7 @@
 
 **Full name:** TeqBench Package - Sync (Main into Dev) Workflow
 **File:** `.github/workflows/sync.yml`
+**Implementation:** Thin caller delegating to [`teqbench/.github/.github/workflows/sync.yml` ↗](https://github.com/teqbench/.github/blob/main/.github/workflows/sync.yml)
 
 ---
 
@@ -9,13 +10,16 @@
 
 After [Release Please ↗](https://github.com/googleapis/release-please) merges a Release PR to `main`, the `dev` branch falls behind — it's missing the version bump in `package.json`, the updated `CHANGELOG.md`, and the new `.release-please-manifest.json`. This workflow automatically merges `main` back into `dev` to keep the branches in sync.
 
+> **Note:** The local `.yml` file is a thin caller. All implementation details below describe the org-wide reusable workflow in `teqbench/.github`. Refer to that repository for the authoritative source.
+
 ---
 
 ## Triggers
 
-| Event  | Branches |
-| ------ | -------- |
-| `push` | `main`   |
+<dl>
+    <dt><code>push</code></dt>
+    <dd>Branches: <code>main</code>.</dd>
+</dl>
 
 Sync runs on **every push to `main`** — release merges, badge commits, and non-release merges alike. This ensures `dev` never silently falls behind `main`. If `dev` is already up to date, the merge is a no-op and the push has nothing to send.
 
@@ -34,10 +38,12 @@ Separate from CI and Release to prevent cross-workflow cancellation.
 
 ## Secrets Used
 
-| Secret            | Purpose                                  |
-| ----------------- | ---------------------------------------- |
-| `APP_ID`          | GitHub App ID for generating a bot token |
-| `APP_PRIVATE_KEY` | GitHub App private key                   |
+<dl>
+    <dt><code>APP_ID</code></dt>
+    <dd><a href="https://docs.github.com/en/apps">GitHub App ↗</a> ID for generating a bot token.</dd>
+    <dt><code>APP_PRIVATE_KEY</code></dt>
+    <dd><a href="https://docs.github.com/en/apps">GitHub App ↗</a> private key.</dd>
+</dl>
 
 The app token allows the Sync workflow to bypass the `dev` branch protection ruleset (which requires PRs and status checks). Without the bot token, the push to `dev` would be rejected.
 
@@ -113,7 +119,9 @@ git push origin dev
 
 ## Interaction with Other Workflows
 
-| What Happens                 | Result                                                                                                                                                                                  |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sync pushes to `dev`         | CI on `dev` is **skipped** — the `[skip ci]` tag in the merge commit message suppresses the `push` trigger per the [GitHub Actions ↗](https://docs.github.com/en/actions) specification |
-| Sync races with another push | Handled by `git pull --rebase` before pushing                                                                                                                                           |
+<dl>
+    <dt>Sync pushes to <code>dev</code></dt>
+    <dd>CI on <code>dev</code> is <strong>skipped</strong> — the <code>[skip ci]</code> tag in the merge commit message suppresses the <code>push</code> trigger per the <a href="https://docs.github.com/en/actions">GitHub Actions ↗</a> specification.</dd>
+    <dt>Sync races with another push</dt>
+    <dd>Handled by <code>git pull --rebase</code> before pushing.</dd>
+</dl>

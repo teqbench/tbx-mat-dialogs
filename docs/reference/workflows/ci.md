@@ -2,6 +2,7 @@
 
 **Full name:** TeqBench Package - CI Workflow
 **File:** `.github/workflows/ci.yml`
+**Implementation:** Thin caller delegating to [`teqbench/.github/.github/workflows/ci.yml` ↗](https://github.com/teqbench/.github/blob/main/.github/workflows/ci.yml)
 
 ---
 
@@ -9,16 +10,18 @@
 
 The CI workflow is the quality gate for the repository. It runs formatting checks, type checking, linting, tests with coverage enforcement, dependency auditing, and README version drift detection on every push and pull request to `main` and `dev`. After a successful push (not PR), it pushes badge data to a shared [GitHub Gist ↗](https://gist.github.com) and updates the README with branch-specific [Shields.io ↗](https://shields.io) badge URLs.
 
+> **Note:** The local `.yml` file is a thin caller. All implementation details below describe the org-wide reusable workflow in `teqbench/.github`. Refer to that repository for the authoritative source.
+
 ---
 
 ## Triggers
 
-| Event          | Branches      | Behavior                        |
-| -------------- | ------------- | ------------------------------- |
-| `push`         | `main`, `dev` | Full pipeline + badge gist push |
-| `pull_request` | `main`, `dev` | Full pipeline, no badge updates |
-
----
+<dl>
+    <dt><code>push</code></dt>
+    <dd>Branches: <code>main</code>, <code>dev</code>. Full pipeline + badge gist push.</dd>
+    <dt><code>pull_request</code></dt>
+    <dd>Branches: <code>main</code>, <code>dev</code>. Full pipeline, no badge updates.</dd>
+</dl>
 
 ---
 
@@ -35,12 +38,16 @@ Per-branch isolation: CI on `main` and `dev` run independently. Runs on the same
 
 ## Secrets & Variables
 
-| Name              | Type     | Scope | Purpose                                      |
-| ----------------- | -------- | ----- | -------------------------------------------- |
-| `APP_ID`          | Secret   | Repo  | GitHub App ID for generating a bot token     |
-| `APP_PRIVATE_KEY` | Secret   | Repo  | GitHub App private key                       |
-| `GIST_TOKEN`      | Secret   | Org   | PAT with `gist` scope for pushing badge data |
-| `GIST_ID`         | Variable | Org   | ID of the shared public badge gist           |
+<dl>
+    <dt><code>APP_ID</code></dt>
+    <dd>Type: Secret. Scope: Repo. GitHub App ID for generating a bot token.</dd>
+    <dt><code>APP_PRIVATE_KEY</code></dt>
+    <dd>Type: Secret. Scope: Repo. GitHub App private key.</dd>
+    <dt><code>GIST_TOKEN</code></dt>
+    <dd>Type: Secret. Scope: Org. PAT with <code>gist</code> scope for pushing badge data.</dd>
+    <dt><code>GIST_ID</code></dt>
+    <dd>Type: Variable. Scope: Org. ID of the shared public badge gist.</dd>
+</dl>
 
 The app token is used for checkout with submodules. The gist token is used to push badge JSON data to the shared gist owned by `teqbench-shields-bot`.
 
@@ -77,19 +84,17 @@ PRs to `main` must come from `release/*`, `hotfix/*`, or `release-please--*` bra
 
 Uses `actions/create-github-app-token@v3` to create a short-lived token from the `teqbench-automation` [GitHub App ↗](https://docs.github.com/en/apps).
 
-This step is conditioned on `github.actor != 'dependabot[bot]'` and is **skipped entirely** on [Dependabot ↗](https://docs.github.com/en/code-security/dependabot) PRs. The app secrets are intentionally unavailable to [Dependabot ↗](https://docs.github.com/en/code-security/dependabot) — [GitHub ↗](https://github.com) isolates [Dependabot ↗](https://docs.github.com/en/code-security/dependabot) from repository secrets as a security boundary.
-
 #### 3. Checkout Code
 
 ```yaml
 uses: actions/checkout@v4
 with:
-    submodules: ${{ github.actor != 'dependabot[bot]' }}
-    token: ${{ steps.app-token.outputs.token || github.token }}
+    submodules: true
+    token: ${{ steps.app-token.outputs.token }}
     fetch-depth: 0
 ```
 
-Uses the app token when available. Falls back to `GITHUB_TOKEN` for [Dependabot ↗](https://docs.github.com/en/code-security/dependabot) PRs. Submodules ([Claude Code ↗](https://github.com/anthropics/claude-code) skills) are checked out for non-Dependabot runs. `fetch-depth: 0` fetches full history.
+Uses the app token to check out submodules ([Claude Code ↗](https://github.com/anthropics/claude-code) skills). `fetch-depth: 0` fetches full history.
 
 #### 4. Setup Node
 
@@ -173,13 +178,18 @@ Compiles [TypeScript ↗](https://www.typescriptlang.org) to `dist/` using `tsco
 
 Five badges are pushed as JSON to a shared public [GitHub Gist ↗](https://gist.github.com) using `schneegans/dynamic-badges-action@v1.7.0`. [Shields.io ↗](https://shields.io) reads the JSON and renders the badges dynamically. Only runs on **push events** (not PRs).
 
-| Badge        | Style         | Source                                            | Gist Filename                       |
-| ------------ | ------------- | ------------------------------------------------- | ----------------------------------- |
-| Coverage     | for-the-badge | `coverage-summary.json` (lines pct)               | `{repo}-{branch}-coverage.json`     |
-| Tests        | for-the-badge | `report.json` (passed/total counts)               | `{repo}-{branch}-tests.json`        |
-| Build Status | for-the-badge | `job.status` (success/failure)                    | `{repo}-{branch}-build-status.json` |
-| Build Number | for-the-badge | `github.run_number`                               | `{repo}-{branch}-build-number.json` |
-| Version      | for-the-badge | `.release-please-manifest.json` or `package.json` | `{repo}-{branch}-version.json`      |
+<dl>
+    <dt>Coverage</dt>
+    <dd>Style: for-the-badge. Source: <code>coverage-summary.json</code> (lines pct). Gist filename: <code>{repo}-{branch}-coverage.json</code>.</dd>
+    <dt>Tests</dt>
+    <dd>Style: for-the-badge. Source: <code>report.json</code> (passed/total counts). Gist filename: <code>{repo}-{branch}-tests.json</code>.</dd>
+    <dt>Build Status</dt>
+    <dd>Style: for-the-badge. Source: <code>job.status</code> (success/failure). Gist filename: <code>{repo}-{branch}-build-status.json</code>.</dd>
+    <dt>Build Number</dt>
+    <dd>Style: for-the-badge. Source: <code>github.run_number</code>. Gist filename: <code>{repo}-{branch}-build-number.json</code>.</dd>
+    <dt>Version</dt>
+    <dd>Style: for-the-badge. Source: <code>.release-please-manifest.json</code> or <code>package.json</code>. Gist filename: <code>{repo}-{branch}-version.json</code>.</dd>
+</dl>
 
 All badge steps run with `if: always()` so badges update even on failure. The `schneegans/dynamic-badges-action` creates gist files automatically if they don't exist — no manual [GitHub Gist ↗](https://gist.github.com) setup is needed per repository.
 
@@ -187,10 +197,12 @@ All badge steps run with `if: always()` so badges update even on failure. The `s
 
 ## Environment Variables
 
-| Variable     | Value                          | Purpose                                                                |
-| ------------ | ------------------------------ | ---------------------------------------------------------------------- |
-| `GIST_OWNER` | `teqbench-shields-bot`         | [GitHub ↗](https://github.com) account that owns the shared badge gist |
-| `REPO_NAME`  | `github.event.repository.name` | Derived automatically — used to prefix gist filenames                  |
+<dl>
+    <dt><code>GIST_OWNER</code></dt>
+    <dd>Value: <code>teqbench-shields-bot</code>. <a href="https://github.com">GitHub ↗</a> account that owns the shared badge gist.</dd>
+    <dt><code>REPO_NAME</code></dt>
+    <dd>Value: <code>github.event.repository.name</code>. Derived automatically — used to prefix gist filenames.</dd>
+</dl>
 
 ---
 
