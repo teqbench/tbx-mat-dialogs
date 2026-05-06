@@ -307,9 +307,12 @@ export class TbxMatDialogService {
      *
      * @remarks
      * Applies default width when not specified. Wires `disableClose`. Sets `ariaModal`
-     * for screen reader modal semantics. Uses `'first-tabbable'` `autoFocus` (Material
-     * default). Content components that need a specific element focused should apply
-     * `cdkFocusInitial` to that element — the CDK focus trap honors it.
+     * for screen reader modal semantics. `autoFocus` is set to `'first-tabbable'` for
+     * input dialogs (so the consumer's `cdkFocusInitial` on a content-component form
+     * field takes precedence) and `'first-heading'` for every other dialog (so the title
+     * receives initial focus instead of the close button — the close button is first in
+     * DOM order and would otherwise win `'first-tabbable'`). The close button remains in
+     * the tab order in both cases.
      *
      * Footer values and content data are only included in the output when the user
      * affirms. Deny, Cancel, Close, Escape, and backdrop dismiss all return empty
@@ -341,7 +344,15 @@ export class TbxMatDialogService {
             maxHeight: config.maxHeight,
             disableClose: config.disableClose ?? false,
             panelClass: ['tbx-mat-dialog-panel', `tbx-mat-dialog-panel-${severity}`],
-            autoFocus: 'first-tabbable',
+            // Input dialogs use `'first-tabbable'` so the consumer's
+            // `cdkFocusInitial` attribute on a form field inside the projected
+            // content component takes precedence. For every other dialog (no
+            // content component), use `'first-heading'` to focus the title
+            // instead of the close button — the close button is first in DOM
+            // order and would otherwise win `'first-tabbable'`. The close
+            // button stays in the tab order in both cases; only initial focus
+            // changes.
+            autoFocus: config.content ? 'first-tabbable' : 'first-heading',
             ariaModal: true,
         });
 

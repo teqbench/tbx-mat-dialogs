@@ -354,9 +354,26 @@ describe('TbxMatDialogService', () => {
             );
         });
 
-        it('should set autoFocus to first-tabbable', async () => {
+        it('should set autoFocus to first-heading when no content component is configured', async () => {
             setupTestBed();
             const promise = service.information({ title: 'Test' });
+            resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
+            await promise;
+
+            expect(dialogSpy.open).toHaveBeenCalledWith(DialogShellComponent, expect.objectContaining({ autoFocus: 'first-heading' }));
+        });
+
+        it('should set autoFocus to first-tabbable when a content component is configured', async () => {
+            setupTestBed();
+            // Hypothetical consumer-defined content component implementing TbxMatDialogData<unknown>.
+            class FormContentComponent {
+                readonly isValid = () => true;
+                readonly value = () => undefined;
+            }
+            const promise = service.input({
+                title: 'Rename',
+                content: FormContentComponent as unknown as Parameters<typeof service.input>[0]['content'],
+            });
             resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
