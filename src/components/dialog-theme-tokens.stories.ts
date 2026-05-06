@@ -1,12 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
-import { DialogHarnessComponent } from './dialog.stories.common';
+import {
+    DEFAULT_HARNESS_ARGS,
+    DialogHarnessComponent,
+    SHARED_HARNESS_ARG_TYPES,
+} from './dialog.stories.common';
 import { withCustomProperties } from './story-overrides';
 
 const meta: Meta<DialogHarnessComponent> = {
     title: 'Dialogs/Theme Token Override',
     component: DialogHarnessComponent,
     decorators: [moduleMetadata({ imports: [DialogHarnessComponent] })],
+    argTypes: SHARED_HARNESS_ARG_TYPES,
 };
 
 export default meta;
@@ -29,6 +34,7 @@ const PER_PACKAGE_OVERRIDE = `
 
 export const Default: Story = {
     name: 'Theme Token Override',
+    args: { ...DEFAULT_HARNESS_ARGS },
     decorators: [withCustomProperties(PER_PACKAGE_OVERRIDE)],
     parameters: {
         docs: {

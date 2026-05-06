@@ -113,30 +113,26 @@ describe('DialogShellComponent', () => {
             expect(title.nativeElement.textContent.trim()).toBe('My Dialog');
         });
 
-        it('should display the icon in a circular container when provided', () => {
+        it('should display the consumer-overridden icon as a font ligature', () => {
             const fixture = createFixture({ title: 'Test', icon: 'warning' });
 
-            const container = fixture.debugElement.query(By.css('.header-icon-container'));
-            expect(container).not.toBeNull();
-
-            const icon = container.query(By.css('.header-icon'));
+            const icon = fixture.debugElement.query(By.css('.tbx-mat-dialog-icon'));
             expect(icon).not.toBeNull();
             expect(icon.nativeElement.textContent.trim()).toBe('warning');
         });
 
-        it('should display the severity-resolved icon container when icon is not overridden', () => {
-            // With the provider-config refactor, every dialog renders a header
-            // icon — the severity resolver always provides one. Consumers
-            // suppress the icon by overriding the severity-icon resolver to
-            // return undefined for the level (or by providing one that has
-            // no registration for the level).
+        it('should display the severity-resolved icon when icon is not overridden', () => {
+            // Every dialog renders a header icon — the severity resolver
+            // always provides one. Consumers suppress the icon by overriding
+            // the severity-icon resolver to return undefined for the level
+            // (or by providing one that has no registration for the level).
             const fixture = createFixture({ title: 'Test' });
 
-            const container = fixture.debugElement.query(By.css('.header-icon-container'));
-            expect(container).not.toBeNull();
+            const icon = fixture.debugElement.query(By.css('.tbx-mat-dialog-icon'));
+            expect(icon).not.toBeNull();
         });
 
-        it('should hide the icon container when the resolver returns no icon for the level', () => {
+        it('should hide the icon when the resolver returns no icon for the level', () => {
             // Stub resolver with the same shape as a real severity resolver but
             // returning undefined for every level — verifies the component's
             // null-fall-through path.
@@ -157,8 +153,8 @@ describe('DialogShellComponent', () => {
                 { severityIconResolverService: emptyResolver }
             );
 
-            const container = fixture.debugElement.query(By.css('.header-icon-container'));
-            expect(container).toBeNull();
+            const icon = fixture.debugElement.query(By.css('.tbx-mat-dialog-icon'));
+            expect(icon).toBeNull();
         });
 
         it('should display the context badge when provided', () => {
@@ -749,10 +745,7 @@ describe('DialogShellComponent', () => {
                 type: TbxMatSeverityLevel.Error,
             });
 
-            const container = fixture.debugElement.query(By.css('.header-icon-container'));
-            expect(container).not.toBeNull();
-
-            const icon = fixture.debugElement.query(By.css('.header-icon'));
+            const icon = fixture.debugElement.query(By.css('.tbx-mat-dialog-icon'));
             expect(icon).not.toBeNull();
         });
     });
@@ -806,23 +799,14 @@ describe('DialogShellComponent', () => {
             expect(button).not.toBeNull();
         });
 
-        it('should apply tbx-mat-dialog-btn-primary class to primary button', () => {
-            const footer: TbxMatDialogFooterControlType[] = [
-                buildButton({ emphasis: 'primary', result: TbxMatDialogDismissReason.Affirm }),
-            ];
-            const fixture = createFixture(
-                { title: 'Test', type: TbxMatSeverityLevel.Warning },
-                footer
-            );
-
-            const button = fixture.debugElement.query(By.css('mat-dialog-actions button'));
-            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-primary')).toBe(
-                true
-            );
-            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(
-                false
-            );
-        });
+        // Primary buttons no longer carry a dedicated class — Material's
+        // filled-container/label tokens are overridden at the panel level
+        // by `_severity-panel` in `_tbx-mat-dialogs.scss` (mirroring how
+        // banners/notifications style their action buttons), so any
+        // `matButton="filled"` button on the dialog inherits the severity
+        // styling automatically. Only `destructive` keeps an explicit
+        // class because it forces the Error severity tokens regardless of
+        // the dialog's own type.
 
         it('should apply tbx-mat-dialog-btn-destructive class to destructive button', () => {
             const footer: TbxMatDialogFooterControlType[] = [
@@ -837,21 +821,30 @@ describe('DialogShellComponent', () => {
             expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(
                 true
             );
-            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-primary')).toBe(
+        });
+
+        it('should not apply destructive class to a primary button', () => {
+            const footer: TbxMatDialogFooterControlType[] = [
+                buildButton({ emphasis: 'primary', result: TbxMatDialogDismissReason.Affirm }),
+            ];
+            const fixture = createFixture(
+                { title: 'Test', type: TbxMatSeverityLevel.Warning },
+                footer
+            );
+
+            const button = fixture.debugElement.query(By.css('mat-dialog-actions button'));
+            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(
                 false
             );
         });
 
-        it('should not apply emphasis class to text buttons', () => {
+        it('should not apply destructive class to a text button', () => {
             const footer: TbxMatDialogFooterControlType[] = [
                 buildButton({ emphasis: 'text', result: TbxMatDialogDismissReason.Cancel }),
             ];
             const fixture = createFixture({ title: 'Test' }, footer);
 
             const button = fixture.debugElement.query(By.css('mat-dialog-actions button'));
-            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-primary')).toBe(
-                false
-            );
             expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(
                 false
             );

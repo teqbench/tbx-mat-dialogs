@@ -1,4 +1,4 @@
-import { Component, computed, inject, Injectable, signal } from '@angular/core';
+import { Component, computed, effect, inject, Injectable, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,6 +18,100 @@ import { type TbxMatDialogData } from '../models/dialog.model';
 import { TBX_MAT_DIALOG_PROVIDER_CONFIG } from '../tokens/dialog-provider-config.token';
 import { TbxMatDialogSeverityFontIconService } from '../services/dialog-severity-font-icon.service';
 import { TbxMatDialogSeveritySvgIconService } from '../services/dialog-severity-svg-icon.service';
+
+/* ─── Shared icon control types ─────────────────────────────────────────────
+ *
+ * Mirrors the IconSize / IconAnimation surface used by
+ * `tbx-mat-banners/src/components/banner-overlay.stories.common.ts` so the
+ * three packages expose the same control shape, but the size scale is
+ * dialog-specific: dialogs default to a larger icon (3rem — the equivalent
+ * of banners' `large`) because the dialog header has more vertical space
+ * than a banner. The options shrink downward from the default — `standard`
+ * (the default 3rem), `medium` (2rem), `small` (1.5rem, banners' default).
+ */
+
+export type IconSize = 'standard' | 'medium' | 'small';
+export type IconAnimation = 'none' | 'state-transition' | 'pulse';
+
+const ICON_SIZE_STYLE_ID = 'tbx-dialog-story-icon-size';
+const ICON_ANIM_STYLE_ID = 'tbx-dialog-story-icon-animation';
+
+const ICON_SIZE_MAP: Record<IconSize, string> = {
+    standard: '',
+    medium: '2rem',
+    small: '1.5rem',
+};
+
+const STATE_TRANSITION_ANIM_CSS = `
+    @keyframes tbx-dialog-icon-fill {
+        from { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        to   { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    }
+    .material-symbols-rounded {
+        animation: tbx-dialog-icon-fill 0.3s ease-in-out 0.15s forwards;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+`;
+
+const PULSE_ANIM_CSS = `
+    @keyframes tbx-dialog-icon-pulse {
+        from { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        to   { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    }
+    .tbx-mat-dialog-icon {
+        animation: tbx-dialog-icon-pulse 1s ease-in-out infinite alternate;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+`;
+
+export function applyIconSize(size: IconSize): void {
+    const value = ICON_SIZE_MAP[size];
+    document.getElementById(ICON_SIZE_STYLE_ID)?.remove();
+    if (!value) return;
+    const style = document.createElement('style');
+    style.id = ICON_SIZE_STYLE_ID;
+    style.textContent = `html { --tbx-mat-dialog-icon-size: ${value}; }`;
+    document.head.appendChild(style);
+}
+
+export function applyIconAnimation(mode: IconAnimation): void {
+    document.getElementById(ICON_ANIM_STYLE_ID)?.remove();
+    if (mode === 'none') return;
+    const style = document.createElement('style');
+    style.id = ICON_ANIM_STYLE_ID;
+    style.textContent = mode === 'state-transition' ? STATE_TRANSITION_ANIM_CSS : PULSE_ANIM_CSS;
+    document.head.appendChild(style);
+}
+
+/* ─── Shared argTypes for stories ───────────────────────────────────────────
+ *
+ * Story files spread `SHARED_HARNESS_ARG_TYPES` into their `argTypes`
+ * object and `DEFAULT_HARNESS_ARGS` into their `args` object. Mirrors
+ * the `SHARED_OVERLAY_ARG_TYPES` / `DEFAULT_OVERLAY_ARGS` exports in
+ * banners.
+ */
+
+export const SHARED_HARNESS_ARG_TYPES = {
+    iconSize: {
+        name: 'Icon Size',
+        control: 'select' as const,
+        options: ['standard', 'medium', 'small'],
+        description:
+            'Severity icon size (overrides --tbx-mat-dialog-icon-size at the document level). Dialogs default to a larger icon than banners/notifications because the header has more vertical space.',
+    },
+    iconAnimation: {
+        name: 'Icon Animation',
+        control: 'select' as const,
+        options: ['none', 'state-transition', 'pulse'],
+        description:
+            'Severity icon animation. `state-transition` fills the Material Symbols glyph once on enter; `pulse` loops the FILL axis indefinitely.',
+    },
+};
+
+export const DEFAULT_HARNESS_ARGS = {
+    iconSize: 'standard' as IconSize,
+    iconAnimation: 'none' as IconAnimation,
+};
 
 /* ─── Demo input component ──────────────────────────────────────────────────
  *
@@ -130,8 +224,8 @@ export class StoryAlternateCloseIconService extends TbxMatFontIconService<string
     styleUrls: ['./story-harness.css'],
     template: `
         <div class="harness">
-            @if (description) {
-                <p class="story-description">{{ description }}</p>
+            @if (description()) {
+                <p class="story-description">{{ description() }}</p>
             }
             <p class="theme-note">
                 Theme: Angular Material prebuilt <strong>Azure Blue</strong>. Dialog severity colors
@@ -194,7 +288,20 @@ export class DialogHarnessComponent {
     readonly lastResult = signal('');
 
     /** Optional description rendered above the button grid (used by docs stories). */
-    description = '';
+    readonly description = input<string>('');
+
+    /** Severity icon size — wires through to `--tbx-mat-dialog-icon-size`. */
+    readonly iconSize = input<IconSize>('standard');
+
+    /** Severity icon animation mode (state-transition fill / pulse / none). */
+    readonly iconAnimation = input<IconAnimation>('none');
+
+    constructor() {
+        // Effects react to Storybook arg changes so the icon size/animation
+        // controls update the rendered dialog without remounting the harness.
+        effect(() => applyIconSize(this.iconSize()));
+        effect(() => applyIconAnimation(this.iconAnimation()));
+    }
 
     async showSuccess(): Promise<void> {
         const output = await this.dialog.success({

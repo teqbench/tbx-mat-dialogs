@@ -124,19 +124,17 @@ export interface DialogShellData {
             <div class="header-content">
                 @let severityIconValue = severityIcon();
                 @if (severityIconValue) {
-                    <div class="header-icon-container">
-                        @if (severityIconValue.isSvg) {
-                            <mat-icon
-                                class="header-icon"
-                                [svgIcon]="severityIconValue.name"
-                                aria-hidden="true"
-                            ></mat-icon>
-                        } @else {
-                            <mat-icon class="header-icon" aria-hidden="true">{{
-                                severityIconValue.name
-                            }}</mat-icon>
-                        }
-                    </div>
+                    @if (severityIconValue.isSvg) {
+                        <mat-icon
+                            class="tbx-mat-dialog-icon"
+                            [svgIcon]="severityIconValue.name"
+                            aria-hidden="true"
+                        ></mat-icon>
+                    } @else {
+                        <mat-icon class="tbx-mat-dialog-icon" aria-hidden="true">{{
+                            severityIconValue.name
+                        }}</mat-icon>
+                    }
                 }
                 <div class="header-text">
                     <div class="header-title-row">
@@ -152,7 +150,12 @@ export interface DialogShellData {
                     }
                 </div>
             </div>
-            <button matIconButton (click)="close()" aria-label="Close dialog">
+            <button
+                matIconButton
+                class="tbx-mat-dialog-close-icon-button"
+                (click)="close()"
+                aria-label="Close dialog"
+            >
                 @let closeIconValue = closeIcon();
                 @if (closeIconValue) {
                     @if (closeIconValue.isSvg) {
@@ -194,9 +197,6 @@ export interface DialogShellData {
                                 @if (btn.emphasis === 'primary' || btn.emphasis === 'destructive') {
                                     <button
                                         matButton="filled"
-                                        [class.tbx-mat-dialog-btn-primary]="
-                                            btn.emphasis === 'primary'
-                                        "
                                         [class.tbx-mat-dialog-btn-destructive]="
                                             btn.emphasis === 'destructive'
                                         "
@@ -289,6 +289,12 @@ export interface DialogShellData {
 
         /* ── Header ────────────────────────────────────────── */
 
+        /* The dialog surface itself carries the severity background and
+         * on-severity text color (set by the .tbx-mat-dialog-panel-{level}
+         * class via the _severity-panel mixin in _tbx-mat-dialogs.scss).
+         * The header / body / footer all sit on the same colored surface,
+         * mirroring how tbx-mat-banners and tbx-mat-notifications color
+         * their entire panel. */
         .dialog-header {
             display: flex;
             align-items: center;
@@ -305,28 +311,20 @@ export interface DialogShellData {
             min-width: 0;
         }
 
-        /* Circular container for the header icon — matches the 2.5rem touch target
-         * of the close button (matIconButton). The icon glyph is centered within.
-         * Background and icon color consume the severity tokens set by the
-         * .tbx-mat-dialog-panel-{level} class on the MatDialog overlay (see
-         * _tbx-mat-dialogs.scss). The tokens cascade to all descendants — no
-         * inline style bindings or host attribute needed. */
-        .header-icon-container {
+        /* Severity icon — rendered directly in the colored panel, no
+         * surrounding container, no explicit color, no
+         * font-variation-settings. Mirrors .tbx-mat-banner-icon /
+         * .tbx-mat-notification-icon exactly: same class-name shape,
+         * same --tbx-mat-{pkg}-icon-size token, same flex-shrink
+         * behavior. The icon inherits its color from the dialog
+         * surface (= --tbx-mat-dialog-current-text, the on-severity
+         * color set by the panel mixin), so it renders identically to
+         * how banners and notifications render their severity icons. */
+        .tbx-mat-dialog-icon {
             flex-shrink: 0;
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--tbx-mat-dialog-current-background);
-        }
-
-        .header-icon {
-            font-size: 1.25rem;
-            width: 1.25rem;
-            height: 1.25rem;
-            color: var(--tbx-mat-dialog-current-text);
+            font-size: var(--tbx-mat-dialog-icon-size, 3rem);
+            width: var(--tbx-mat-dialog-icon-size, 3rem);
+            height: var(--tbx-mat-dialog-icon-size, 3rem);
         }
 
         .header-text {
@@ -343,10 +341,11 @@ export interface DialogShellData {
         /* matDialogTitle provides aria-labelledby linkage. Override Material's
          * default padding/margin/display since the header container manages its
          * own flex layout. Material sets display: block on the title which breaks
-         * flex centering — inline keeps it in the flex flow. */
+         * flex centering — inline keeps it in the flex flow.
+         * Color: inherits from the colored header (= --tbx-mat-dialog-current-text). */
         [matDialogTitle] {
             font: var(--mat-sys-title-large);
-            color: var(--mat-sys-on-surface);
+            color: inherit;
             display: inline;
             margin: 0;
             padding: 0;
@@ -358,7 +357,7 @@ export interface DialogShellData {
 
         .dialog-subtitle {
             font: var(--mat-sys-body-small);
-            color: var(--mat-sys-on-surface-variant);
+            color: inherit;
             margin: 0.25rem 0 0;
         }
 
@@ -384,7 +383,7 @@ export interface DialogShellData {
 
         .dialog-message {
             font: var(--mat-sys-body-medium);
-            color: var(--mat-sys-on-surface);
+            color: inherit;
             margin: 0;
             line-height: 1.6;
         }

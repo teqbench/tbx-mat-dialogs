@@ -47,16 +47,16 @@ html {
 
 /* ━━━ Dialog Panel Surface ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  *
- * MatDialog renders overlays outside component scope. The
- * `.tbx-mat-dialog-panel` class is applied via MatDialog's `panelClass`
- * by `TbxMatDialogService`. Structural padding/border-radius adjustments
- * are scoped via descendant selectors to MatDialog's surface element.
+ * MatDialog wraps the rendered component in `.mat-mdc-dialog-container >
+ * .mat-mdc-dialog-surface`. The `.tbx-mat-dialog-panel` class is applied
+ * to MatDialog's overlay panel via `panelClass` by `TbxMatDialogService`,
+ * and structural overrides target the surface element inside.
  *
- * The dialog surface stays neutral (Material theme background); severity
- * colors drive the header icon container and primary action button only.
- * This is the structural difference from banners/notifications, where
- * the entire panel takes the severity background — dialogs are modal
- * overlays where neutral chrome is the convention.
+ * Severity color is applied to the entire dialog surface — header, body,
+ * and footer all sit on the same severity background — mirroring how
+ * `tbx-mat-banners` and `tbx-mat-notifications` color their entire panel.
+ * The icon, title, body text, footer buttons, and form controls all
+ * inherit from the panel-level token overrides set by `_severity-panel`.
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 .tbx-mat-dialog-panel .mat-mdc-dialog-container .mat-mdc-dialog-surface {
@@ -64,22 +64,179 @@ html {
     border-radius: 1rem;
 }
 
-/* ━━━ Severity Panel Classes ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+/* ━━━ Severity Panel Mixin ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  *
- * Six panel classes, one per severity level. Each class exposes the
- * active severity's background/text tokens as
- * `--tbx-mat-dialog-current-{background,text}` for descendant consumption
- * (header icon container, primary button via the `.tbx-mat-dialog-btn-primary`
- * opt-in class). The component template stays severity-agnostic and reads
- * from the `current-*` tokens.
- *
- * `.tbx-mat-severity-inverted` flip support is inherited automatically
- * via the shared severity-theme mixin emitted on `html` above.
+ * Adapted from `tbx-mat-banners`/`tbx-mat-notifications` to dialogs.
+ * Applies the severity background to the dialog surface (via Material's
+ * `dialog-overrides()` for `container-color`, falling through to
+ * `--mdc-dialog-container-color`), sets the surface `color` to the
+ * on-severity token (so descendants pick it up via inheritance), and
+ * exposes Material control tokens for every button variant
+ * (text / filled / tonal / outlined / elevated), the icon button,
+ * checkbox, slide-toggle, radio, and button-toggle group — same shape
+ * as banners' `_severity-panel($bg, $text)`.
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 @mixin _severity-panel($bg, $text) {
+    /* Expose the active severity tokens for shell-component consumers
+     * (icon, title-row badges, etc.) that read --tbx-mat-dialog-current-*. */
     --tbx-mat-dialog-current-background: #{$bg};
     --tbx-mat-dialog-current-text: #{$text};
+
+    /* ── Dialog title + body text + container ──
+     *
+     * Material's MatDialog colors the title via --mdc-dialog-subhead-color
+     * and the body via --mdc-dialog-supporting-text-color. Override both
+     * to the on-severity color so title, subtitle, and message all
+     * render as full $text — same as how `tbx-mat-banners` colors its
+     * label and `tbx-mat-notifications` colors its supporting-text via
+     * `mat.snack-bar-overrides({ supporting-text-color: $text })`. */
+    @include mat.dialog-overrides(
+        (
+            container-color: $bg,
+            subhead-color: $text,
+            supporting-text-color: $text,
+        )
+    );
+
+    /* Surface `color` is set so generic descendants (severity icon,
+     * custom paragraph elements without their own color, etc.) pick up
+     * the on-severity color via standard CSS inheritance. */
+    .mat-mdc-dialog-surface {
+        color: #{$text};
+    }
+
+    /* ── Divider (mat-divider) — keep visible against the colored panel ── */
+    --mat-divider-color: #{$text};
+
+    /* ── Icon button color tokens (used by .tbx-mat-dialog-close-icon-button) ── */
+    --tbx-mat-dialog-close-icon-color: color-mix(in srgb, #{$text} calc(var(--tbx-mat-dialog-close-icon-opacity) * 100%), transparent);
+    --tbx-mat-dialog-close-icon-state-layer-color: #{$text};
+
+    /* ── Text button ── */
+    --mat-button-text-label-text-color: color-mix(in srgb, #{$text} calc(var(--tbx-mat-dialog-action-text-opacity) * 100%), transparent);
+    --mat-button-text-state-layer-color: #{$text};
+    --mat-button-text-ripple-color: color-mix(in srgb, #{$text} calc(var(--mat-sys-pressed-state-layer-opacity) * 100%), transparent);
+
+    /* ── Filled button ── */
+    --mat-button-filled-container-color: color-mix(in srgb, #{$text} calc(var(--tbx-mat-dialog-action-filled-container-opacity) * 100%), transparent);
+    --mat-button-filled-label-text-color: #{$bg};
+    --mat-button-filled-state-layer-color: #{$bg};
+    --mat-button-filled-hover-state-layer-opacity: var(--tbx-mat-dialog-action-filled-hover-state-layer-opacity);
+    --mat-button-filled-ripple-color: color-mix(in srgb, #{$bg} calc(var(--mat-sys-pressed-state-layer-opacity) * 100%), transparent);
+
+    /* ── Tonal button ── */
+    --mat-button-tonal-container-color: color-mix(in srgb, #{$text} calc(var(--tbx-mat-dialog-action-tonal-container-opacity) * 100%), transparent);
+    --mat-button-tonal-label-text-color: #{$bg};
+    --mat-button-tonal-state-layer-color: #{$bg};
+    --mat-button-tonal-hover-state-layer-opacity: var(--tbx-mat-dialog-action-tonal-hover-state-layer-opacity);
+    --mat-button-tonal-ripple-color: color-mix(in srgb, #{$bg} calc(var(--mat-sys-pressed-state-layer-opacity) * 100%), transparent);
+
+    /* ── Outlined button ── */
+    --mat-button-outlined-label-text-color: color-mix(in srgb, #{$text} calc(var(--tbx-mat-dialog-action-outlined-opacity) * 100%), transparent);
+    --mat-button-outlined-outline-color: #{$text};
+    --mat-button-outlined-state-layer-color: #{$text};
+    --mat-button-outlined-ripple-color: color-mix(in srgb, #{$text} calc(var(--mat-sys-pressed-state-layer-opacity) * 100%), transparent);
+
+    /* ── Elevated (protected) button ── */
+    --mat-button-protected-label-text-color: color-mix(in srgb, #{$text} calc(var(--tbx-mat-dialog-action-elevated-opacity) * 100%), transparent);
+    --mat-button-protected-container-color: #{$bg};
+    --mat-button-protected-state-layer-color: #{$text};
+    --mat-button-protected-container-elevation-shadow: var(--mat-sys-level1);
+    --mat-button-protected-hover-container-elevation-shadow: var(--mat-sys-level2);
+    --mat-button-protected-focus-container-elevation-shadow: var(--mat-sys-level1);
+    --mat-button-protected-pressed-container-elevation-shadow: var(--mat-sys-level1);
+    --mat-button-protected-ripple-color: color-mix(in srgb, #{$text} calc(var(--mat-sys-pressed-state-layer-opacity) * 100%), transparent);
+
+    /* ── Checkbox ── */
+    --mat-checkbox-selected-checkmark-color: #{$bg};
+    --mat-checkbox-selected-focus-icon-color: #{$text};
+    --mat-checkbox-selected-hover-icon-color: #{$text};
+    --mat-checkbox-selected-icon-color: #{$text};
+    --mat-checkbox-selected-pressed-state-layer-color: #{$text};
+    --mat-checkbox-unselected-focus-icon-color: #{$text};
+    --mat-checkbox-unselected-hover-icon-color: #{$text};
+    --mat-checkbox-unselected-icon-color: #{$text};
+    --mat-checkbox-label-text-color: #{$text};
+
+    /* ── Slide toggle ── */
+    --mat-slide-toggle-label-text-color: #{$text};
+    --mat-slide-toggle-selected-track-color: #{$text};
+    --mat-slide-toggle-selected-hover-track-color: #{$text};
+    --mat-slide-toggle-selected-focus-track-color: #{$text};
+    --mat-slide-toggle-selected-pressed-track-color: #{$text};
+    --mat-slide-toggle-selected-handle-color: #{$bg};
+    --mat-slide-toggle-selected-hover-handle-color: #{$bg};
+    --mat-slide-toggle-selected-focus-handle-color: #{$bg};
+    --mat-slide-toggle-selected-pressed-handle-color: #{$bg};
+    --mat-slide-toggle-selected-icon-color: #{$text};
+    --mat-slide-toggle-unselected-track-color: color-mix(in srgb, #{$text} 30%, transparent);
+    --mat-slide-toggle-unselected-hover-track-color: color-mix(in srgb, #{$text} 40%, transparent);
+    --mat-slide-toggle-unselected-focus-track-color: color-mix(in srgb, #{$text} 30%, transparent);
+    --mat-slide-toggle-unselected-pressed-track-color: color-mix(in srgb, #{$text} 40%, transparent);
+    --mat-slide-toggle-unselected-handle-color: #{$text};
+    --mat-slide-toggle-unselected-hover-handle-color: #{$text};
+    --mat-slide-toggle-unselected-focus-handle-color: #{$text};
+    --mat-slide-toggle-unselected-pressed-handle-color: #{$text};
+    --mat-slide-toggle-unselected-icon-color: #{$bg};
+    --mat-slide-toggle-track-outline-color: color-mix(in srgb, #{$text} 50%, transparent);
+
+    /* ── Radio ── */
+    --mat-radio-checked-ripple-color: #{$text};
+    --mat-radio-ripple-color: #{$text};
+    --mat-radio-selected-icon-color: #{$text};
+    --mat-radio-selected-hover-icon-color: #{$text};
+    --mat-radio-selected-focus-icon-color: #{$text};
+    --mat-radio-selected-pressed-icon-color: #{$text};
+    --mat-radio-unselected-icon-color: #{$text};
+    --mat-radio-unselected-hover-icon-color: #{$text};
+    --mat-radio-unselected-focus-icon-color: #{$text};
+    --mat-radio-unselected-pressed-icon-color: #{$text};
+    --mat-radio-label-text-color: #{$text};
+
+    /* ── Button toggle group ── */
+    --mat-button-toggle-text-color: #{$text};
+    --mat-button-toggle-selected-state-text-color: #{$bg};
+    --mat-button-toggle-selected-state-background-color: #{$text};
+    --mat-button-toggle-divider-color: color-mix(in srgb, #{$text} 40%, transparent);
+    --mat-button-toggle-disabled-state-text-color: color-mix(in srgb, #{$text} 40%, transparent);
+    --mat-button-toggle-state-layer-color: #{$text};
+    --mat-button-toggle-hover-state-layer-opacity: 0.15;
+
+    /* ── Chip (used by context badge in the header) ── */
+    --mat-chip-label-text-color: #{$text};
+    --mat-chip-disabled-label-text-color: #{$text};
+    --mat-chip-disabled-container-color: color-mix(in srgb, #{$text} 18%, transparent);
+
+    /* ── Outlined form field (used by input dialog content) ──
+     * Banners/notifications don't host form fields, so this set is
+     * dialog-specific. Uses Material's `mat.form-field-overrides()`
+     * mixin so the correct internal tokens are targeted regardless of
+     * Material's exact token naming. Idle-state outline and label are
+     * softened with color-mix so the field reads as a passive control
+     * until the user hovers or focuses it (then the outline becomes
+     * full $text). Validation error messages keep Material's default
+     * error color — on an Error severity dialog those errors aren't
+     * usually rendered (the dialog itself is the error surface), and
+     * on other severities the default error color provides contrast. */
+    @include mat.form-field-overrides(
+        (
+            outlined-outline-color: color-mix(in srgb, #{$text} 50%, transparent),
+            outlined-hover-outline-color: #{$text},
+            outlined-focus-outline-color: #{$text},
+            outlined-disabled-outline-color: color-mix(in srgb, #{$text} 30%, transparent),
+            outlined-input-text-color: #{$text},
+            outlined-disabled-input-text-color: color-mix(in srgb, #{$text} 50%, transparent),
+            outlined-input-text-placeholder-color: color-mix(in srgb, #{$text} 50%, transparent),
+            outlined-label-text-color: color-mix(in srgb, #{$text} 70%, transparent),
+            outlined-hover-label-text-color: #{$text},
+            outlined-focus-label-text-color: #{$text},
+            outlined-disabled-label-text-color: color-mix(in srgb, #{$text} 50%, transparent),
+            outlined-caret-color: #{$text},
+            leading-icon-color: #{$text},
+            trailing-icon-color: #{$text},
+        )
+    );
 }
 
 .tbx-mat-dialog-panel-default {
@@ -124,30 +281,41 @@ html {
     );
 }
 
-/* ━━━ Button Severity Overrides ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+/* ━━━ Icon Button Class Overrides ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  *
- * Applied via `[class.tbx-mat-dialog-btn-primary]` /
- * `[class.tbx-mat-dialog-btn-destructive]` in the dialog shell template.
- *
- * - **Primary button** — takes the active panel's severity tokens via
- *   `--tbx-mat-dialog-current-*`, so the primary action matches the
- *   dialog's overall severity.
- * - **Destructive button** — always uses the Error severity tokens
- *   regardless of the dialog's severity. "Destructive" is a UX intent,
- *   not a severity (e.g., a "Delete" button inside a Help-severity
- *   dialog should still read as destructive).
+ * Class-targeted rules applied to mat-mdc-icon-button instances so the
+ * close icon picks up the close-icon-color tokens emitted by the panel
+ * mixin. Mirrors the pattern in
+ * `tbx-mat-banners`/`tbx-mat-notifications`.
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-.tbx-mat-dialog-panel .tbx-mat-dialog-btn-primary {
-    @include mat.button-overrides(
-        (
-            filled-container-color: var(--tbx-mat-dialog-current-background),
-            filled-label-text-color: var(--tbx-mat-dialog-current-text),
-        )
-    );
+.tbx-mat-dialog-close-icon-button.mat-mdc-icon-button {
+    --mat-icon-button-icon-color: var(--tbx-mat-dialog-close-icon-color);
+    --mat-icon-button-state-layer-color: var(--tbx-mat-dialog-close-icon-state-layer-color);
 }
 
-.tbx-mat-dialog-panel .tbx-mat-dialog-btn-destructive {
+/* ━━━ Destructive Button ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ *
+ * Dialog-only extension: a footer button with `emphasis: 'destructive'`
+ * renders with the Error severity tokens so it reads as destructive
+ * regardless of the dialog's own severity (e.g., a "Delete" button
+ * inside a Help dialog still looks destructive). All other footer
+ * buttons inherit their Material variant tokens from the panel mixin
+ * above.
+ *
+ * Excluded when the dialog itself is Error severity — on an Error panel
+ * the override's `filled-container-color: --tbx-mat-dialog-error-background`
+ * resolves to the same value as the surface background, making the
+ * button invisible. The `:not(.tbx-mat-dialog-panel-error)` guard lets
+ * the destructive button fall through to the panel mixin's filled
+ * tokens on Error dialogs, which already render the Error-theme
+ * styling correctly. The fall-through works under
+ * `.tbx-mat-severity-inverted` too because both sides of the inversion
+ * collide identically when the dialog severity matches the destructive
+ * intent.
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.tbx-mat-dialog-panel:not(.tbx-mat-dialog-panel-error) .tbx-mat-dialog-btn-destructive {
     @include mat.button-overrides(
         (
             filled-container-color: var(--tbx-mat-dialog-error-background),
