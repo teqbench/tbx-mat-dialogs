@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.1](https://github.com/teqbench/tbx-mat-dialogs/compare/v1.0.0...v1.0.1) (2026-05-06)
+
+
+### Bug Fixes
+
+* **claude+docs:** forward-port Markdown Tables section, publish docs assets, sharpen APF parenthetical ([00ac084](https://github.com/teqbench/tbx-mat-dialogs/commit/00ac08408cca0bdcb5dc5076b5198cb34b22c08e))
+* **claude:** add Markdown Tables Convention section ([d00cb22](https://github.com/teqbench/tbx-mat-dialogs/commit/d00cb223fd4a1018864891443838bc022b1b25c6))
+* **claude:** describe actual APF exports shape in Publishing section ([e954907](https://github.com/teqbench/tbx-mat-dialogs/commit/e95490719bdda05b078c7cfadaec2b8c2c0c690f))
+* **docs:** publish docs/ assets and align CLAUDE.md description ([349b122](https://github.com/teqbench/tbx-mat-dialogs/commit/349b1229fcfd601396fb263bac325a7fda04454f))
+
 ## [1.0.0](https://github.com/teqbench/tbx-mat-dialogs/compare/v0.1.1...v1.0.0) (2026-05-06)
 
 
