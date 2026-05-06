@@ -84,6 +84,8 @@ export interface DialogShellData {
  * Padding is controlled by a single CSS custom property (--dialog-padding-inline)
  * on :host, ensuring header, body, footer, and divider insets are always aligned.
  * Material directive default padding is overridden to use this property.
+ *
+ * @internal
  */
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,

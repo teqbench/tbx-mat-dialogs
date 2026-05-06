@@ -39,8 +39,8 @@ This is a `@teqbench` [Angular ↗](https://angular.dev) library package built w
 - `src/index.ts` — Barrel file (public API exports)
 - `dist/` — Compiled output (git-ignored, only this directory is published)
 - `.storybook/` — [Storybook ↗](https://storybook.js.org) configuration ([Vite ↗](https://vite.dev)-based via [@analogjs/storybook-angular ↗](https://analogjs.org))
-- `docs/` — Documentation (placeholder for package-specific guides)
-- `.github/workflows/` — CI/CD pipelines (ci, release, sync, dep-compat-check, claude)
+- `docs/` — Per-package docs pipeline inputs (`overview.md`, `concepts.yml`, `features.yml`, `related.yml`, `accessibility.md`) consumed by the org-wide docs-deploy workflow. Also contains `reference/workflows/` describing each CI/CD pipeline.
+- `.github/workflows/` — CI/CD pipelines (ci, release, sync, dep-compat-check, docs-deploy, claude)
 - Dependency updates run centrally via [Renovate ↗](https://docs.renovatebot.com/) (org-level workflow + `renovate-config.js` in `teqbench/.github`); no per-repo config is required
 
 ## Publishing

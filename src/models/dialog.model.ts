@@ -302,13 +302,14 @@ export interface TbxMatDialogResult<T = void, F extends Record<string, unknown> 
  *
  * #### Focus management
  *
- * The dialog uses `autoFocus: 'first-tabbable'` ({@link https://material.angular.dev | Angular Material}
- * default). For input dialogs, the first tabbable element in DOM order is typically the
- * header close button — not the first form field. Content components should apply the
- * `cdkFocusInitial` attribute to the element that should receive initial focus. This is a
- * plain HTML attribute recognized by the
- * {@link https://material.angular.dev/cdk/a11y/api#FocusTrap | Angular CDK FocusTrap} —
- * no directive import needed.
+ * For input dialogs, the dialog service sets `autoFocus: 'first-tabbable'` so the
+ * consumer's `cdkFocusInitial` attribute on a form field inside the projected content
+ * component takes precedence. Content components should apply `cdkFocusInitial` to the
+ * element that should receive initial focus. This is a plain HTML attribute recognized
+ * by the {@link https://material.angular.dev/cdk/a11y/api#FocusTrap | Angular CDK FocusTrap} —
+ * no directive import needed. Without it, focus would fall through to the first tabbable
+ * element in DOM order (typically the header close button), so applying it on the
+ * intended target is required for correct UX.
  *
  * #### Non-input components (display-only content)
  *

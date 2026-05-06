@@ -42,7 +42,6 @@
   },
   "peerDependencies": {
     "@angular/cdk": ">=21.0.0",
-    "@angular/common": ">=21.0.0",
     "@angular/core": ">=21.0.0",
     "@angular/material": ">=21.0.0",
     "@teqbench/tbx-mat-icons": ">=4.0.0",
@@ -82,14 +81,14 @@
     "vitest": "^4.0.18",
     "zone.js": "^0.16.1"
   },
-  "//overrides": "Pin vite to 7.3.2 — @angular/build bundles vite internally but does not constrain the version tightly enough; 7.4+ causes build failures with ng-packagr. Remove when @angular/build supports vite 7.4+.",
+  "//overrides": "Pin vite to 7.3.2 — @angular/build bundles vite internally but does not constrain the version tightly enough; 7.4+ causes build failures with ng-packagr. Remove when @angular/build supports vite 7.4+. Tracking: https://github.com/teqbench/tbx-mat-dialogs/issues/72.",
   "overrides": {
     "@angular/build": {
       "vite": "7.3.2"
     }
   },
   "lint-staged": {
-    "*.{ts,json,md,yml,yaml}": [
+    "*.{ts,json,md,yml,yaml,scss,css}": [
       "prettier --write"
     ]
   }
