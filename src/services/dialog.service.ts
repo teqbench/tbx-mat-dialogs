@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
 import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
 import { DialogShellComponent, type DialogShellData } from '../components/dialog-shell.component';
-import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
+import { TbxMatDialogDismissReason } from '../enums/dialog-dismiss-reason.enum';
 import { type TbxMatDialogConfig, type TbxMatDialogResult } from '../models/dialog.model';
 import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
 import { type TbxMatDialogConfigArgs } from '../types/dialog-config-override.type';

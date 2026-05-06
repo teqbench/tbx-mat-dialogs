@@ -1,4 +1,4 @@
-import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
+import { TbxMatDialogDismissReason } from '../enums/dialog-dismiss-reason.enum';
 import { type TbxMatDialogFooterButton } from '../models/dialog-footer.model';
 
 /**

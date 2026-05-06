@@ -1,5 +1,5 @@
 import { type Signal } from '@angular/core';
-import { type TbxMatDialogDismissReason } from '../types/dialog-result.type';
+import { type TbxMatDialogDismissReason } from '../enums/dialog-dismiss-reason.enum';
 
 /**
  * Base interface for all dialog footer items — buttons and form controls alike

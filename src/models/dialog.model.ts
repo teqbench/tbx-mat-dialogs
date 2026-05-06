@@ -1,6 +1,6 @@
 import { type Signal, Type } from '@angular/core';
 import { type TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
-import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
+import { TbxMatDialogDismissReason } from '../enums/dialog-dismiss-reason.enum';
 import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
 
 /**

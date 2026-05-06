@@ -22,7 +22,7 @@
  * }
  * ```
  *
- * @category Types
+ * @category Enums
  * @displayName Dialog Dismiss Reason
  * @order 1
  * @since 0.1.0
@@ -31,8 +31,31 @@
  * @public
  */
 export enum TbxMatDialogDismissReason {
+    /**
+     * The user confirmed the action (OK, Yes, Save, Delete, etc.)
+     *
+     * @public
+     */
     Affirm = 'affirm',
+
+    /**
+     * The user explicitly declined (No)
+     *
+     * @public
+     */
     Deny = 'deny',
+
+    /**
+     * The user aborted the interaction (Cancel button)
+     *
+     * @public
+     */
     Cancel = 'cancel',
+
+    /**
+     * The user dismissed without choosing (close button, Escape, backdrop)
+     *
+     * @public
+     */
     Close = 'close',
 }

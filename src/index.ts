@@ -35,8 +35,10 @@
  * @packageDocumentation
  */
 
+// Enums
+export { TbxMatDialogDismissReason } from './enums/dialog-dismiss-reason.enum';
+
 // Types
-export { TbxMatDialogDismissReason } from './types/dialog-result.type';
 export type { TbxMatDialogFooterControlType } from './types/dialog-footer-control.type';
 export type { TbxMatDialogConfigArgs } from './types/dialog-config-override.type';
 export type { TbxMatDialogIconResolver } from './types/dialog-icon-resolver.type';

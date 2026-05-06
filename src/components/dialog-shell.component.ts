@@ -10,7 +10,7 @@ import { MatDivider } from '@angular/material/divider';
 import { MatChipSet, MatChip } from '@angular/material/chips';
 import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
 import { TbxMatIconType, TBX_MAT_FONT_ICON_DEFAULT_FONT_SET } from '@teqbench/tbx-mat-icons';
-import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
+import { TbxMatDialogDismissReason } from '../enums/dialog-dismiss-reason.enum';
 import { type TbxMatDialogConfig, type TbxMatDialogData } from '../models/dialog.model';
 import { type TbxMatDialogFooterButton, type TbxMatDialogFooterCheckbox, type TbxMatDialogFooterToggle, type TbxMatDialogFooterRadioGroup, type TbxMatDialogFooterToggleGroup } from '../models/dialog-footer.model';
 import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';

@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
 import { TbxMatDialogService } from './dialog.service';
 import { DialogShellComponent } from '../components/dialog-shell.component';
-import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
+import { TbxMatDialogDismissReason } from '../enums/dialog-dismiss-reason.enum';
 import { TBX_MAT_DIALOG_BUTTONS_OK, TBX_MAT_DIALOG_BUTTONS_OK_CANCEL, TBX_MAT_DIALOG_BUTTONS_YES_NO, TBX_MAT_DIALOG_DEFAULT_WIDTH } from '../constants/dialog.constants';
 
 /**
