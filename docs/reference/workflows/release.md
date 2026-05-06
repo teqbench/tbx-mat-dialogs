@@ -2,12 +2,15 @@
 
 **Full name:** TeqBench Package - Release Workflow
 **File:** `.github/workflows/release.yml`
+**Implementation:** Thin caller delegating to [`teqbench/.github/.github/workflows/release.yml` ↗](https://github.com/teqbench/.github/blob/main/.github/workflows/release.yml)
 
 ---
 
 ## Purpose
 
 The Release workflow automates versioning, changelog generation, [GitHub Release ↗](https://docs.github.com/en/repositories/releasing-projects-on-github) creation, and [npm ↗](https://www.npmjs.com) publishing using Google's [Release Please ↗](https://github.com/googleapis/release-please). It eliminates the need to manually edit version numbers, write changelogs, or create release tags. When a release is created, the package is automatically published to [GitHub Packages ↗](https://github.com/orgs/teqbench/packages).
+
+> **Note:** The local `.yml` file is a thin caller. All implementation details below describe the org-wide reusable workflow in `teqbench/.github`. Refer to that repository for the authoritative source.
 
 ---
 
