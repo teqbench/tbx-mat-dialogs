@@ -427,7 +427,6 @@ export class DialogHarnessComponent {
         ];
         const output = await this.dialog.show({
             title: 'Delete Account',
-            icon: 'error',
             type: TbxMatSeverityLevel.Error,
             message:
                 'This will permanently delete your account and all associated data. This action cannot be undone.',
