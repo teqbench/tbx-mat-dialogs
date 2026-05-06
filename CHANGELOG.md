@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/teqbench/tbx-mat-dialogs/compare/v1.0.1...v1.0.2) (2026-05-06)
+
+
+### Bug Fixes
+
+* remove dependabot artifacts after migration to renovate ([b6463c0](https://github.com/teqbench/tbx-mat-dialogs/commit/b6463c01c3ec46d8d236f9b58eca5151c40bbb7c))
+
 ## [1.0.1](https://github.com/teqbench/tbx-mat-dialogs/compare/v1.0.0...v1.0.1) (2026-05-06)
 
 
