@@ -1,0 +1,8 @@
+# Accessibility
+
+- **Modal semantics.** Dialogs render via [Angular Material's MatDialog ↗](https://material.angular.dev/components/dialog/api), which sets `aria-modal="true"`, manages the backdrop, and traps keyboard focus inside the overlay until dismissal. The title is the dialog's `aria-labelledby` target via `matDialogTitle`.
+- **Focus.** Initial focus uses [Angular Material ↗](https://material.angular.dev)'s default `'first-tabbable'`. For input dialogs, content components should apply the `cdkFocusInitial` HTML attribute to the element that should receive initial focus — this is recognized by the [CDK FocusTrap ↗](https://material.angular.dev/cdk/a11y/api#FocusTrap) without any directive import. Without it, the first tabbable element in DOM order receives focus (typically the close button).
+- **Keyboard.** `Escape` dismisses the dialog with `Close` unless `disableClose: true` is set. `Tab` cycles through focusable elements within the dialog. Footer buttons activate on `Enter` and `Space`; form controls use their native [Angular Material ↗](https://material.angular.dev) keyboard behavior.
+- **Reduced motion.** [Angular Material's MatDialog ↗](https://material.angular.dev/components/dialog/api) honors `prefers-reduced-motion: reduce` for its open/close animation.
+- **Color contrast.** The default severity palette meets [WCAG ↗](https://www.w3.org/WAI/standards-guidelines/wcag/) AA contrast for text on each severity background. Overriding the severity CSS custom properties is the consumer's responsibility to re-verify.
+- **Icons.** Severity and close icons are decorative and marked `aria-hidden`; meaning is carried by the title and message text and by the close button's `aria-label`.
