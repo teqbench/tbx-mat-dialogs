@@ -2,12 +2,15 @@
 
 **Full name:** TeqBench Package - Claude Code Workflow
 **File:** `.github/workflows/claude.yml`
+**Implementation:** Thin caller delegating to [`teqbench/.github/.github/workflows/claude.yml` ↗](https://github.com/teqbench/.github/blob/main/.github/workflows/claude.yml)
 
 ---
 
 ## Purpose
 
 The [Claude Code ↗](https://github.com/anthropics/claude-code) workflow provides AI-powered assistance directly in [GitHub ↗](https://github.com) issues and pull requests. When a user mentions `@claude` in a comment or issue body, [Claude ↗](https://www.anthropic.com/claude) reads the codebase, analyzes the request, and can implement features, fix bugs, review code, or create pull requests — all within the [GitHub ↗](https://github.com) UI.
+
+> **Note:** The local `.yml` file is a thin caller. All implementation details below describe the org-wide reusable workflow in `teqbench/.github`. Refer to that repository for the authoritative source.
 
 ---
 

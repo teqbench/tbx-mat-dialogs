@@ -2,12 +2,15 @@
 
 **Full name:** Dependency Compatibility Check
 **File:** `.github/workflows/dep-compat-check.yml`
+**Implementation:** Thin caller delegating to [`teqbench/.github/.github/workflows/dep-compat-check.yml` ↗](https://github.com/teqbench/.github/blob/main/.github/workflows/dep-compat-check.yml)
 
 ---
 
 ## Purpose
 
 Tracks pinned dependencies that are waiting for a new version — for example, waiting for a package to release a compatible major version before it can be adopted. The workflow checks the [npm ↗](https://www.npmjs.com) registry daily, evaluates resolution conditions, and posts status updates to a tracking issue.
+
+> **Note:** The local `.yml` file is a thin caller. All implementation details below describe the org-wide reusable workflow in `teqbench/.github`. Refer to that repository for the authoritative source.
 
 ---
 

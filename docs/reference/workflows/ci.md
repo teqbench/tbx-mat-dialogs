@@ -2,12 +2,15 @@
 
 **Full name:** TeqBench Package - CI Workflow
 **File:** `.github/workflows/ci.yml`
+**Implementation:** Thin caller delegating to [`teqbench/.github/.github/workflows/ci.yml` ↗](https://github.com/teqbench/.github/blob/main/.github/workflows/ci.yml)
 
 ---
 
 ## Purpose
 
 The CI workflow is the quality gate for the repository. It runs formatting checks, type checking, linting, tests with coverage enforcement, dependency auditing, and README version drift detection on every push and pull request to `main` and `dev`. After a successful push (not PR), it pushes badge data to a shared [GitHub Gist ↗](https://gist.github.com) and updates the README with branch-specific [Shields.io ↗](https://shields.io) badge URLs.
+
+> **Note:** The local `.yml` file is a thin caller. All implementation details below describe the org-wide reusable workflow in `teqbench/.github`. Refer to that repository for the authoritative source.
 
 ---
 
@@ -19,8 +22,6 @@ The CI workflow is the quality gate for the repository. It runs formatting check
     <dt><code>pull_request</code></dt>
     <dd>Branches: <code>main</code>, <code>dev</code>. Full pipeline, no badge updates.</dd>
 </dl>
-
----
 
 ---
 

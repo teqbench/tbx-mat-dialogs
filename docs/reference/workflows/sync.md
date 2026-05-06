@@ -2,12 +2,15 @@
 
 **Full name:** TeqBench Package - Sync (Main into Dev) Workflow
 **File:** `.github/workflows/sync.yml`
+**Implementation:** Thin caller delegating to [`teqbench/.github/.github/workflows/sync.yml` ↗](https://github.com/teqbench/.github/blob/main/.github/workflows/sync.yml)
 
 ---
 
 ## Purpose
 
 After [Release Please ↗](https://github.com/googleapis/release-please) merges a Release PR to `main`, the `dev` branch falls behind — it's missing the version bump in `package.json`, the updated `CHANGELOG.md`, and the new `.release-please-manifest.json`. This workflow automatically merges `main` back into `dev` to keep the branches in sync.
+
+> **Note:** The local `.yml` file is a thin caller. All implementation details below describe the org-wide reusable workflow in `teqbench/.github`. Refer to that repository for the authoritative source.
 
 ---
 
