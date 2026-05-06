@@ -511,27 +511,27 @@ export class DialogShellComponent {
     //
     // The @switch guarantees the discriminant matches — the cast is safe.
 
-    /** Cast for @case ('button') — provides TbxMatDialogFooterButton type in template. */
+    /** Cast for `@case ('button')` — provides TbxMatDialogFooterButton type in template. */
     protected asButton(control: TbxMatDialogFooterControlType): TbxMatDialogFooterButton {
         return control as TbxMatDialogFooterButton;
     }
 
-    /** Cast for @case ('checkbox') — provides TbxMatDialogFooterCheckbox type in template. */
+    /** Cast for `@case ('checkbox')` — provides TbxMatDialogFooterCheckbox type in template. */
     protected asCheckbox(control: TbxMatDialogFooterControlType): TbxMatDialogFooterCheckbox {
         return control as TbxMatDialogFooterCheckbox;
     }
 
-    /** Cast for @case ('toggle') — provides TbxMatDialogFooterToggle type in template. */
+    /** Cast for `@case ('toggle')` — provides TbxMatDialogFooterToggle type in template. */
     protected asToggle(control: TbxMatDialogFooterControlType): TbxMatDialogFooterToggle {
         return control as TbxMatDialogFooterToggle;
     }
 
-    /** Cast for @case ('radio-group') — provides TbxMatDialogFooterRadioGroup type in template. */
+    /** Cast for `@case ('radio-group')` — provides TbxMatDialogFooterRadioGroup type in template. */
     protected asRadioGroup(control: TbxMatDialogFooterControlType): TbxMatDialogFooterRadioGroup {
         return control as TbxMatDialogFooterRadioGroup;
     }
 
-    /** Cast for @case ('toggle-group') — provides TbxMatDialogFooterToggleGroup type in template. */
+    /** Cast for `@case ('toggle-group')` — provides TbxMatDialogFooterToggleGroup type in template. */
     protected asToggleGroup(control: TbxMatDialogFooterControlType): TbxMatDialogFooterToggleGroup {
         return control as TbxMatDialogFooterToggleGroup;
     }

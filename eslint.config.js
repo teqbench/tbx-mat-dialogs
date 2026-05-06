@@ -1,4 +1,5 @@
 import angular from 'angular-eslint';
+import tsdoc from 'eslint-plugin-tsdoc';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
@@ -18,6 +19,7 @@ export default tseslint.config(
     ...tseslint.configs.recommended,
     ...angular.configs.tsRecommended,
     {
+        plugins: { tsdoc },
         languageOptions: {
             parserOptions: {
                 projectService: {
@@ -25,6 +27,17 @@ export default tseslint.config(
                 },
                 tsconfigRootDir: import.meta.dirname,
             },
+        },
+        rules: {
+            '@angular-eslint/directive-selector': [
+                'error',
+                { type: 'attribute', prefix: 'tbx', style: 'camelCase' },
+            ],
+            '@angular-eslint/component-selector': [
+                'error',
+                { type: 'element', prefix: 'tbx', style: 'kebab-case' },
+            ],
+            'tsdoc/syntax': 'warn',
         },
     },
     {
