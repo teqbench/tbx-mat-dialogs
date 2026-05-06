@@ -477,7 +477,7 @@ Contributions are welcome. See the [contributing guide ↗](https://github.com/t
 
 ## Security
 
-See the [security policy](SECURITY.md) for the supported-version policy and how to report a vulnerability privately.
+See the [security policy ↗](https://github.com/teqbench/.github/blob/main/SECURITY.md) for the supported-version policy and how to report a vulnerability privately.
 
 ## Feedback
 
