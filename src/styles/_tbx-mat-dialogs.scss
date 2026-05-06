@@ -258,8 +258,8 @@ html {
     --mat-button-toggle-hover-state-layer-opacity: 0.15;
 
     /* ── Chip (used by context badge in the header) ── */
-    --mat-chip-label-text-color: #{$text};
-    --mat-chip-disabled-label-text-color: #{$text};
+    --mat-chip-label-text-color: color-mix(in srgb, #{$text} 50%, transparent);
+    --mat-chip-disabled-label-text-color: color-mix(in srgb, #{$text} 50%, transparent);
     --mat-chip-disabled-container-color: color-mix(in srgb, #{$text} 18%, transparent);
 
     /* ── Outlined form field (used by input dialog content) ──
