@@ -7,19 +7,11 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { DialogShellComponent, type DialogShellData } from './dialog-shell.component';
 import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
 import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
-import {
-    TBX_MAT_FONT_ICON_DEFAULT_FONT_SET,
-    TBX_MAT_ICON_FONT_SET_MATERIAL_SYMBOLS_ROUNDED,
-} from '@teqbench/tbx-mat-icons';
+import { TBX_MAT_FONT_ICON_DEFAULT_FONT_SET, TBX_MAT_ICON_FONT_SET_MATERIAL_SYMBOLS_ROUNDED } from '@teqbench/tbx-mat-icons';
 import { type TbxMatDialogConfig, type TbxMatDialogData } from '../models/dialog.model';
 import { type TbxMatDialogFooterButton } from '../models/dialog-footer.model';
 import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
-import {
-    TBX_MAT_DIALOG_BUTTONS_OK,
-    TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
-    TBX_MAT_DIALOG_BUTTONS_YES_NO,
-    TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL,
-} from '../constants/dialog.constants';
+import { TBX_MAT_DIALOG_BUTTONS_OK, TBX_MAT_DIALOG_BUTTONS_OK_CANCEL, TBX_MAT_DIALOG_BUTTONS_YES_NO, TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL } from '../constants/dialog.constants';
 import { TBX_MAT_DIALOG_PROVIDER_CONFIG } from '../tokens/dialog-provider-config.token';
 import { TbxMatDialogSeverityFontIconService } from '../services/dialog-severity-font-icon.service';
 import { type TbxMatDialogProviderConfig } from '../models/dialog-provider-config.model';
@@ -43,17 +35,11 @@ class TestInputComponent implements TbxMatDialogData<string> {
 
 function buildDefaultProviderConfig(): TbxMatDialogProviderConfig {
     return {
-        severityIconResolverService: new TbxMatDialogSeverityFontIconService(
-            TBX_MAT_ICON_FONT_SET_MATERIAL_SYMBOLS_ROUNDED
-        ),
+        severityIconResolverService: new TbxMatDialogSeverityFontIconService(TBX_MAT_ICON_FONT_SET_MATERIAL_SYMBOLS_ROUNDED),
     };
 }
 
-function createFixture(
-    config: Partial<TbxMatDialogConfig<unknown>>,
-    footer?: readonly TbxMatDialogFooterControlType[],
-    providerConfig: TbxMatDialogProviderConfig = buildDefaultProviderConfig()
-): ComponentFixture<DialogShellComponent> {
+function createFixture(config: Partial<TbxMatDialogConfig<unknown>>, footer?: readonly TbxMatDialogFooterControlType[], providerConfig: TbxMatDialogProviderConfig = buildDefaultProviderConfig()): ComponentFixture<DialogShellComponent> {
     const fullConfig: TbxMatDialogConfig<unknown> = {
         title: 'Test Dialog',
         ...config,
@@ -82,9 +68,7 @@ function createFixture(
     return fixture;
 }
 
-function getDialogRef(
-    fixture: ComponentFixture<DialogShellComponent>
-): MatDialogRef<DialogShellComponent> {
+function getDialogRef(fixture: ComponentFixture<DialogShellComponent>): MatDialogRef<DialogShellComponent> {
     return fixture.debugElement.injector.get(MatDialogRef);
 }
 
@@ -147,11 +131,7 @@ describe('DialogShellComponent', () => {
                 information: noopMethod,
                 help: noopMethod,
             } as unknown as TbxMatDialogProviderConfig['severityIconResolverService'];
-            const fixture = createFixture(
-                { title: 'Test', type: TbxMatSeverityLevel.Default },
-                undefined,
-                { severityIconResolverService: emptyResolver }
-            );
+            const fixture = createFixture({ title: 'Test', type: TbxMatSeverityLevel.Default }, undefined, { severityIconResolverService: emptyResolver });
 
             const icon = fixture.debugElement.query(By.css('.tbx-mat-dialog-icon'));
             expect(icon).toBeNull();
@@ -253,59 +233,44 @@ describe('DialogShellComponent', () => {
 
     describe('content component (input dialogs)', () => {
         it('should dynamically create content component when config.content is provided', () => {
-            const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [
-                ...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
-            ]);
+            const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL]);
 
             const input = fixture.debugElement.query(By.css('tbx-test-input'));
             expect(input).not.toBeNull();
         });
 
         it('should not display message when content component is provided', () => {
-            const fixture = createFixture(
-                { title: 'Input', message: 'Ignored', content: TestInputComponent },
-                [...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL]
-            );
+            const fixture = createFixture({ title: 'Input', message: 'Ignored', content: TestInputComponent }, [...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL]);
 
             const message = fixture.debugElement.query(By.css('.dialog-message'));
             expect(message).toBeNull();
         });
 
         it('should disable affirm button when content isValid is false', () => {
-            const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [
-                ...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
-            ]);
+            const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL]);
 
             // Content starts with empty name → isValid is false
-            const affirmButton = fixture.debugElement
-                .queryAll(By.css('mat-dialog-actions button'))
-                .find((btn) => btn.nativeElement.textContent.trim() === 'OK');
+            const affirmButton = fixture.debugElement.queryAll(By.css('mat-dialog-actions button')).find((btn) => btn.nativeElement.textContent.trim() === 'OK');
 
             expect(affirmButton).not.toBeUndefined();
             expect(affirmButton!.nativeElement.disabled).toBe(true);
         });
 
         it('should enable affirm button when content isValid becomes true', () => {
-            const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [
-                ...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
-            ]);
+            const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL]);
 
             // Set a value on the content component to make isValid true
             const testInput = fixture.debugElement.query(By.directive(TestInputComponent));
             testInput.componentInstance.name.set('hello');
             fixture.detectChanges();
 
-            const affirmButton = fixture.debugElement
-                .queryAll(By.css('mat-dialog-actions button'))
-                .find((btn) => btn.nativeElement.textContent.trim() === 'OK');
+            const affirmButton = fixture.debugElement.queryAll(By.css('mat-dialog-actions button')).find((btn) => btn.nativeElement.textContent.trim() === 'OK');
 
             expect(affirmButton!.nativeElement.disabled).toBe(false);
         });
 
         it('should include content value in output on affirm', () => {
-            const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [
-                ...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
-            ]);
+            const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL]);
             const dialogRef = getDialogRef(fixture);
 
             // Set a value on the content component
@@ -314,9 +279,7 @@ describe('DialogShellComponent', () => {
             fixture.detectChanges();
 
             // Click OK
-            const affirmButton = fixture.debugElement
-                .queryAll(By.css('mat-dialog-actions button'))
-                .find((btn) => btn.nativeElement.textContent.trim() === 'OK');
+            const affirmButton = fixture.debugElement.queryAll(By.css('mat-dialog-actions button')).find((btn) => btn.nativeElement.textContent.trim() === 'OK');
             affirmButton!.nativeElement.click();
 
             expect(dialogRef.close).toHaveBeenCalledWith(
@@ -328,9 +291,7 @@ describe('DialogShellComponent', () => {
         });
 
         it('should not include content value in output on cancel', () => {
-            const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [
-                ...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
-            ]);
+            const fixture = createFixture({ title: 'Input', content: TestInputComponent }, [...TBX_MAT_DIALOG_BUTTONS_OK_CANCEL]);
             const dialogRef = getDialogRef(fixture);
 
             // Set a value
@@ -339,9 +300,7 @@ describe('DialogShellComponent', () => {
             fixture.detectChanges();
 
             // Click Cancel
-            const cancelButton = fixture.debugElement
-                .queryAll(By.css('mat-dialog-actions button'))
-                .find((btn) => btn.nativeElement.textContent.trim() === 'Cancel');
+            const cancelButton = fixture.debugElement.queryAll(By.css('mat-dialog-actions button')).find((btn) => btn.nativeElement.textContent.trim() === 'Cancel');
             cancelButton!.nativeElement.click();
 
             expect(dialogRef.close).toHaveBeenCalledWith(
@@ -364,18 +323,14 @@ describe('DialogShellComponent', () => {
         it('should not render footer separator when no items', () => {
             const fixture = createFixture({ title: 'Test' }, []);
 
-            const separators = fixture.debugElement.queryAll(
-                By.css('mat-divider.dialog-separator')
-            );
+            const separators = fixture.debugElement.queryAll(By.css('mat-divider.dialog-separator'));
             expect(separators.length).toBe(1);
         });
 
         it('should render footer separator when items exist', () => {
             const fixture = createFixture({ title: 'Test' }, [...TBX_MAT_DIALOG_BUTTONS_OK]);
 
-            const separators = fixture.debugElement.queryAll(
-                By.css('mat-divider.dialog-separator')
-            );
+            const separators = fixture.debugElement.queryAll(By.css('mat-divider.dialog-separator'));
             expect(separators.length).toBe(2);
         });
     });
@@ -405,9 +360,7 @@ describe('DialogShellComponent', () => {
         });
 
         it('should not close dialog when button has no result', () => {
-            const footer: TbxMatDialogFooterControlType[] = [
-                buildButton({ key: 'custom', label: 'Custom', result: undefined }),
-            ];
+            const footer: TbxMatDialogFooterControlType[] = [buildButton({ key: 'custom', label: 'Custom', result: undefined })];
             const fixture = createFixture({ title: 'Test' }, footer);
             const dialogRef = getDialogRef(fixture);
 
@@ -532,9 +485,7 @@ describe('DialogShellComponent', () => {
 
     describe('footer controls', () => {
         it('should render checkbox with label', () => {
-            const footer: TbxMatDialogFooterControlType[] = [
-                { key: 'remember', type: 'checkbox', label: 'Remember me', align: 'start' },
-            ];
+            const footer: TbxMatDialogFooterControlType[] = [{ key: 'remember', type: 'checkbox', label: 'Remember me', align: 'start' }];
             const fixture = createFixture({ title: 'Test' }, footer);
 
             const checkbox = fixture.debugElement.query(By.css('mat-checkbox'));
@@ -558,18 +509,14 @@ describe('DialogShellComponent', () => {
         });
 
         it('should default checkbox to false when initialValue omitted', () => {
-            const footer: TbxMatDialogFooterControlType[] = [
-                { key: 'opt', type: 'checkbox', label: 'Opt in', align: 'start' },
-            ];
+            const footer: TbxMatDialogFooterControlType[] = [{ key: 'opt', type: 'checkbox', label: 'Opt in', align: 'start' }];
             const fixture = createFixture({ title: 'Test' }, footer);
 
             expect(fixture.componentInstance.getFooterValue('opt')).toBe(false);
         });
 
         it('should render slide toggle with label', () => {
-            const footer: TbxMatDialogFooterControlType[] = [
-                { key: 'dark', type: 'toggle', label: 'Dark mode', align: 'start' },
-            ];
+            const footer: TbxMatDialogFooterControlType[] = [{ key: 'dark', type: 'toggle', label: 'Dark mode', align: 'start' }];
             const fixture = createFixture({ title: 'Test' }, footer);
 
             const toggle = fixture.debugElement.query(By.css('mat-slide-toggle'));
@@ -696,9 +643,7 @@ describe('DialogShellComponent', () => {
 
     describe('footer layout', () => {
         it('should apply margin-left auto to first end-aligned item', () => {
-            const fixture = createFixture({ title: 'Test' }, [
-                ...TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL,
-            ]);
+            const fixture = createFixture({ title: 'Test' }, [...TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL]);
 
             expect(fixture.componentInstance.firstEndIndex()).toBe(1);
         });
@@ -752,50 +697,34 @@ describe('DialogShellComponent', () => {
 
     describe('button emphasis rendering', () => {
         it('should render primary button as filled', () => {
-            const footer: TbxMatDialogFooterControlType[] = [
-                buildButton({ emphasis: 'primary', result: TbxMatDialogDismissReason.Affirm }),
-            ];
+            const footer: TbxMatDialogFooterControlType[] = [buildButton({ emphasis: 'primary', result: TbxMatDialogDismissReason.Affirm })];
             const fixture = createFixture({ title: 'Test' }, footer);
 
-            const button = fixture.debugElement.query(
-                By.css('mat-dialog-actions button[matButton="filled"]')
-            );
+            const button = fixture.debugElement.query(By.css('mat-dialog-actions button[matButton="filled"]'));
             expect(button).not.toBeNull();
         });
 
         it('should render destructive button as filled', () => {
-            const footer: TbxMatDialogFooterControlType[] = [
-                buildButton({ emphasis: 'destructive', result: TbxMatDialogDismissReason.Affirm }),
-            ];
+            const footer: TbxMatDialogFooterControlType[] = [buildButton({ emphasis: 'destructive', result: TbxMatDialogDismissReason.Affirm })];
             const fixture = createFixture({ title: 'Test' }, footer);
 
-            const button = fixture.debugElement.query(
-                By.css('mat-dialog-actions button[matButton="filled"]')
-            );
+            const button = fixture.debugElement.query(By.css('mat-dialog-actions button[matButton="filled"]'));
             expect(button).not.toBeNull();
         });
 
         it('should render text button as text', () => {
-            const footer: TbxMatDialogFooterControlType[] = [
-                buildButton({ emphasis: 'text', result: TbxMatDialogDismissReason.Cancel }),
-            ];
+            const footer: TbxMatDialogFooterControlType[] = [buildButton({ emphasis: 'text', result: TbxMatDialogDismissReason.Cancel })];
             const fixture = createFixture({ title: 'Test' }, footer);
 
-            const button = fixture.debugElement.query(
-                By.css('mat-dialog-actions button[matButton="text"]')
-            );
+            const button = fixture.debugElement.query(By.css('mat-dialog-actions button[matButton="text"]'));
             expect(button).not.toBeNull();
         });
 
         it('should render button without emphasis as text', () => {
-            const footer: TbxMatDialogFooterControlType[] = [
-                buildButton({ result: TbxMatDialogDismissReason.Cancel }),
-            ];
+            const footer: TbxMatDialogFooterControlType[] = [buildButton({ result: TbxMatDialogDismissReason.Cancel })];
             const fixture = createFixture({ title: 'Test' }, footer);
 
-            const button = fixture.debugElement.query(
-                By.css('mat-dialog-actions button[matButton="text"]')
-            );
+            const button = fixture.debugElement.query(By.css('mat-dialog-actions button[matButton="text"]'));
             expect(button).not.toBeNull();
         });
 
@@ -809,45 +738,27 @@ describe('DialogShellComponent', () => {
         // the dialog's own type.
 
         it('should apply tbx-mat-dialog-btn-destructive class to destructive button', () => {
-            const footer: TbxMatDialogFooterControlType[] = [
-                buildButton({ emphasis: 'destructive', result: TbxMatDialogDismissReason.Affirm }),
-            ];
-            const fixture = createFixture(
-                { title: 'Test', type: TbxMatSeverityLevel.Default },
-                footer
-            );
+            const footer: TbxMatDialogFooterControlType[] = [buildButton({ emphasis: 'destructive', result: TbxMatDialogDismissReason.Affirm })];
+            const fixture = createFixture({ title: 'Test', type: TbxMatSeverityLevel.Default }, footer);
 
             const button = fixture.debugElement.query(By.css('mat-dialog-actions button'));
-            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(
-                true
-            );
+            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(true);
         });
 
         it('should not apply destructive class to a primary button', () => {
-            const footer: TbxMatDialogFooterControlType[] = [
-                buildButton({ emphasis: 'primary', result: TbxMatDialogDismissReason.Affirm }),
-            ];
-            const fixture = createFixture(
-                { title: 'Test', type: TbxMatSeverityLevel.Warning },
-                footer
-            );
+            const footer: TbxMatDialogFooterControlType[] = [buildButton({ emphasis: 'primary', result: TbxMatDialogDismissReason.Affirm })];
+            const fixture = createFixture({ title: 'Test', type: TbxMatSeverityLevel.Warning }, footer);
 
             const button = fixture.debugElement.query(By.css('mat-dialog-actions button'));
-            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(
-                false
-            );
+            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(false);
         });
 
         it('should not apply destructive class to a text button', () => {
-            const footer: TbxMatDialogFooterControlType[] = [
-                buildButton({ emphasis: 'text', result: TbxMatDialogDismissReason.Cancel }),
-            ];
+            const footer: TbxMatDialogFooterControlType[] = [buildButton({ emphasis: 'text', result: TbxMatDialogDismissReason.Cancel })];
             const fixture = createFixture({ title: 'Test' }, footer);
 
             const button = fixture.debugElement.query(By.css('mat-dialog-actions button'));
-            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(
-                false
-            );
+            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(false);
         });
     });
 });

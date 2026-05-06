@@ -42,9 +42,7 @@ html {
     --tbx-mat-dialog-close-icon-opacity: var(--tbx-mat-dialog-action-text-opacity);
 
     --tbx-mat-dialog-action-filled-hover-state-layer-opacity: 0.3;
-    --tbx-mat-dialog-action-tonal-hover-state-layer-opacity: var(
-        --tbx-mat-dialog-action-filled-hover-state-layer-opacity
-    );
+    --tbx-mat-dialog-action-tonal-hover-state-layer-opacity: var(--tbx-mat-dialog-action-filled-hover-state-layer-opacity);
 }
 
 /* ━━━ Dialog Panel Surface ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -112,91 +110,43 @@ html {
     --mat-divider-color: #{$text};
 
     /* ── Icon button color tokens (used by .tbx-mat-dialog-close-icon-button) ── */
-    --tbx-mat-dialog-close-icon-color: color-mix(
-        in srgb,
-        #{$text} calc(var(--tbx-mat-dialog-close-icon-opacity) * 100%),
-        transparent
-    );
+    --tbx-mat-dialog-close-icon-color: color-mix(in srgb, #{$text} calc(var(--tbx-mat-dialog-close-icon-opacity) * 100%), transparent);
     --tbx-mat-dialog-close-icon-state-layer-color: #{$text};
 
     /* ── Text button ── */
-    --mat-button-text-label-text-color: color-mix(
-        in srgb,
-        #{$text} calc(var(--tbx-mat-dialog-action-text-opacity) * 100%),
-        transparent
-    );
+    --mat-button-text-label-text-color: color-mix(in srgb, #{$text} calc(var(--tbx-mat-dialog-action-text-opacity) * 100%), transparent);
     --mat-button-text-state-layer-color: #{$text};
-    --mat-button-text-ripple-color: color-mix(
-        in srgb,
-        #{$text} calc(var(--mat-sys-pressed-state-layer-opacity) * 100%),
-        transparent
-    );
+    --mat-button-text-ripple-color: color-mix(in srgb, #{$text} calc(var(--mat-sys-pressed-state-layer-opacity) * 100%), transparent);
 
     /* ── Filled button ── */
-    --mat-button-filled-container-color: color-mix(
-        in srgb,
-        #{$text} calc(var(--tbx-mat-dialog-action-filled-container-opacity) * 100%),
-        transparent
-    );
+    --mat-button-filled-container-color: color-mix(in srgb, #{$text} calc(var(--tbx-mat-dialog-action-filled-container-opacity) * 100%), transparent);
     --mat-button-filled-label-text-color: #{$bg};
     --mat-button-filled-state-layer-color: #{$bg};
-    --mat-button-filled-hover-state-layer-opacity: var(
-        --tbx-mat-dialog-action-filled-hover-state-layer-opacity
-    );
-    --mat-button-filled-ripple-color: color-mix(
-        in srgb,
-        #{$bg} calc(var(--mat-sys-pressed-state-layer-opacity) * 100%),
-        transparent
-    );
+    --mat-button-filled-hover-state-layer-opacity: var(--tbx-mat-dialog-action-filled-hover-state-layer-opacity);
+    --mat-button-filled-ripple-color: color-mix(in srgb, #{$bg} calc(var(--mat-sys-pressed-state-layer-opacity) * 100%), transparent);
 
     /* ── Tonal button ── */
-    --mat-button-tonal-container-color: color-mix(
-        in srgb,
-        #{$text} calc(var(--tbx-mat-dialog-action-tonal-container-opacity) * 100%),
-        transparent
-    );
+    --mat-button-tonal-container-color: color-mix(in srgb, #{$text} calc(var(--tbx-mat-dialog-action-tonal-container-opacity) * 100%), transparent);
     --mat-button-tonal-label-text-color: #{$bg};
     --mat-button-tonal-state-layer-color: #{$bg};
-    --mat-button-tonal-hover-state-layer-opacity: var(
-        --tbx-mat-dialog-action-tonal-hover-state-layer-opacity
-    );
-    --mat-button-tonal-ripple-color: color-mix(
-        in srgb,
-        #{$bg} calc(var(--mat-sys-pressed-state-layer-opacity) * 100%),
-        transparent
-    );
+    --mat-button-tonal-hover-state-layer-opacity: var(--tbx-mat-dialog-action-tonal-hover-state-layer-opacity);
+    --mat-button-tonal-ripple-color: color-mix(in srgb, #{$bg} calc(var(--mat-sys-pressed-state-layer-opacity) * 100%), transparent);
 
     /* ── Outlined button ── */
-    --mat-button-outlined-label-text-color: color-mix(
-        in srgb,
-        #{$text} calc(var(--tbx-mat-dialog-action-outlined-opacity) * 100%),
-        transparent
-    );
+    --mat-button-outlined-label-text-color: color-mix(in srgb, #{$text} calc(var(--tbx-mat-dialog-action-outlined-opacity) * 100%), transparent);
     --mat-button-outlined-outline-color: #{$text};
     --mat-button-outlined-state-layer-color: #{$text};
-    --mat-button-outlined-ripple-color: color-mix(
-        in srgb,
-        #{$text} calc(var(--mat-sys-pressed-state-layer-opacity) * 100%),
-        transparent
-    );
+    --mat-button-outlined-ripple-color: color-mix(in srgb, #{$text} calc(var(--mat-sys-pressed-state-layer-opacity) * 100%), transparent);
 
     /* ── Elevated (protected) button ── */
-    --mat-button-protected-label-text-color: color-mix(
-        in srgb,
-        #{$text} calc(var(--tbx-mat-dialog-action-elevated-opacity) * 100%),
-        transparent
-    );
+    --mat-button-protected-label-text-color: color-mix(in srgb, #{$text} calc(var(--tbx-mat-dialog-action-elevated-opacity) * 100%), transparent);
     --mat-button-protected-container-color: #{$bg};
     --mat-button-protected-state-layer-color: #{$text};
     --mat-button-protected-container-elevation-shadow: var(--mat-sys-level1);
     --mat-button-protected-hover-container-elevation-shadow: var(--mat-sys-level2);
     --mat-button-protected-focus-container-elevation-shadow: var(--mat-sys-level1);
     --mat-button-protected-pressed-container-elevation-shadow: var(--mat-sys-level1);
-    --mat-button-protected-ripple-color: color-mix(
-        in srgb,
-        #{$text} calc(var(--mat-sys-pressed-state-layer-opacity) * 100%),
-        transparent
-    );
+    --mat-button-protected-ripple-color: color-mix(in srgb, #{$text} calc(var(--mat-sys-pressed-state-layer-opacity) * 100%), transparent);
 
     /* ── Checkbox ── */
     --mat-checkbox-selected-checkmark-color: #{$bg};
@@ -223,11 +173,7 @@ html {
     --mat-slide-toggle-unselected-track-color: color-mix(in srgb, #{$text} 30%, transparent);
     --mat-slide-toggle-unselected-hover-track-color: color-mix(in srgb, #{$text} 40%, transparent);
     --mat-slide-toggle-unselected-focus-track-color: color-mix(in srgb, #{$text} 30%, transparent);
-    --mat-slide-toggle-unselected-pressed-track-color: color-mix(
-        in srgb,
-        #{$text} 40%,
-        transparent
-    );
+    --mat-slide-toggle-unselected-pressed-track-color: color-mix(in srgb, #{$text} 40%, transparent);
     --mat-slide-toggle-unselected-handle-color: #{$text};
     --mat-slide-toggle-unselected-hover-handle-color: #{$text};
     --mat-slide-toggle-unselected-focus-handle-color: #{$text};
@@ -294,45 +240,27 @@ html {
 }
 
 .tbx-mat-dialog-panel-default {
-    @include _severity-panel(
-        var(--tbx-mat-dialog-default-background),
-        var(--tbx-mat-dialog-default-text)
-    );
+    @include _severity-panel(var(--tbx-mat-dialog-default-background), var(--tbx-mat-dialog-default-text));
 }
 
 .tbx-mat-dialog-panel-success {
-    @include _severity-panel(
-        var(--tbx-mat-dialog-success-background),
-        var(--tbx-mat-dialog-success-text)
-    );
+    @include _severity-panel(var(--tbx-mat-dialog-success-background), var(--tbx-mat-dialog-success-text));
 }
 
 .tbx-mat-dialog-panel-error {
-    @include _severity-panel(
-        var(--tbx-mat-dialog-error-background),
-        var(--tbx-mat-dialog-error-text)
-    );
+    @include _severity-panel(var(--tbx-mat-dialog-error-background), var(--tbx-mat-dialog-error-text));
 }
 
 .tbx-mat-dialog-panel-warning {
-    @include _severity-panel(
-        var(--tbx-mat-dialog-warning-background),
-        var(--tbx-mat-dialog-warning-text)
-    );
+    @include _severity-panel(var(--tbx-mat-dialog-warning-background), var(--tbx-mat-dialog-warning-text));
 }
 
 .tbx-mat-dialog-panel-information {
-    @include _severity-panel(
-        var(--tbx-mat-dialog-information-background),
-        var(--tbx-mat-dialog-information-text)
-    );
+    @include _severity-panel(var(--tbx-mat-dialog-information-background), var(--tbx-mat-dialog-information-text));
 }
 
 .tbx-mat-dialog-panel-help {
-    @include _severity-panel(
-        var(--tbx-mat-dialog-help-background),
-        var(--tbx-mat-dialog-help-text)
-    );
+    @include _severity-panel(var(--tbx-mat-dialog-help-background), var(--tbx-mat-dialog-help-text));
 }
 
 /* ━━━ Icon Button Class Overrides ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

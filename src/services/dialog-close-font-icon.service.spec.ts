@@ -1,10 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { TestBed } from '@angular/core/testing';
-import {
-    TBX_MAT_FONT_ICON_DEFAULT_FONT_SET,
-    TBX_MAT_ICON_FONT_SET_MATERIAL_SYMBOLS_ROUNDED,
-    TbxMatIconType,
-} from '@teqbench/tbx-mat-icons';
+import { TBX_MAT_FONT_ICON_DEFAULT_FONT_SET, TBX_MAT_ICON_FONT_SET_MATERIAL_SYMBOLS_ROUNDED, TbxMatIconType } from '@teqbench/tbx-mat-icons';
 import { TbxMatDialogCloseFontIconService } from './dialog-close-font-icon.service';
 
 describe('TbxMatDialogCloseFontIconService', () => {
@@ -49,8 +45,7 @@ describe('TbxMatDialogCloseFontIconService', () => {
                 providers: [
                     {
                         provide: TbxMatDialogCloseFontIconService,
-                        useFactory: () =>
-                            new TbxMatDialogCloseFontIconService('material-symbols-sharp'),
+                        useFactory: () => new TbxMatDialogCloseFontIconService('material-symbols-sharp'),
                     },
                 ],
             });

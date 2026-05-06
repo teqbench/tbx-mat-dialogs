@@ -1,11 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
-import {
-    DEFAULT_HARNESS_ARGS,
-    DialogHarnessComponent,
-    SHARED_HARNESS_ARG_TYPES,
-    withSvgIcons,
-} from './dialog.stories.common';
+import { DEFAULT_HARNESS_ARGS, DialogHarnessComponent, SHARED_HARNESS_ARG_TYPES, withSvgIcons } from './dialog.stories.common';
 
 const meta: Meta<DialogHarnessComponent> = {
     title: 'Dialogs/SVG Icons',

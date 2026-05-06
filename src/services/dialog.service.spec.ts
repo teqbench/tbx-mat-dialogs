@@ -6,12 +6,7 @@ import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
 import { TbxMatDialogService } from './dialog.service';
 import { DialogShellComponent } from '../components/dialog-shell.component';
 import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
-import {
-    TBX_MAT_DIALOG_BUTTONS_OK,
-    TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
-    TBX_MAT_DIALOG_BUTTONS_YES_NO,
-    TBX_MAT_DIALOG_DEFAULT_WIDTH,
-} from '../constants/dialog.constants';
+import { TBX_MAT_DIALOG_BUTTONS_OK, TBX_MAT_DIALOG_BUTTONS_OK_CANCEL, TBX_MAT_DIALOG_BUTTONS_YES_NO, TBX_MAT_DIALOG_DEFAULT_WIDTH } from '../constants/dialog.constants';
 
 /**
  * Service-level tests focus on what the service is responsible for:
@@ -301,10 +296,7 @@ describe('TbxMatDialogService', () => {
             resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(dialogSpy.open).toHaveBeenCalledWith(
-                DialogShellComponent,
-                expect.objectContaining({ width: TBX_MAT_DIALOG_DEFAULT_WIDTH })
-            );
+            expect(dialogSpy.open).toHaveBeenCalledWith(DialogShellComponent, expect.objectContaining({ width: TBX_MAT_DIALOG_DEFAULT_WIDTH }));
         });
 
         it('should use custom width when specified', async () => {
@@ -313,10 +305,7 @@ describe('TbxMatDialogService', () => {
             resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(dialogSpy.open).toHaveBeenCalledWith(
-                DialogShellComponent,
-                expect.objectContaining({ width: '600px' })
-            );
+            expect(dialogSpy.open).toHaveBeenCalledWith(DialogShellComponent, expect.objectContaining({ width: '600px' }));
         });
 
         it('should set disableClose to false by default', async () => {
@@ -325,10 +314,7 @@ describe('TbxMatDialogService', () => {
             resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(dialogSpy.open).toHaveBeenCalledWith(
-                DialogShellComponent,
-                expect.objectContaining({ disableClose: false })
-            );
+            expect(dialogSpy.open).toHaveBeenCalledWith(DialogShellComponent, expect.objectContaining({ disableClose: false }));
         });
 
         it('should pass disableClose true when specified', async () => {
@@ -337,10 +323,7 @@ describe('TbxMatDialogService', () => {
             resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(dialogSpy.open).toHaveBeenCalledWith(
-                DialogShellComponent,
-                expect.objectContaining({ disableClose: true })
-            );
+            expect(dialogSpy.open).toHaveBeenCalledWith(DialogShellComponent, expect.objectContaining({ disableClose: true }));
         });
 
         it('should apply tbx-mat-dialog-panel and per-severity panel classes', async () => {
@@ -377,10 +360,7 @@ describe('TbxMatDialogService', () => {
             resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(dialogSpy.open).toHaveBeenCalledWith(
-                DialogShellComponent,
-                expect.objectContaining({ autoFocus: 'first-tabbable' })
-            );
+            expect(dialogSpy.open).toHaveBeenCalledWith(DialogShellComponent, expect.objectContaining({ autoFocus: 'first-tabbable' }));
         });
 
         it('should set ariaModal to true', async () => {
@@ -389,10 +369,7 @@ describe('TbxMatDialogService', () => {
             resolveDialog({ result: TbxMatDialogDismissReason.Affirm, footerValues: {} });
             await promise;
 
-            expect(dialogSpy.open).toHaveBeenCalledWith(
-                DialogShellComponent,
-                expect.objectContaining({ ariaModal: true })
-            );
+            expect(dialogSpy.open).toHaveBeenCalledWith(DialogShellComponent, expect.objectContaining({ ariaModal: true }));
         });
 
         it('should pass title and message through to shell data', async () => {

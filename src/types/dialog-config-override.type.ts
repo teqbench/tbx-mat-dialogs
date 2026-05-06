@@ -30,6 +30,4 @@ import { type TbxMatDialogConfig } from '../models/dialog.model';
  *
  * @public
  */
-export type TbxMatDialogConfigArgs<T = void> = { title: string } & Partial<
-    Omit<TbxMatDialogConfig<T>, 'title'>
->;
+export type TbxMatDialogConfigArgs<T = void> = { title: string } & Partial<Omit<TbxMatDialogConfig<T>, 'title'>>;

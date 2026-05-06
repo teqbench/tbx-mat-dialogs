@@ -1,10 +1,4 @@
-import {
-    type TbxMatDialogFooterButton,
-    type TbxMatDialogFooterCheckbox,
-    type TbxMatDialogFooterToggle,
-    type TbxMatDialogFooterRadioGroup,
-    type TbxMatDialogFooterToggleGroup,
-} from '../models/dialog-footer.model';
+import { type TbxMatDialogFooterButton, type TbxMatDialogFooterCheckbox, type TbxMatDialogFooterToggle, type TbxMatDialogFooterRadioGroup, type TbxMatDialogFooterToggleGroup } from '../models/dialog-footer.model';
 
 /**
  * Discriminated union of all dialog footer item types
@@ -41,9 +35,4 @@ import {
  *
  * @public
  */
-export type TbxMatDialogFooterControlType =
-    | TbxMatDialogFooterButton
-    | TbxMatDialogFooterCheckbox
-    | TbxMatDialogFooterToggle
-    | TbxMatDialogFooterRadioGroup
-    | TbxMatDialogFooterToggleGroup;
+export type TbxMatDialogFooterControlType = TbxMatDialogFooterButton | TbxMatDialogFooterCheckbox | TbxMatDialogFooterToggle | TbxMatDialogFooterRadioGroup | TbxMatDialogFooterToggleGroup;

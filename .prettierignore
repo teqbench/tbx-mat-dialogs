@@ -12,6 +12,7 @@ report.json
 CHANGELOG.md
 .badges/
 .release-please-manifest.json
+release-please-config.json
 package-lock.json
 
 # Dependencies

@@ -1,9 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-    TBX_MAT_SEVERITY_DEFAULT_SVG_ICONS,
-    TbxMatSeveritySvgIconService,
-    TbxMatSeverityLevel,
-} from '@teqbench/tbx-mat-severity-theme';
+import { TBX_MAT_SEVERITY_DEFAULT_SVG_ICONS, TbxMatSeveritySvgIconService, TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
 
 /**
  * Resolve severity levels to SVG dialog icons

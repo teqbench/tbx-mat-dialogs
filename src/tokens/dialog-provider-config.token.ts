@@ -78,6 +78,4 @@ import type { TbxMatDialogProviderConfig } from '../models/dialog-provider-confi
  *
  * @public
  */
-export const TBX_MAT_DIALOG_PROVIDER_CONFIG = new InjectionToken<TbxMatDialogProviderConfig>(
-    'TBX_MAT_DIALOG_PROVIDER_CONFIG'
-);
+export const TBX_MAT_DIALOG_PROVIDER_CONFIG = new InjectionToken<TbxMatDialogProviderConfig>('TBX_MAT_DIALOG_PROVIDER_CONFIG');

@@ -34,9 +34,7 @@ const preview: Preview = {
                 {
                     provide: TBX_MAT_DIALOG_PROVIDER_CONFIG,
                     useFactory: () => ({
-                        severityIconResolverService: new TbxMatDialogSeverityFontIconService(
-                            'material-symbols-rounded'
-                        ),
+                        severityIconResolverService: new TbxMatDialogSeverityFontIconService('material-symbols-rounded'),
                     }),
                 },
             ],

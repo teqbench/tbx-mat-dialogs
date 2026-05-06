@@ -42,31 +42,12 @@ export type { TbxMatDialogConfigArgs } from './types/dialog-config-override.type
 export type { TbxMatDialogIconResolver } from './types/dialog-icon-resolver.type';
 
 // Models
-export type {
-    TbxMatDialogResult,
-    TbxMatDialogConfig,
-    TbxMatDialogData,
-} from './models/dialog.model';
+export type { TbxMatDialogResult, TbxMatDialogConfig, TbxMatDialogData } from './models/dialog.model';
 export type { TbxMatDialogProviderConfig } from './models/dialog-provider-config.model';
-export type {
-    TbxMatDialogFooterItem,
-    TbxMatDialogFooterButton,
-    TbxMatDialogFooterCheckbox,
-    TbxMatDialogFooterToggle,
-    TbxMatDialogFooterRadioGroup,
-    TbxMatDialogFooterRadioOption,
-    TbxMatDialogFooterToggleGroup,
-    TbxMatDialogFooterToggleOption,
-} from './models/dialog-footer.model';
+export type { TbxMatDialogFooterItem, TbxMatDialogFooterButton, TbxMatDialogFooterCheckbox, TbxMatDialogFooterToggle, TbxMatDialogFooterRadioGroup, TbxMatDialogFooterRadioOption, TbxMatDialogFooterToggleGroup, TbxMatDialogFooterToggleOption } from './models/dialog-footer.model';
 
 // Constants
-export {
-    TBX_MAT_DIALOG_DEFAULT_WIDTH,
-    TBX_MAT_DIALOG_BUTTONS_OK,
-    TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
-    TBX_MAT_DIALOG_BUTTONS_YES_NO,
-    TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL,
-} from './constants/dialog.constants';
+export { TBX_MAT_DIALOG_DEFAULT_WIDTH, TBX_MAT_DIALOG_BUTTONS_OK, TBX_MAT_DIALOG_BUTTONS_OK_CANCEL, TBX_MAT_DIALOG_BUTTONS_YES_NO, TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL } from './constants/dialog.constants';
 
 // Tokens
 export { TBX_MAT_DIALOG_PROVIDER_CONFIG } from './tokens/dialog-provider-config.token';

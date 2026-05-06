@@ -1,9 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-    TBX_MAT_SEVERITY_DEFAULT_FONT_LIGATURES,
-    TbxMatSeverityFontIconService,
-    TbxMatSeverityLevel,
-} from '@teqbench/tbx-mat-severity-theme';
+import { TBX_MAT_SEVERITY_DEFAULT_FONT_LIGATURES, TbxMatSeverityFontIconService, TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
 
 /**
  * Resolve severity levels to font-based dialog icons

@@ -1,15 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { applicationConfig, moduleMetadata } from '@storybook/angular';
 import { provideTbxMatSeverityTheme } from '@teqbench/tbx-mat-severity-theme';
-import {
-    DEFAULT_HARNESS_ARGS,
-    DialogHarnessComponent,
-    SHARED_HARNESS_ARG_TYPES,
-    withSvgIcons,
-} from '../../components/dialog.stories.common';
+import { DEFAULT_HARNESS_ARGS, DialogHarnessComponent, SHARED_HARNESS_ARG_TYPES, withSvgIcons } from '../../components/dialog.stories.common';
 
-const INSTRUCTIONS =
-    'Modal dialogs with severity-leveled chrome. Service methods (default / success / error / warning / information / help) mirror tbx-mat-banners and tbx-mat-notifications. Dialog-only patterns (confirm / input) layer on top of severity. Click any button to open the corresponding dialog. Use the Controls panel to tweak Icon Size and Icon Animation. The dialog surface stays neutral; the header icon container takes the severity color and scales proportionally with the icon size.';
+const INSTRUCTIONS = 'Modal dialogs with severity-leveled chrome. Service methods (default / success / error / warning / information / help) mirror tbx-mat-banners and tbx-mat-notifications. Dialog-only patterns (confirm / input) layer on top of severity. Click any button to open the corresponding dialog. Use the Controls panel to tweak Icon Size and Icon Animation. The dialog surface stays neutral; the header icon container takes the severity color and scales proportionally with the icon size.';
 
 const meta: Meta<DialogHarnessComponent> = {
     title: 'Dialogs',

@@ -256,10 +256,7 @@ export interface TbxMatDialogConfig<T = void> {
  *
  * @public
  */
-export interface TbxMatDialogResult<
-    T = void,
-    F extends Record<string, unknown> = Record<string, unknown>,
-> {
+export interface TbxMatDialogResult<T = void, F extends Record<string, unknown> = Record<string, unknown>> {
     /**
      * Which action closed the dialog
      *

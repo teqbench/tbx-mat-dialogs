@@ -4,17 +4,7 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
     {
-        ignores: [
-            '.claude/',
-            '.shared-skills/',
-            '.storybook/',
-            'coverage/',
-            'dist/',
-            'node_modules/',
-            'storybook-static/',
-            'storybook-dev-static/',
-            'storybook-docs-static/',
-        ],
+        ignores: ['.claude/', '.shared-skills/', '.storybook/', 'coverage/', 'dist/', 'node_modules/', 'storybook-static/', 'storybook-dev-static/', 'storybook-docs-static/'],
     },
     ...tseslint.configs.recommended,
     ...angular.configs.tsRecommended,
@@ -29,14 +19,8 @@ export default tseslint.config(
             },
         },
         rules: {
-            '@angular-eslint/directive-selector': [
-                'error',
-                { type: 'attribute', prefix: 'tbx', style: 'camelCase' },
-            ],
-            '@angular-eslint/component-selector': [
-                'error',
-                { type: 'element', prefix: 'tbx', style: 'kebab-case' },
-            ],
+            '@angular-eslint/directive-selector': ['error', { type: 'attribute', prefix: 'tbx', style: 'camelCase' }],
+            '@angular-eslint/component-selector': ['error', { type: 'element', prefix: 'tbx', style: 'kebab-case' }],
             'tsdoc/syntax': 'warn',
         },
     },

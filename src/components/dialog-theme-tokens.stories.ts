@@ -1,10 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
-import {
-    DEFAULT_HARNESS_ARGS,
-    DialogHarnessComponent,
-    SHARED_HARNESS_ARG_TYPES,
-} from './dialog.stories.common';
+import { DEFAULT_HARNESS_ARGS, DialogHarnessComponent, SHARED_HARNESS_ARG_TYPES } from './dialog.stories.common';
 import { withCustomProperties } from './story-overrides';
 
 const meta: Meta<DialogHarnessComponent> = {

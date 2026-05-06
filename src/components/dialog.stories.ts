@@ -1,11 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { applicationConfig, moduleMetadata } from '@storybook/angular';
 import { provideTbxMatSeverityTheme } from '@teqbench/tbx-mat-severity-theme';
-import {
-    DEFAULT_HARNESS_ARGS,
-    DialogHarnessComponent,
-    SHARED_HARNESS_ARG_TYPES,
-} from './dialog.stories.common';
+import { DEFAULT_HARNESS_ARGS, DialogHarnessComponent, SHARED_HARNESS_ARG_TYPES } from './dialog.stories.common';
 
 const meta: Meta<DialogHarnessComponent> = {
     title: 'Dialogs',

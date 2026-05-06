@@ -7,12 +7,7 @@ import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
 import { type TbxMatDialogConfig, type TbxMatDialogResult } from '../models/dialog.model';
 import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
 import { type TbxMatDialogConfigArgs } from '../types/dialog-config-override.type';
-import {
-    TBX_MAT_DIALOG_BUTTONS_OK,
-    TBX_MAT_DIALOG_BUTTONS_OK_CANCEL,
-    TBX_MAT_DIALOG_BUTTONS_YES_NO,
-    TBX_MAT_DIALOG_DEFAULT_WIDTH,
-} from '../constants/dialog.constants';
+import { TBX_MAT_DIALOG_BUTTONS_OK, TBX_MAT_DIALOG_BUTTONS_OK_CANCEL, TBX_MAT_DIALOG_BUTTONS_YES_NO, TBX_MAT_DIALOG_DEFAULT_WIDTH } from '../constants/dialog.constants';
 
 /**
  * Open a typed modal dialog and await the user's choice
@@ -134,9 +129,7 @@ export class TbxMatDialogService {
      *
      * @public
      */
-    async show<T = void, F extends Record<string, unknown> = Record<string, unknown>>(
-        config: TbxMatDialogConfig<T>
-    ): Promise<TbxMatDialogResult<T, F>> {
+    async show<T = void, F extends Record<string, unknown> = Record<string, unknown>>(config: TbxMatDialogConfig<T>): Promise<TbxMatDialogResult<T, F>> {
         return this.open<T, F>(config, config.footer ?? []);
     }
 
@@ -154,13 +147,8 @@ export class TbxMatDialogService {
      *
      * @public
      */
-    async success<F extends Record<string, unknown> = Record<string, unknown>>(
-        config: TbxMatDialogConfigArgs<void>
-    ): Promise<TbxMatDialogResult<void, F>> {
-        return this.open<void, F>(
-            this.mergeDefaults(config, TbxMatSeverityLevel.Success),
-            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
-        );
+    async success<F extends Record<string, unknown> = Record<string, unknown>>(config: TbxMatDialogConfigArgs<void>): Promise<TbxMatDialogResult<void, F>> {
+        return this.open<void, F>(this.mergeDefaults(config, TbxMatSeverityLevel.Success), config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK);
     }
 
     /**
@@ -177,13 +165,8 @@ export class TbxMatDialogService {
      *
      * @public
      */
-    async error<F extends Record<string, unknown> = Record<string, unknown>>(
-        config: TbxMatDialogConfigArgs<void>
-    ): Promise<TbxMatDialogResult<void, F>> {
-        return this.open<void, F>(
-            this.mergeDefaults(config, TbxMatSeverityLevel.Error),
-            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
-        );
+    async error<F extends Record<string, unknown> = Record<string, unknown>>(config: TbxMatDialogConfigArgs<void>): Promise<TbxMatDialogResult<void, F>> {
+        return this.open<void, F>(this.mergeDefaults(config, TbxMatSeverityLevel.Error), config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK);
     }
 
     /**
@@ -200,13 +183,8 @@ export class TbxMatDialogService {
      *
      * @public
      */
-    async warning<F extends Record<string, unknown> = Record<string, unknown>>(
-        config: TbxMatDialogConfigArgs<void>
-    ): Promise<TbxMatDialogResult<void, F>> {
-        return this.open<void, F>(
-            this.mergeDefaults(config, TbxMatSeverityLevel.Warning),
-            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
-        );
+    async warning<F extends Record<string, unknown> = Record<string, unknown>>(config: TbxMatDialogConfigArgs<void>): Promise<TbxMatDialogResult<void, F>> {
+        return this.open<void, F>(this.mergeDefaults(config, TbxMatSeverityLevel.Warning), config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK);
     }
 
     /**
@@ -223,13 +201,8 @@ export class TbxMatDialogService {
      *
      * @public
      */
-    async information<F extends Record<string, unknown> = Record<string, unknown>>(
-        config: TbxMatDialogConfigArgs<void>
-    ): Promise<TbxMatDialogResult<void, F>> {
-        return this.open<void, F>(
-            this.mergeDefaults(config, TbxMatSeverityLevel.Information),
-            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
-        );
+    async information<F extends Record<string, unknown> = Record<string, unknown>>(config: TbxMatDialogConfigArgs<void>): Promise<TbxMatDialogResult<void, F>> {
+        return this.open<void, F>(this.mergeDefaults(config, TbxMatSeverityLevel.Information), config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK);
     }
 
     /**
@@ -246,13 +219,8 @@ export class TbxMatDialogService {
      *
      * @public
      */
-    async help<F extends Record<string, unknown> = Record<string, unknown>>(
-        config: TbxMatDialogConfigArgs<void>
-    ): Promise<TbxMatDialogResult<void, F>> {
-        return this.open<void, F>(
-            this.mergeDefaults(config, TbxMatSeverityLevel.Help),
-            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
-        );
+    async help<F extends Record<string, unknown> = Record<string, unknown>>(config: TbxMatDialogConfigArgs<void>): Promise<TbxMatDialogResult<void, F>> {
+        return this.open<void, F>(this.mergeDefaults(config, TbxMatSeverityLevel.Help), config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK);
     }
 
     /**
@@ -269,13 +237,8 @@ export class TbxMatDialogService {
      *
      * @public
      */
-    async default<F extends Record<string, unknown> = Record<string, unknown>>(
-        config: TbxMatDialogConfigArgs<void>
-    ): Promise<TbxMatDialogResult<void, F>> {
-        return this.open<void, F>(
-            this.mergeDefaults(config, TbxMatSeverityLevel.Default),
-            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK
-        );
+    async default<F extends Record<string, unknown> = Record<string, unknown>>(config: TbxMatDialogConfigArgs<void>): Promise<TbxMatDialogResult<void, F>> {
+        return this.open<void, F>(this.mergeDefaults(config, TbxMatSeverityLevel.Default), config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK);
     }
 
     /**
@@ -293,13 +256,8 @@ export class TbxMatDialogService {
      *
      * @public
      */
-    async confirm<F extends Record<string, unknown> = Record<string, unknown>>(
-        config: TbxMatDialogConfigArgs<void>
-    ): Promise<TbxMatDialogResult<void, F>> {
-        return this.open<void, F>(
-            this.mergeDefaults(config, TbxMatSeverityLevel.Help),
-            config.footer ?? TBX_MAT_DIALOG_BUTTONS_YES_NO
-        );
+    async confirm<F extends Record<string, unknown> = Record<string, unknown>>(config: TbxMatDialogConfigArgs<void>): Promise<TbxMatDialogResult<void, F>> {
+        return this.open<void, F>(this.mergeDefaults(config, TbxMatSeverityLevel.Help), config.footer ?? TBX_MAT_DIALOG_BUTTONS_YES_NO);
     }
 
     /**
@@ -321,13 +279,8 @@ export class TbxMatDialogService {
      *
      * @public
      */
-    async input<T, F extends Record<string, unknown> = Record<string, unknown>>(
-        config: TbxMatDialogConfigArgs<T>
-    ): Promise<TbxMatDialogResult<T, F>> {
-        return this.open<T, F>(
-            this.mergeDefaults(config, TbxMatSeverityLevel.Information),
-            config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK_CANCEL
-        );
+    async input<T, F extends Record<string, unknown> = Record<string, unknown>>(config: TbxMatDialogConfigArgs<T>): Promise<TbxMatDialogResult<T, F>> {
+        return this.open<T, F>(this.mergeDefaults(config, TbxMatSeverityLevel.Information), config.footer ?? TBX_MAT_DIALOG_BUTTONS_OK_CANCEL);
     }
 
     /**
@@ -342,10 +295,7 @@ export class TbxMatDialogService {
      *
      * @internal
      */
-    private mergeDefaults<T>(
-        config: TbxMatDialogConfigArgs<T>,
-        defaultType: TbxMatSeverityLevel
-    ): TbxMatDialogConfig<T> {
+    private mergeDefaults<T>(config: TbxMatDialogConfigArgs<T>, defaultType: TbxMatSeverityLevel): TbxMatDialogConfig<T> {
         return {
             ...config,
             type: config.type ?? defaultType,
@@ -374,10 +324,7 @@ export class TbxMatDialogService {
      *
      * @internal
      */
-    private async open<T, F extends Record<string, unknown>>(
-        config: TbxMatDialogConfig<T>,
-        resolvedFooter: readonly TbxMatDialogFooterControlType[]
-    ): Promise<TbxMatDialogResult<T, F>> {
+    private async open<T, F extends Record<string, unknown>>(config: TbxMatDialogConfig<T>, resolvedFooter: readonly TbxMatDialogFooterControlType[]): Promise<TbxMatDialogResult<T, F>> {
         const shellData: DialogShellData = {
             config: config as TbxMatDialogConfig<unknown>,
             resolvedFooter,

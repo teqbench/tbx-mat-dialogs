@@ -8,11 +8,7 @@ import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
 import { TbxMatFontIconService } from '@teqbench/tbx-mat-icons';
 import { TbxMatDialogService } from '../services/dialog.service';
 import { TbxMatDialogDismissReason } from '../types/dialog-result.type';
-import {
-    TBX_MAT_DIALOG_BUTTONS_OK,
-    TBX_MAT_DIALOG_BUTTONS_YES_NO,
-    TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL,
-} from '../constants/dialog.constants';
+import { TBX_MAT_DIALOG_BUTTONS_OK, TBX_MAT_DIALOG_BUTTONS_YES_NO, TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL } from '../constants/dialog.constants';
 import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
 import { type TbxMatDialogData } from '../models/dialog.model';
 import { TBX_MAT_DIALOG_PROVIDER_CONFIG } from '../tokens/dialog-provider-config.token';
@@ -96,15 +92,13 @@ export const SHARED_HARNESS_ARG_TYPES = {
         name: 'Icon Size',
         control: 'select' as const,
         options: ['standard', 'medium', 'small'],
-        description:
-            'Severity icon size (overrides --tbx-mat-dialog-icon-size at the document level). Dialogs default to a larger icon than banners/notifications because the header has more vertical space.',
+        description: 'Severity icon size (overrides --tbx-mat-dialog-icon-size at the document level). Dialogs default to a larger icon than banners/notifications because the header has more vertical space.',
     },
     iconAnimation: {
         name: 'Icon Animation',
         control: 'select' as const,
         options: ['none', 'state-transition', 'pulse'],
-        description:
-            'Severity icon animation. `state-transition` fills the Material Symbols glyph once on enter; `pulse` loops the FILL axis indefinitely.',
+        description: 'Severity icon animation. `state-transition` fills the Material Symbols glyph once on enter; `pulse` loops the FILL axis indefinitely.',
     },
 };
 
@@ -135,33 +129,15 @@ export interface StoryInputData {
         <div class="story-input-form">
             <mat-form-field appearance="outline">
                 <mat-label>First Name</mat-label>
-                <input
-                    matInput
-                    cdkFocusInitial
-                    required
-                    [ngModel]="firstName()"
-                    (ngModelChange)="firstName.set($event)"
-                    placeholder="Enter first name"
-                />
+                <input matInput cdkFocusInitial required [ngModel]="firstName()" (ngModelChange)="firstName.set($event)" placeholder="Enter first name" />
             </mat-form-field>
             <mat-form-field appearance="outline">
                 <mat-label>Last Name</mat-label>
-                <input
-                    matInput
-                    required
-                    [ngModel]="lastName()"
-                    (ngModelChange)="lastName.set($event)"
-                    placeholder="Enter last name"
-                />
+                <input matInput required [ngModel]="lastName()" (ngModelChange)="lastName.set($event)" placeholder="Enter last name" />
             </mat-form-field>
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
                 <mat-label>Address</mat-label>
-                <input
-                    matInput
-                    [ngModel]="address()"
-                    (ngModelChange)="address.set($event)"
-                    placeholder="Enter address (optional)"
-                />
+                <input matInput [ngModel]="address()" (ngModelChange)="address.set($event)" placeholder="Enter address (optional)" />
             </mat-form-field>
         </div>
     `,
@@ -181,9 +157,7 @@ export class StoryInputComponent implements TbxMatDialogData<StoryInputData> {
     readonly lastName = signal('');
     readonly address = signal('');
 
-    readonly isValid = computed(
-        () => this.firstName().trim().length > 0 && this.lastName().trim().length > 0
-    );
+    readonly isValid = computed(() => this.firstName().trim().length > 0 && this.lastName().trim().length > 0);
 
     readonly value = computed<StoryInputData>(() => ({
         firstName: this.firstName().trim(),
@@ -227,11 +201,7 @@ export class StoryAlternateCloseIconService extends TbxMatFontIconService<string
             @if (description()) {
                 <p class="story-description">{{ description() }}</p>
             }
-            <p class="theme-note">
-                Theme: Angular Material prebuilt <strong>Azure Blue</strong>. Dialog severity colors
-                are driven by <code>@teqbench/tbx-mat-severity-theme</code>; dialog UX patterns
-                (confirm/input) layer on top of severity.
-            </p>
+            <p class="theme-note">Theme: Angular Material prebuilt <strong>Azure Blue</strong>. Dialog severity colors are driven by <code>@teqbench/tbx-mat-severity-theme</code>; dialog UX patterns (confirm/input) layer on top of severity.</p>
 
             <h3>Severity Methods</h3>
             <div class="button-group">
@@ -314,8 +284,7 @@ export class DialogHarnessComponent {
     async showError(): Promise<void> {
         const output = await this.dialog.error({
             title: 'Save Failed',
-            message:
-                'Could not save your changes. The server returned an unexpected error. Please try again or contact support if the problem persists.',
+            message: 'Could not save your changes. The server returned an unexpected error. Please try again or contact support if the problem persists.',
         });
         this.lastResult.set(output.result);
     }
@@ -323,8 +292,7 @@ export class DialogHarnessComponent {
     async showWarning(): Promise<void> {
         const output = await this.dialog.warning({
             title: 'Unsaved Changes',
-            message:
-                'You have unsaved changes that will be lost if you navigate away. Are you sure you want to leave this page?',
+            message: 'You have unsaved changes that will be lost if you navigate away. Are you sure you want to leave this page?',
         });
         this.lastResult.set(output.result);
     }
@@ -340,8 +308,7 @@ export class DialogHarnessComponent {
     async showHelp(): Promise<void> {
         const output = await this.dialog.help({
             title: 'How it works',
-            message:
-                'This panel shows tips and guidance for completing your task. Tap any control for more details.',
+            message: 'This panel shows tips and guidance for completing your task. Tap any control for more details.',
         });
         this.lastResult.set(output.result);
     }
@@ -357,8 +324,7 @@ export class DialogHarnessComponent {
     async showConfirm(): Promise<void> {
         const output = await this.dialog.confirm({
             title: 'Delete Project?',
-            message:
-                'This action cannot be undone. All data associated with this project will be permanently removed.',
+            message: 'This action cannot be undone. All data associated with this project will be permanently removed.',
         });
         this.lastResult.set(output.result);
     }
@@ -368,19 +334,14 @@ export class DialogHarnessComponent {
             title: 'Enter Details',
             content: StoryInputComponent,
         });
-        this.lastResult.set(
-            output.result === TbxMatDialogDismissReason.Affirm
-                ? `${output.result}: ${JSON.stringify(output.data)}`
-                : output.result
-        );
+        this.lastResult.set(output.result === TbxMatDialogDismissReason.Affirm ? `${output.result}: ${JSON.stringify(output.data)}` : output.result);
     }
 
     async showWithSubtitle(): Promise<void> {
         const output = await this.dialog.information({
             title: 'System Update',
             subtitle: 'Version 2.4.0 is now available',
-            message:
-                'A new version is available with performance improvements and bug fixes. The update will be applied automatically during the next maintenance window.',
+            message: 'A new version is available with performance improvements and bug fixes. The update will be applied automatically during the next maintenance window.',
         });
         this.lastResult.set(output.result);
     }
@@ -389,8 +350,7 @@ export class DialogHarnessComponent {
         const output = await this.dialog.information({
             title: 'Feature Preview',
             contextBadge: 'Beta',
-            message:
-                'This feature is currently in beta. Some functionality may change before the final release.',
+            message: 'This feature is currently in beta. Some functionality may change before the final release.',
         });
         this.lastResult.set(output.result);
     }
@@ -428,8 +388,7 @@ export class DialogHarnessComponent {
         const output = await this.dialog.show({
             title: 'Delete Account',
             type: TbxMatSeverityLevel.Error,
-            message:
-                'This will permanently delete your account and all associated data. This action cannot be undone.',
+            message: 'This will permanently delete your account and all associated data. This action cannot be undone.',
             footer: destructiveButtons,
         });
         this.lastResult.set(output.result);
@@ -501,8 +460,7 @@ export class DialogHarnessComponent {
             subtitle: 'Using show() for full control',
             contextBadge: 'v2',
             type: TbxMatSeverityLevel.Warning,
-            message:
-                'This dialog was opened via the show() method with all options configured manually.',
+            message: 'This dialog was opened via the show() method with all options configured manually.',
             footer: [
                 {
                     key: 'acknowledge',
@@ -562,12 +520,8 @@ export function withAlternateCloseIcon() {
             {
                 provide: TBX_MAT_DIALOG_PROVIDER_CONFIG,
                 useFactory: () => ({
-                    severityIconResolverService: new TbxMatDialogSeverityFontIconService(
-                        'material-symbols-rounded'
-                    ),
-                    closeIconResolverService: new StoryAlternateCloseIconService(
-                        'material-symbols-rounded'
-                    ),
+                    severityIconResolverService: new TbxMatDialogSeverityFontIconService('material-symbols-rounded'),
+                    closeIconResolverService: new StoryAlternateCloseIconService('material-symbols-rounded'),
                 }),
             },
         ],
