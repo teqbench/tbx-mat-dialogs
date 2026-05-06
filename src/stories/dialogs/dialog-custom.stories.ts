@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { JsonPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import type { Meta, StoryObj } from '@storybook/angular';
@@ -8,19 +8,28 @@ import { TbxMatDialogService, TbxMatDialogDismissReason, type TbxMatDialogFooter
 
 // Document-level token override blocks. Dialogs render in a CDK overlay outside
 // the component tree, so per-component styling does not reach the dialog
-// surface. Token overrides scoped to a body class are injected once and applied
-// for the lifetime of a story selection.
+// surface. Token overrides are scoped to body classes that are toggled
+// synchronously around each dialog.show() call.
+//
+// Specificity notes:
+// - Squared corners must out-specify the library rule
+//   `.tbx-mat-dialog-panel .mat-mdc-dialog-container .mat-mdc-dialog-surface`
+//   (specificity 0,3,0). The override below adds the body class for (0,4,1).
+// - Padding overrides target `tbx-mat-dialog-shell` directly because the shell
+//   declares `:host { --dialog-padding-inline: 1.25rem }`, which shadows any
+//   value inherited from `body`. Targeting the host element with the body
+//   class as ancestor wins specificity (0,1,2 vs the host's 0,1,0).
 const TOKEN_OVERRIDE_CSS = `
-  .tbx-demo-wide-radius .mat-mdc-dialog-surface {
+  body.tbx-demo-squared-corners .tbx-mat-dialog-panel .mat-mdc-dialog-container .mat-mdc-dialog-surface {
     border-radius: 0;
   }
-  .tbx-demo-tight-padding {
+  body.tbx-demo-tight-padding tbx-mat-dialog-shell {
     --dialog-padding-inline: 0.5rem;
   }
-  .tbx-demo-loose-padding {
+  body.tbx-demo-loose-padding tbx-mat-dialog-shell {
     --dialog-padding-inline: 2.5rem;
   }
-  .tbx-demo-large-icon {
+  body.tbx-demo-large-icon {
     --tbx-mat-dialog-icon-size: 4rem;
   }
 `;
@@ -160,8 +169,6 @@ class DialogCustomHarnessComponent {
     private readonly dialog = inject(TbxMatDialogService);
     readonly lastResult = signal<unknown>(null);
 
-    private readonly bodyClass = signal<string | null>(null);
-
     constructor() {
         // Inject the demo override CSS once at the document level so it reaches
         // the CDK overlay surface (which renders outside the component tree).
@@ -172,25 +179,20 @@ class DialogCustomHarnessComponent {
             style.textContent = TOKEN_OVERRIDE_CSS;
             document.head.appendChild(style);
         }
-
-        // Toggle a body class to scope token overrides per story interaction.
-        // The previous class is removed before applying the next one.
-        let previous: string | null = null;
-        effect(() => {
-            if (previous) document.body.classList.remove(previous);
-            const current = this.bodyClass();
-            if (current) document.body.classList.add(current);
-            previous = current;
-        });
     }
 
     private async open(config: Parameters<TbxMatDialogService['show']>[0], scope?: string): Promise<void> {
-        this.bodyClass.set(scope ?? null);
+        // Toggle the body class synchronously around the dialog lifecycle.
+        // An effect-based toggle would defer the class change to the next
+        // microtask, which is too late — MatDialog opens the CDK overlay
+        // synchronously inside .show() and reads styles immediately, so the
+        // override must be on document.body before the call returns.
+        if (scope) document.body.classList.add(scope);
         try {
             const output = await this.dialog.show(config);
             this.lastResult.set({ result: output.result, footerValues: output.footerValues });
         } finally {
-            this.bodyClass.set(null);
+            if (scope) document.body.classList.remove(scope);
         }
     }
 
@@ -199,7 +201,7 @@ class DialogCustomHarnessComponent {
             title: 'Wide Dialog',
             type: TbxMatSeverityLevel.Information,
             width: '50rem',
-            message: 'Width set to 50rem via the width config option. Default is 30rem (TBX_MAT_DIALOG_DEFAULT_WIDTH).',
+            message: 'Width set to 50rem via the width config option. The default is 30rem.',
         });
     }
 
@@ -259,7 +261,7 @@ class DialogCustomHarnessComponent {
                 type: TbxMatSeverityLevel.Information,
                 message: 'border-radius zeroed on .mat-mdc-dialog-surface via a custom CSS rule scoped to a body class.',
             },
-            'tbx-demo-wide-radius'
+            'tbx-demo-squared-corners'
         );
     }
 

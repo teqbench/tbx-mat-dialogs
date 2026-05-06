@@ -244,6 +244,12 @@ class DialogConfirmHarnessComponent {
         const output = await this.dialog.confirm<{ autoUpdate: boolean; channel: string }>({
             title: 'Update Preferences',
             message: 'Choose how often updates are applied and which release channel to follow.',
+            // Widened from the 30rem default so the four-item footer (checkbox + radio
+            // group + Cancel + Apply) fits on a single row without wrapping. With
+            // wrapping enabled, the first end-aligned button (Cancel) gets stranded
+            // on the controls row by `margin-left: auto` while the primary Apply
+            // button drops alone to a second row — visually awkward.
+            width: '42rem',
             footer,
         });
         this.lastResult.set({ result: output.result, footerValues: output.footerValues });
