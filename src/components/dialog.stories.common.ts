@@ -141,12 +141,12 @@ export class StoryAlternateCloseIconService extends TbxMatFontIconService<string
 
             <h3>Severity Methods</h3>
             <div class="button-group">
+                <button mat-flat-button (click)="showDefault()">Default</button>
                 <button mat-flat-button (click)="showSuccess()">Success</button>
                 <button mat-flat-button (click)="showError()">Error</button>
                 <button mat-flat-button (click)="showWarning()">Warning</button>
                 <button mat-flat-button (click)="showInformation()">Information</button>
                 <button mat-flat-button (click)="showHelp()">Help</button>
-                <button mat-flat-button (click)="showDefault()">Default</button>
             </div>
 
             <h3>Dialog Patterns</h3>
