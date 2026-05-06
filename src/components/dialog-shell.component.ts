@@ -1,70 +1,46 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    afterNextRender,
-    computed,
-    inject,
-    signal,
-    viewChild,
-    ViewContainerRef,
-    ComponentRef,
-    type Signal,
-} from '@angular/core';
-import {
-    MAT_DIALOG_DATA,
-    MatDialogRef,
-    MatDialogTitle,
-    MatDialogContent,
-    MatDialogActions,
-} from '@angular/material/dialog';
+import { ChangeDetectionStrategy, Component, afterNextRender, computed, inject, signal, viewChild, ViewContainerRef, ComponentRef, type Signal } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { MatIconModule, MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDivider } from '@angular/material/divider';
 import { MatChipSet, MatChip } from '@angular/material/chips';
-import { DialogResultType } from '../types/dialog-result.type';
-import { DialogEmphasisType } from '../types/dialog-emphasis.type';
-import { type DialogConfig, type DialogContent } from '../models/dialog.model';
-import {
-    type DialogFooterButton,
-    type DialogFooterCheckbox,
-    type DialogFooterToggle,
-    type DialogFooterRadioGroup,
-    type DialogFooterToggleGroup,
-} from '../models/dialog-footer.model';
-import { type DialogFooterControlType } from '../types/dialog-footer-control.type';
-
-/**
- * Emphasis CSS variable prefix mapping.
- * Maps DialogEmphasisType enum values to the --tbx-dialog-* token prefix
- * used in _dialog-panels.scss.
- */
-const EMPHASIS_TOKEN_MAP: Readonly<Record<DialogEmphasisType, string>> = {
-    [DialogEmphasisType.Default]: 'default',
-    [DialogEmphasisType.Destructive]: 'destructive',
-    [DialogEmphasisType.Warning]: 'warning',
-    [DialogEmphasisType.Informational]: 'info',
-};
+import { TbxMatSeverityLevel } from '@teqbench/tbx-mat-severity-theme';
+import { TbxMatIconType, TBX_MAT_FONT_ICON_DEFAULT_FONT_SET } from '@teqbench/tbx-mat-icons';
+import { TbxMatDialogDismissReason } from '../enums/dialog-dismiss-reason.enum';
+import { type TbxMatDialogConfig, type TbxMatDialogData } from '../models/dialog.model';
+import { type TbxMatDialogFooterButton, type TbxMatDialogFooterCheckbox, type TbxMatDialogFooterToggle, type TbxMatDialogFooterRadioGroup, type TbxMatDialogFooterToggleGroup } from '../models/dialog-footer.model';
+import { type TbxMatDialogFooterControlType } from '../types/dialog-footer-control.type';
+import { type TbxMatDialogIconResolver } from '../types/dialog-icon-resolver.type';
+import { type ResolvedIcon } from '../models/resolved-icon.model';
+import { TBX_MAT_DIALOG_PROVIDER_CONFIG } from '../tokens/dialog-provider-config.token';
+import { TbxMatDialogCloseFontIconService } from '../services/dialog-close-font-icon.service';
 
 /**
  * Internal data payload injected into DialogShellComponent via MAT_DIALOG_DATA.
  *
- * This is the shape the DialogService passes when opening the shell.
- * It extends DialogConfig with the resolved footer (service applies default
+ * @remarks
+ * This is the shape the {@link TbxMatDialogService} passes when opening the shell.
+ * It extends {@link TbxMatDialogConfig} with the resolved footer (service applies default
  * button presets when the caller omits footer).
+ *
+ * @internal
  */
 export interface DialogShellData {
-    readonly config: DialogConfig<unknown>;
-    readonly resolvedFooter: readonly DialogFooterControlType[];
+    readonly config: TbxMatDialogConfig<unknown>;
+    readonly resolvedFooter: readonly TbxMatDialogFooterControlType[];
 }
 
 /**
- * Common dialog chrome shared by all three dialog types (info, confirm, input).
+ * Render the common dialog chrome shared by all dialog types (info, confirm, input).
  *
- * Renders a consistent layout using Material dialog structural directives:
+ * @remarks
+ * Renders a consistent layout using
+ * {@link https://material.angular.dev/components/dialog/api | Angular Material} dialog
+ * structural directives:
  *   - Header: icon in circular container (optional), title (matDialogTitle for
  *     aria-labelledby accessibility), context badge (mat-chip, optional),
  *     subtitle (optional), close button — all vertically centered
@@ -75,7 +51,8 @@ export interface DialogShellData {
  *   - Footer (mat-dialog-actions): single flex row of buttons and controls
  *
  * The shell is internal to the dialog system — consumers never reference it directly.
- * They interact with DialogService, which opens this component via MatDialog.
+ * They interact with {@link TbxMatDialogService}, which opens this component via
+ * {@link https://material.angular.dev/components/dialog/api | MatDialog}.
  *
  * For input dialogs, the shell dynamically creates the content component from
  * config.content and reads its isValid/value signals. The affirm button's
@@ -88,12 +65,15 @@ export interface DialogShellData {
  *   - 'primary' / 'destructive' → matButton="filled" with CSS class emphasis
  *   - 'text' / undefined → matButton="text"
  *
- * Emphasis colors are driven by CSS custom properties set on :host via the
- * data-emphasis attribute. The header icon container, icon glyph, and primary/
- * destructive button classes all consume --tbx-dialog-current-accent and
- * --tbx-dialog-current-on-accent — no inline style bindings. Button emphasis
- * overrides use Angular Material's mat.button-overrides() mixin in the global
- * _dialog-panels.scss (same pattern as _snackbar-panels.scss).
+ * Severity colors are driven by the per-severity panel class
+ * (`tbx-mat-dialog-panel-{level}`) applied to the MatDialog overlay by
+ * `TbxMatDialogService`. Each panel class exposes
+ * `--tbx-mat-dialog-current-{background,text}` tokens via the
+ * `_severity-panel` mixin in `_tbx-mat-dialogs.scss`. The header icon
+ * container and primary/destructive button classes consume those tokens
+ * directly — no host attribute binding or inline style bindings needed.
+ * Button overrides use Angular Material's `mat.button-overrides()` mixin
+ * in the global stylesheet.
  *
  * Icon position uses Material's `iconPositionEnd` attribute on `mat-icon`.
  * Material's button template has separate content projection slots for
@@ -104,35 +84,24 @@ export interface DialogShellData {
  * Padding is controlled by a single CSS custom property (--dialog-padding-inline)
  * on :host, ensuring header, body, footer, and divider insets are always aligned.
  * Material directive default padding is overridden to use this property.
+ *
+ * @internal
  */
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
-    selector: 'tbx-dialog-shell',
-    host: {
-        '[attr.data-emphasis]': 'emphasisToken',
-    },
-    imports: [
-        MatButtonModule,
-        MatIconModule,
-        MatCheckboxModule,
-        MatSlideToggleModule,
-        MatRadioModule,
-        MatButtonToggleModule,
-        MatDialogTitle,
-        MatDialogContent,
-        MatDialogActions,
-        MatDivider,
-        MatChipSet,
-        MatChip,
-    ],
+    selector: 'tbx-mat-dialog-shell',
+    imports: [MatButtonModule, MatIconModule, MatCheckboxModule, MatSlideToggleModule, MatRadioModule, MatButtonToggleModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatDivider, MatChipSet, MatChip],
     template: `
         <!-- ── Header ───────────────────────────────────────── -->
         <header class="dialog-header">
             <div class="header-content">
-                @if (config.icon) {
-                    <div class="header-icon-container">
-                        <mat-icon class="header-icon">{{ config.icon }}</mat-icon>
-                    </div>
+                @let severityIconValue = severityIcon();
+                @if (severityIconValue) {
+                    @if (severityIconValue.isSvg) {
+                        <mat-icon class="tbx-mat-dialog-icon" [svgIcon]="severityIconValue.name" aria-hidden="true"></mat-icon>
+                    } @else {
+                        <mat-icon class="tbx-mat-dialog-icon" aria-hidden="true">{{ severityIconValue.name }}</mat-icon>
+                    }
                 }
                 <div class="header-text">
                     <div class="header-title-row">
@@ -148,8 +117,15 @@ export interface DialogShellData {
                     }
                 </div>
             </div>
-            <button matIconButton (click)="close()" aria-label="Close dialog">
-                <mat-icon>close</mat-icon>
+            <button matIconButton class="tbx-mat-dialog-close-icon-button" (click)="close()" aria-label="Close dialog">
+                @let closeIconValue = closeIcon();
+                @if (closeIconValue) {
+                    @if (closeIconValue.isSvg) {
+                        <mat-icon [svgIcon]="closeIconValue.name" aria-hidden="true"></mat-icon>
+                    } @else {
+                        <mat-icon aria-hidden="true">{{ closeIconValue.name }}</mat-icon>
+                    }
+                }
             </button>
         </header>
 
@@ -181,16 +157,7 @@ export interface DialogShellData {
                                 to route mat-icon to the correct content projection slot,
                                 which also applies proper margin spacing. -->
                                 @if (btn.emphasis === 'primary' || btn.emphasis === 'destructive') {
-                                    <button
-                                        matButton="filled"
-                                        [class.dialog-btn-primary]="btn.emphasis === 'primary'"
-                                        [class.dialog-btn-destructive]="
-                                            btn.emphasis === 'destructive'
-                                        "
-                                        [attr.cdkFocusInitial]="shouldAutoFocus(btn) ? '' : null"
-                                        [disabled]="isButtonDisabled(btn)"
-                                        (click)="onButtonClick(btn)"
-                                    >
+                                    <button matButton="filled" [class.tbx-mat-dialog-btn-destructive]="btn.emphasis === 'destructive'" [attr.cdkFocusInitial]="shouldAutoFocus(btn) ? '' : null" [disabled]="isButtonDisabled(btn)" (click)="onButtonClick(btn)">
                                         @if (btn.icon && btn.iconPosition !== 'after') {
                                             <mat-icon>{{ btn.icon }}</mat-icon>
                                         }
@@ -200,11 +167,7 @@ export interface DialogShellData {
                                         }
                                     </button>
                                 } @else {
-                                    <button
-                                        matButton="text"
-                                        [disabled]="isButtonDisabled(btn)"
-                                        (click)="onButtonClick(btn)"
-                                    >
+                                    <button matButton="text" [disabled]="isButtonDisabled(btn)" (click)="onButtonClick(btn)">
                                         @if (btn.icon && btn.iconPosition !== 'after') {
                                             <mat-icon>{{ btn.icon }}</mat-icon>
                                         }
@@ -217,26 +180,15 @@ export interface DialogShellData {
                             }
                             @case ('checkbox') {
                                 @let chk = asCheckbox(control);
-                                <mat-checkbox
-                                    [checked]="getFooterValue(chk.key) === true"
-                                    (change)="setFooterValue(chk.key, $event.checked)"
-                                    >{{ chk.label }}</mat-checkbox
-                                >
+                                <mat-checkbox [checked]="getFooterValue(chk.key) === true" (change)="setFooterValue(chk.key, $event.checked)">{{ chk.label }}</mat-checkbox>
                             }
                             @case ('toggle') {
                                 @let tgl = asToggle(control);
-                                <mat-slide-toggle
-                                    [checked]="getFooterValue(tgl.key) === true"
-                                    (change)="setFooterValue(tgl.key, $event.checked)"
-                                    >{{ tgl.label }}</mat-slide-toggle
-                                >
+                                <mat-slide-toggle [checked]="getFooterValue(tgl.key) === true" (change)="setFooterValue(tgl.key, $event.checked)">{{ tgl.label }}</mat-slide-toggle>
                             }
                             @case ('radio-group') {
                                 @let rdo = asRadioGroup(control);
-                                <mat-radio-group
-                                    [value]="getFooterValue(rdo.key)"
-                                    (change)="setFooterValue(rdo.key, $event.value)"
-                                >
+                                <mat-radio-group [value]="getFooterValue(rdo.key)" (change)="setFooterValue(rdo.key, $event.value)">
                                     @for (option of rdo.options; track option.value) {
                                         <mat-radio-button [value]="option.value">
                                             {{ option.label }}
@@ -246,11 +198,7 @@ export interface DialogShellData {
                             }
                             @case ('toggle-group') {
                                 @let tglGrp = asToggleGroup(control);
-                                <mat-button-toggle-group
-                                    [multiple]="tglGrp.multiple ?? false"
-                                    [value]="getFooterValue(tglGrp.key)"
-                                    (change)="setFooterValue(tglGrp.key, $event.value)"
-                                >
+                                <mat-button-toggle-group [multiple]="tglGrp.multiple ?? false" [value]="getFooterValue(tglGrp.key)" (change)="setFooterValue(tglGrp.key, $event.value)">
                                     @for (option of tglGrp.options; track option.value) {
                                         <mat-button-toggle [value]="option.value">
                                             @if (option.icon) {
@@ -274,35 +222,14 @@ export interface DialogShellData {
             --dialog-padding-inline: 1.25rem;
         }
 
-        /* ── Emphasis ──────────────────────────────────────── */
-
-        /* Each emphasis sets --tbx-dialog-current-accent and --tbx-dialog-current-on-accent
-         * on :host via the data-emphasis attribute. These cascade to all descendants —
-         * the icon container, icon glyph, and button emphasis classes all consume them.
-         * Default is the fallback when data-emphasis is not set. */
-        :host,
-        :host([data-emphasis='default']) {
-            --tbx-dialog-current-accent: var(--tbx-dialog-default-accent);
-            --tbx-dialog-current-on-accent: var(--tbx-dialog-default-on-accent);
-        }
-
-        :host([data-emphasis='destructive']) {
-            --tbx-dialog-current-accent: var(--tbx-dialog-destructive-accent);
-            --tbx-dialog-current-on-accent: var(--tbx-dialog-destructive-on-accent);
-        }
-
-        :host([data-emphasis='warning']) {
-            --tbx-dialog-current-accent: var(--tbx-dialog-warning-accent);
-            --tbx-dialog-current-on-accent: var(--tbx-dialog-warning-on-accent);
-        }
-
-        :host([data-emphasis='info']) {
-            --tbx-dialog-current-accent: var(--tbx-dialog-info-accent);
-            --tbx-dialog-current-on-accent: var(--tbx-dialog-info-on-accent);
-        }
-
         /* ── Header ────────────────────────────────────────── */
 
+        /* The dialog surface itself carries the severity background and
+         * on-severity text color (set by the .tbx-mat-dialog-panel-{level}
+         * class via the _severity-panel mixin in _tbx-mat-dialogs.scss).
+         * The header / body / footer all sit on the same colored surface,
+         * mirroring how tbx-mat-banners and tbx-mat-notifications color
+         * their entire panel. */
         .dialog-header {
             display: flex;
             align-items: center;
@@ -319,26 +246,20 @@ export interface DialogShellData {
             min-width: 0;
         }
 
-        /* Circular container for the header icon — matches the 2.5rem touch target
-         * of the close button (matIconButton). The icon glyph is centered within.
-         * Background and icon color consume the emphasis host variables set by
-         * :host([data-emphasis]) — no inline style bindings needed. */
-        .header-icon-container {
+        /* Severity icon — rendered directly in the colored panel, no
+         * surrounding container, no explicit color, no
+         * font-variation-settings. Mirrors .tbx-mat-banner-icon /
+         * .tbx-mat-notification-icon exactly: same class-name shape,
+         * same --tbx-mat-{pkg}-icon-size token, same flex-shrink
+         * behavior. The icon inherits its color from the dialog
+         * surface (= --tbx-mat-dialog-current-text, the on-severity
+         * color set by the panel mixin), so it renders identically to
+         * how banners and notifications render their severity icons. */
+        .tbx-mat-dialog-icon {
             flex-shrink: 0;
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--tbx-dialog-current-accent);
-        }
-
-        .header-icon {
-            font-size: 1.25rem;
-            width: 1.25rem;
-            height: 1.25rem;
-            color: var(--tbx-dialog-current-on-accent);
+            font-size: var(--tbx-mat-dialog-icon-size, 3rem);
+            width: var(--tbx-mat-dialog-icon-size, 3rem);
+            height: var(--tbx-mat-dialog-icon-size, 3rem);
         }
 
         .header-text {
@@ -355,10 +276,11 @@ export interface DialogShellData {
         /* matDialogTitle provides aria-labelledby linkage. Override Material's
          * default padding/margin/display since the header container manages its
          * own flex layout. Material sets display: block on the title which breaks
-         * flex centering — inline keeps it in the flex flow. */
+         * flex centering — inline keeps it in the flex flow.
+         * Color: inherits from the colored header (= --tbx-mat-dialog-current-text). */
         [matDialogTitle] {
             font: var(--mat-sys-title-large);
-            color: var(--mat-sys-on-surface);
+            color: inherit;
             display: inline;
             margin: 0;
             padding: 0;
@@ -370,7 +292,7 @@ export interface DialogShellData {
 
         .dialog-subtitle {
             font: var(--mat-sys-body-small);
-            color: var(--mat-sys-on-surface-variant);
+            color: inherit;
             margin: 0.25rem 0 0;
         }
 
@@ -396,7 +318,7 @@ export interface DialogShellData {
 
         .dialog-message {
             font: var(--mat-sys-body-medium);
-            color: var(--mat-sys-on-surface);
+            color: inherit;
             margin: 0;
             line-height: 1.6;
         }
@@ -423,8 +345,16 @@ export interface DialogShellData {
 export class DialogShellComponent {
     private readonly dialogRef = inject(MatDialogRef<DialogShellComponent>);
     private readonly shellData = inject<DialogShellData>(MAT_DIALOG_DATA);
+    private readonly providerConfig = inject(TBX_MAT_DIALOG_PROVIDER_CONFIG);
 
-    /** The caller's configuration (title, icon, message, emphasis, content, etc.). */
+    /**
+     * Package-provided default close icon resolver, used when the consumer's
+     * `TbxMatDialogProviderConfig` does not supply a custom `closeIconResolverService`.
+     * Mirrors the pattern used by `TbxMatBannerComponent`.
+     */
+    private readonly defaultCloseIconService = new TbxMatDialogCloseFontIconService(inject(TBX_MAT_FONT_ICON_DEFAULT_FONT_SET, { optional: true }) ?? inject(MAT_ICON_DEFAULT_OPTIONS, { optional: true })?.fontSet);
+
+    /** The caller's configuration (title, icon, message, type, content, etc.). */
     readonly config = this.shellData.config;
 
     /** Resolved footer items (service applies default presets when caller omits footer). */
@@ -437,7 +367,7 @@ export class DialogShellComponent {
      * content component is created in afterNextRender — no manual change
      * detection needed.
      */
-    private readonly contentRef = signal<DialogContent<unknown> | null>(null);
+    private readonly contentRef = signal<TbxMatDialogData<unknown> | null>(null);
 
     /** ViewContainerRef for the content host — used to dynamically create input dialog content. */
     readonly contentHost = viewChild('contentHost', { read: ViewContainerRef });
@@ -445,31 +375,48 @@ export class DialogShellComponent {
     /**
      * Current values of all footer controls, keyed by control.key.
      * Initialized from initialValue on each control, updated on user interaction.
-     * Included in DialogOutput.footerValues when the dialog closes.
+     * Included in TbxMatDialogResult.footerValues when the dialog closes.
      */
-    private readonly footerValues = signal<Record<string, unknown>>(
-        this.buildInitialFooterValues()
-    );
+    private readonly footerValues = signal<Record<string, unknown>>(this.buildInitialFooterValues());
 
     /**
-     * The resolved emphasis — defaults to Default when not specified.
+     * The resolved severity — defaults to Default when not specified.
+     * Used by `severityIcon` to look up the right icon from the resolver.
+     * The per-severity panel class on the MatDialog overlay drives all
+     * color tokens; the component does not bind the severity to any
+     * host attribute.
      */
-    private readonly emphasis = this.config.emphasis ?? DialogEmphasisType.Default;
+    private readonly type = this.config.type ?? TbxMatSeverityLevel.Default;
 
     /**
-     * Token suffix for the current emphasis — used by the host data-emphasis
-     * attribute binding and the :host([data-emphasis]) CSS selectors.
+     * Resolved severity icon for the header.
+     *
+     * A consumer-provided `config.icon` override always wins and is rendered
+     * as a font ligature. When no override is present, the icon is resolved
+     * from the severity (`config.type`) via the configured
+     * `severityIconResolverService` on `TBX_MAT_DIALOG_PROVIDER_CONFIG`.
+     * Returns `null` when no icon should be rendered.
      */
-    readonly emphasisToken = EMPHASIS_TOKEN_MAP[this.emphasis];
+    readonly severityIcon = computed<ResolvedIcon | null>(() => {
+        if (this.config.icon) {
+            return { name: this.config.icon, isSvg: false };
+        }
+        return this.resolveIcon(this.providerConfig.severityIconResolverService, this.type);
+    });
+
+    /**
+     * Resolved close button icon. Defers to the consumer's
+     * `closeIconResolverService` when provided; otherwise uses the package
+     * default `TbxMatDialogCloseFontIconService` (font ligature `'close'`).
+     */
+    readonly closeIcon = computed<ResolvedIcon | null>(() => this.resolveIcon(this.providerConfig.closeIconResolverService ?? this.defaultCloseIconService, 'close'));
 
     /**
      * Index of the first footer item with align: 'end'.
      * Used to apply margin-left: auto for the start/end split.
      * Returns -1 if all items are align: 'start'.
      */
-    readonly firstEndIndex = computed(() =>
-        this.resolvedFooter.findIndex((c) => c.align === 'end')
-    );
+    readonly firstEndIndex = computed(() => this.resolvedFooter.findIndex((c) => c.align === 'end'));
 
     // ── Footer control type cast helpers ────────────────────────────────
     //
@@ -480,29 +427,29 @@ export class DialogShellComponent {
     //
     // The @switch guarantees the discriminant matches — the cast is safe.
 
-    /** Cast for @case ('button') — provides DialogFooterButton type in template. */
-    protected asButton(control: DialogFooterControlType): DialogFooterButton {
-        return control as DialogFooterButton;
+    /** Cast for `@case ('button')` — provides TbxMatDialogFooterButton type in template. */
+    protected asButton(control: TbxMatDialogFooterControlType): TbxMatDialogFooterButton {
+        return control as TbxMatDialogFooterButton;
     }
 
-    /** Cast for @case ('checkbox') — provides DialogFooterCheckbox type in template. */
-    protected asCheckbox(control: DialogFooterControlType): DialogFooterCheckbox {
-        return control as DialogFooterCheckbox;
+    /** Cast for `@case ('checkbox')` — provides TbxMatDialogFooterCheckbox type in template. */
+    protected asCheckbox(control: TbxMatDialogFooterControlType): TbxMatDialogFooterCheckbox {
+        return control as TbxMatDialogFooterCheckbox;
     }
 
-    /** Cast for @case ('toggle') — provides DialogFooterToggle type in template. */
-    protected asToggle(control: DialogFooterControlType): DialogFooterToggle {
-        return control as DialogFooterToggle;
+    /** Cast for `@case ('toggle')` — provides TbxMatDialogFooterToggle type in template. */
+    protected asToggle(control: TbxMatDialogFooterControlType): TbxMatDialogFooterToggle {
+        return control as TbxMatDialogFooterToggle;
     }
 
-    /** Cast for @case ('radio-group') — provides DialogFooterRadioGroup type in template. */
-    protected asRadioGroup(control: DialogFooterControlType): DialogFooterRadioGroup {
-        return control as DialogFooterRadioGroup;
+    /** Cast for `@case ('radio-group')` — provides TbxMatDialogFooterRadioGroup type in template. */
+    protected asRadioGroup(control: TbxMatDialogFooterControlType): TbxMatDialogFooterRadioGroup {
+        return control as TbxMatDialogFooterRadioGroup;
     }
 
-    /** Cast for @case ('toggle-group') — provides DialogFooterToggleGroup type in template. */
-    protected asToggleGroup(control: DialogFooterControlType): DialogFooterToggleGroup {
-        return control as DialogFooterToggleGroup;
+    /** Cast for `@case ('toggle-group')` — provides TbxMatDialogFooterToggleGroup type in template. */
+    protected asToggleGroup(control: TbxMatDialogFooterControlType): TbxMatDialogFooterToggleGroup {
+        return control as TbxMatDialogFooterToggleGroup;
     }
 
     constructor() {
@@ -519,18 +466,16 @@ export class DialogShellComponent {
             const host = this.contentHost();
 
             if (this.config.content && host) {
-                const ref: ComponentRef<DialogContent<unknown>> = host.createComponent(
-                    this.config.content
-                );
+                const ref: ComponentRef<TbxMatDialogData<unknown>> = host.createComponent(this.config.content);
                 this.contentRef.set(ref.instance);
             }
         });
     }
 
-    /** Close the dialog with DialogResultType.Close (dismiss without choosing). */
+    /** Close the dialog with TbxMatDialogDismissReason.Close (dismiss without choosing). */
     close(): void {
         this.dialogRef.close({
-            result: DialogResultType.Close,
+            result: TbxMatDialogDismissReason.Close,
             footerValues: {},
         });
     }
@@ -542,12 +487,12 @@ export class DialogShellComponent {
      * dialog's content. Deny, Cancel, and Close are negative actions;
      * returning footer state alongside them would be a mixed signal.
      */
-    onButtonClick(button: DialogFooterButton): void {
+    onButtonClick(button: TbxMatDialogFooterButton): void {
         if (button.result === undefined) {
             return;
         }
 
-        const isAffirm = button.result === DialogResultType.Affirm;
+        const isAffirm = button.result === TbxMatDialogDismissReason.Affirm;
 
         this.dialogRef.close({
             result: button.result,
@@ -564,18 +509,18 @@ export class DialogShellComponent {
      * the content component manages its own focus via cdkFocusInitial on the
      * appropriate form element.
      */
-    shouldAutoFocus(button: DialogFooterButton): boolean {
-        return !this.config.content && button.result === DialogResultType.Affirm;
+    shouldAutoFocus(button: TbxMatDialogFooterButton): boolean {
+        return !this.config.content && button.result === TbxMatDialogDismissReason.Affirm;
     }
 
     /**
      * Resolve a button's disabled state.
      * For affirm buttons in input dialogs, also checks content.isValid.
      */
-    isButtonDisabled(button: DialogFooterButton): boolean {
+    isButtonDisabled(button: TbxMatDialogFooterButton): boolean {
         const content = this.contentRef();
 
-        if (button.result === DialogResultType.Affirm && content && !content.isValid()) {
+        if (button.result === TbxMatDialogDismissReason.Affirm && content && !content.isValid()) {
             return true;
         }
 
@@ -624,5 +569,27 @@ export class DialogShellComponent {
         }
 
         return values;
+    }
+
+    /**
+     * Resolve a `ResolvedIcon` from a resolver and key.
+     *
+     * Returns `null` when the resolver or key is missing, or when the
+     * resolver does not have an icon registered for the given key. The
+     * `isSvg` flag is derived from the resolver's `iconType` property —
+     * the template uses it to choose between `<mat-icon [svgIcon]>` and
+     * `<mat-icon>{{ name }}</mat-icon>` rendering branches.
+     */
+    private resolveIcon(resolver: TbxMatDialogIconResolver | undefined, key: string | undefined): ResolvedIcon | null {
+        /* v8 ignore start -- defensive guard; resolver and key are present in normal flow */
+        if (!resolver || !key) {
+            return null;
+        }
+        /* v8 ignore stop */
+        const name = resolver.resolve(key);
+        if (!name) {
+            return null;
+        }
+        return { name, isSvg: resolver.iconType === TbxMatIconType.Svg };
     }
 }

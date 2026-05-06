@@ -1,14 +1,14 @@
 {
   "name": "@teqbench/tbx-mat-dialogs",
   "version": "0.1.1",
-  "description": "Opinionated Angular dialog service built on Material dialog. Typed methods for info, warning, error, confirm, and input dialogs returning Promise<DialogOutput<T, F>>. Features emphasis-driven styling, rich footer controls, signal-based input validation via DialogContent, and pluggable icon resolution. Angular 21+.",
+  "description": "Opinionated Angular modal dialog service built on Material's MatDialog. Severity-leveled methods (success / error / warning / information / help / default) plus dialog-specific UX patterns (confirm / input). Returns Promise<TbxMatDialogResult<T, F>>. Severity colors via @teqbench/tbx-mat-severity-theme; pluggable icons via TBX_MAT_DIALOG_PROVIDER_CONFIG. Angular 21+.",
   "type": "module",
   "exports": {
     "./styles/*": {
       "sass": "./styles/_*.scss"
     }
   },
-  "license": "Apache-2.0",
+  "license": "AGPL-3.0-only",
   "engines": {
     "node": ">=24.0.0"
   },
@@ -23,8 +23,12 @@
     "test:coverage": "vitest run --coverage",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
+    "storybook": "STORYBOOK_MODE=dev storybook dev -p 6006 -c .storybook",
+    "storybook:dev": "STORYBOOK_MODE=dev storybook dev -p 6006 -c .storybook",
+    "storybook:docs": "STORYBOOK_MODE=docs storybook dev -p 6007 -c .storybook",
+    "build-storybook": "STORYBOOK_MODE=dev storybook build -c .storybook -o storybook-dev-static",
+    "build-storybook:dev": "STORYBOOK_MODE=dev storybook build -c .storybook -o storybook-dev-static",
+    "build-storybook:docs": "STORYBOOK_MODE=docs storybook build -c .storybook -o storybook-docs-static",
     "prepare": "husky"
   },
   "devDependenciesPinned": {
@@ -37,11 +41,11 @@
     ]
   },
   "peerDependencies": {
-    "@angular/cdk": "^21.0.0",
-    "@angular/common": "^21.0.0",
-    "@angular/core": "^21.0.0",
-    "@angular/material": "^21.0.0",
-    "@teqbench/tbx-mat-severity-icons": ">=7.0.0"
+    "@angular/cdk": ">=21.0.0",
+    "@angular/core": ">=21.0.0",
+    "@angular/material": ">=21.0.0",
+    "@teqbench/tbx-mat-icons": ">=4.0.0",
+    "@teqbench/tbx-mat-severity-theme": ">=8.0.0"
   },
   "devDependencies": {
     "@analogjs/storybook-angular": "^2.3.1",
@@ -58,12 +62,14 @@
     "@angular/material": "^21.2.4",
     "@angular/platform-browser": "^21.2.6",
     "@angular/platform-browser-dynamic": "^21.2.6",
-    "@teqbench/tbx-mat-severity-icons": "^7.0.0",
+    "@teqbench/tbx-mat-icons": "^4.2.0",
+    "@teqbench/tbx-mat-severity-theme": "^8.0.2",
     "@storybook/angular": "^10.3.3",
     "@types/node": "~24.12.0",
     "@vitest/coverage-v8": "^4.1.1",
     "angular-eslint": "^21.3.1",
     "eslint": "^9.39.2",
+    "eslint-plugin-tsdoc": "^0.5.2",
     "husky": "^9.1.7",
     "jsdom": "^29.0.1",
     "lint-staged": "^16.3.3",
@@ -75,8 +81,14 @@
     "vitest": "^4.0.18",
     "zone.js": "^0.16.1"
   },
+  "//overrides": "Pin vite to 7.3.2 — @angular/build bundles vite internally but does not constrain the version tightly enough; 7.4+ causes build failures with ng-packagr. Remove when @angular/build supports vite 7.4+. Tracking: https://github.com/teqbench/tbx-mat-dialogs/issues/72.",
+  "overrides": {
+    "@angular/build": {
+      "vite": "7.3.2"
+    }
+  },
   "lint-staged": {
-    "*.{ts,json,md,yml,yaml}": [
+    "*.{ts,json,md,yml,yaml,scss,css}": [
       "prettier --write"
     ]
   }
