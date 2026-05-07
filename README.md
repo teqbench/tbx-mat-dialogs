@@ -266,7 +266,7 @@ providers: [
 - **Severity level** — a classification (default, success, error, warning, information, help) that selects the icon and color scheme applied to a dialog. Identical to the severity model used by `tbx-mat-banners` and `tbx-mat-notifications`.
 - **Dialog patterns** — `confirm` and `input` are dialog-specific UX wrappers around the severity model. `confirm` defaults to Help severity with Yes/No buttons; `input` defaults to Information severity with a projected content component and OK/Cancel buttons.
 - **Footer item** — every footer entry has a `key` (used in the returned `footerValues` record) and an `align` (`'start'` flows left, `'end'` flows right). The first `align: 'end'` item gets `margin-left: auto`, separating start- and end-aligned items.
-- **Footer button emphasis** — `'primary'` (filled, severity-colored), `'destructive'` (filled, always Error-colored regardless of dialog severity), or `'text'` / undefined (text, no fill).
+- **Footer button emphasis** — `'primary'` (filled, severity-colored) or `'text'` / undefined (text, no fill). For destructive prompts, set the dialog `severity` to `'warning'` (reversible) or `'error'` (irreversible) — the panel itself communicates danger.
 - **Dismiss reason** — `Affirm`, `Deny`, `Cancel`, or `Close`. Footer buttons declare a `result` to map their click; backdrop click and Escape both emit `Close` with empty footer values.
 - **Provider config** — the DI-provided configuration (`TBX_MAT_DIALOG_PROVIDER_CONFIG`) that supplies the severity icon resolver and an optional close icon resolver. Required.
 - **Content component** — a consumer-defined `@Component` that implements `TbxMatDialogData<T>`. Used in the body of input dialogs; the shell reads `isValid` to drive the affirm button's disabled state and `value` to extract data on confirm.
@@ -371,7 +371,7 @@ Implemented by components projected into the body of input dialogs.
 
 ### Footer types
 
-`TbxMatDialogFooterControlType` is a discriminated union over `TbxMatDialogFooterButton`, `TbxMatDialogFooterCheckbox`, `TbxMatDialogFooterToggle`, `TbxMatDialogFooterRadioGroup`, and `TbxMatDialogFooterToggleGroup`. Every item has `key` and `align: 'start' | 'end'`. Buttons additionally take `label`, `icon` / `iconPosition`, `emphasis: 'primary' | 'destructive' | 'text'`, `result: TbxMatDialogDismissReason`, and an optional `disabled: boolean | Signal<boolean>`.
+`TbxMatDialogFooterControlType` is a discriminated union over `TbxMatDialogFooterButton`, `TbxMatDialogFooterCheckbox`, `TbxMatDialogFooterToggle`, `TbxMatDialogFooterRadioGroup`, and `TbxMatDialogFooterToggleGroup`. Every item has `key` and `align: 'start' | 'end'`. Buttons additionally take `label`, `icon` / `iconPosition`, `emphasis: 'primary' | 'text'`, `result: TbxMatDialogDismissReason`, and an optional `disabled: boolean | Signal<boolean>`.
 
 Convenience presets are exported alongside:
 
@@ -394,7 +394,7 @@ The shared severity-theme mixin emits per-level pairs. Themes can override the d
     <dt><code>--tbx-mat-dialog-success-background</code> / <code>--tbx-mat-dialog-success-text</code></dt>
     <dd>Success tier.</dd>
     <dt><code>--tbx-mat-dialog-error-background</code> / <code>--tbx-mat-dialog-error-text</code></dt>
-    <dd>Error tier (also used by the always-Error <code>destructive</code> button emphasis).</dd>
+    <dd>Error tier — set as the dialog <code>severity</code> for irreversible destructive prompts.</dd>
     <dt><code>--tbx-mat-dialog-warning-background</code> / <code>--tbx-mat-dialog-warning-text</code></dt>
     <dd>Warning tier.</dd>
     <dt><code>--tbx-mat-dialog-information-background</code> / <code>--tbx-mat-dialog-information-text</code></dt>

@@ -135,18 +135,19 @@ export interface TbxMatDialogFooterButton extends TbxMatDialogFooterItem {
      * Visual emphasis of the button
      *
      * @remarks
-     * - `'primary'` — `matButton="filled"` with emphasis accent color.
-     * - `'destructive'` — `matButton="filled"` with the Error severity tokens
-     *   (`--tbx-mat-dialog-error-{background,text}`).
+     * - `'primary'` — `matButton="filled"` with the dialog severity tokens.
      * - `'text'` — `matButton="text"` (no background).
      *
-     * Defaults to `'text'` when omitted.
+     * Defaults to `'text'` when omitted. For destructive prompts, set the
+     * dialog `severity` to `'warning'` (reversible) or `'error'` (irreversible);
+     * the panel itself communicates danger and a single `'primary'` affirm
+     * button reads correctly without per-button palette overrides.
      *
      * @order 4
      *
      * @public
      */
-    readonly emphasis?: 'primary' | 'destructive' | 'text';
+    readonly emphasis?: 'primary' | 'text';
 
     /**
      * {@link TbxMatDialogDismissReason} returned when this button is clicked

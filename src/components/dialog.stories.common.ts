@@ -381,7 +381,7 @@ export class DialogHarnessComponent {
                 icon: 'delete',
                 iconPosition: 'before',
                 result: TbxMatDialogDismissReason.Affirm,
-                emphasis: 'destructive',
+                emphasis: 'primary',
                 align: 'end',
             },
         ];
