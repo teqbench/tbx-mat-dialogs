@@ -93,9 +93,6 @@ import { TBX_MAT_DIALOG_BUTTONS_OK, TBX_MAT_DIALOG_BUTTONS_OK_CANCEL, TBX_MAT_DI
  * });
  * ```
  *
- * @see {@link https://angular.dev | Angular}
- * @see {@link https://material.angular.dev/components/dialog/api | Angular Material MatDialog}
- *
  * @category Services
  * @displayName Dialog Service
  * @order 1
