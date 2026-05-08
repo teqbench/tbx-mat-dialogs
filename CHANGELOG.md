@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.0.0](https://github.com/teqbench/tbx-mat-dialogs/compare/v1.0.2...v2.0.0) (2026-05-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* **api:** footer buttons can no longer set `emphasis: 'destructive'`. Migrate by removing the destructive emphasis and elevating the dialog's `severity` to 'warning' or 'error'.
+
+### Features
+
+* **api:** drop destructive emphasis — use dialog severity for destructive prompts ([b822858](https://github.com/teqbench/tbx-mat-dialogs/commit/b82285848b66c0939b8c130bf7ad76d4070ce58b))
+
+
+### Bug Fixes
+
+* **styles:** decouple close-icon opacity from action-button opacity ([d3c51c3](https://github.com/teqbench/tbx-mat-dialogs/commit/d3c51c3a3851ec68aaa2dc90518609ac4999507c))
+
 ## [1.0.2](https://github.com/teqbench/tbx-mat-dialogs/compare/v1.0.1...v1.0.2) (2026-05-06)
 
 

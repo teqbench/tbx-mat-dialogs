@@ -1,6 +1,6 @@
 {
   "name": "@teqbench/tbx-mat-dialogs",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "Opinionated Angular modal dialog service built on Material's MatDialog. Severity-leveled methods (success / error / warning / information / help / default) plus dialog-specific UX patterns (confirm / input). Returns Promise<TbxMatDialogResult<T, F>>. Severity colors via @teqbench/tbx-mat-severity-theme; pluggable icons via TBX_MAT_DIALOG_PROVIDER_CONFIG. Angular 21+.",
   "type": "module",
   "exports": {
