@@ -62,7 +62,7 @@ export interface DialogShellData {
  * Footer buttons use separate template elements for filled vs text variants
  * because matButton is a compile-time directive — it cannot be bound dynamically
  * via [attr.matButton]. Each emphasis maps to a static directive:
- *   - 'primary' / 'destructive' → matButton="filled" with CSS class emphasis
+ *   - 'primary' → matButton="filled"
  *   - 'text' / undefined → matButton="text"
  *
  * Severity colors are driven by the per-severity panel class
@@ -70,7 +70,7 @@ export interface DialogShellData {
  * `TbxMatDialogService`. Each panel class exposes
  * `--tbx-mat-dialog-current-{background,text}` tokens via the
  * `_severity-panel` mixin in `_tbx-mat-dialogs.scss`. The header icon
- * container and primary/destructive button classes consume those tokens
+ * container and primary button consume those tokens
  * directly — no host attribute binding or inline style bindings needed.
  * Button overrides use Angular Material's `mat.button-overrides()` mixin
  * in the global stylesheet.
@@ -156,8 +156,8 @@ export interface DialogShellData {
                                 Icon position uses Material's iconPositionEnd attribute
                                 to route mat-icon to the correct content projection slot,
                                 which also applies proper margin spacing. -->
-                                @if (btn.emphasis === 'primary' || btn.emphasis === 'destructive') {
-                                    <button matButton="filled" [class.tbx-mat-dialog-btn-destructive]="btn.emphasis === 'destructive'" [attr.cdkFocusInitial]="shouldAutoFocus(btn) ? '' : null" [disabled]="isButtonDisabled(btn)" (click)="onButtonClick(btn)">
+                                @if (btn.emphasis === 'primary') {
+                                    <button matButton="filled" [attr.cdkFocusInitial]="shouldAutoFocus(btn) ? '' : null" [disabled]="isButtonDisabled(btn)" (click)="onButtonClick(btn)">
                                         @if (btn.icon && btn.iconPosition !== 'after') {
                                             <mat-icon>{{ btn.icon }}</mat-icon>
                                         }

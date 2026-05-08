@@ -402,7 +402,7 @@ describe('DialogShellComponent', () => {
                     label: 'Delete',
                     icon: 'delete',
                     result: TbxMatDialogDismissReason.Affirm,
-                    emphasis: 'destructive',
+                    emphasis: 'primary',
                 }),
             ];
             const fixture = createFixture({ title: 'Test' }, footer);
@@ -923,14 +923,6 @@ describe('DialogShellComponent', () => {
             expect(button).not.toBeNull();
         });
 
-        it('should render destructive button as filled', () => {
-            const footer: TbxMatDialogFooterControlType[] = [buildButton({ emphasis: 'destructive', result: TbxMatDialogDismissReason.Affirm })];
-            const fixture = createFixture({ title: 'Test' }, footer);
-
-            const button = fixture.debugElement.query(By.css('mat-dialog-actions button[matButton="filled"]'));
-            expect(button).not.toBeNull();
-        });
-
         it('should render text button as text', () => {
             const footer: TbxMatDialogFooterControlType[] = [buildButton({ emphasis: 'text', result: TbxMatDialogDismissReason.Cancel })];
             const fixture = createFixture({ title: 'Test' }, footer);
@@ -947,37 +939,12 @@ describe('DialogShellComponent', () => {
             expect(button).not.toBeNull();
         });
 
-        // Primary buttons no longer carry a dedicated class — Material's
-        // filled-container/label tokens are overridden at the panel level
-        // by `_severity-panel` in `_tbx-mat-dialogs.scss` (mirroring how
-        // banners/notifications style their action buttons), so any
-        // `matButton="filled"` button on the dialog inherits the severity
-        // styling automatically. Only `destructive` keeps an explicit
-        // class because it forces the Error severity tokens regardless of
-        // the dialog's own type.
-
-        it('should apply tbx-mat-dialog-btn-destructive class to destructive button', () => {
-            const footer: TbxMatDialogFooterControlType[] = [buildButton({ emphasis: 'destructive', result: TbxMatDialogDismissReason.Affirm })];
-            const fixture = createFixture({ title: 'Test', type: TbxMatSeverityLevel.Default }, footer);
-
-            const button = fixture.debugElement.query(By.css('mat-dialog-actions button'));
-            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(true);
-        });
-
-        it('should not apply destructive class to a primary button', () => {
-            const footer: TbxMatDialogFooterControlType[] = [buildButton({ emphasis: 'primary', result: TbxMatDialogDismissReason.Affirm })];
-            const fixture = createFixture({ title: 'Test', type: TbxMatSeverityLevel.Warning }, footer);
-
-            const button = fixture.debugElement.query(By.css('mat-dialog-actions button'));
-            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(false);
-        });
-
-        it('should not apply destructive class to a text button', () => {
-            const footer: TbxMatDialogFooterControlType[] = [buildButton({ emphasis: 'text', result: TbxMatDialogDismissReason.Cancel })];
-            const fixture = createFixture({ title: 'Test' }, footer);
-
-            const button = fixture.debugElement.query(By.css('mat-dialog-actions button'));
-            expect(button.nativeElement.classList.contains('tbx-mat-dialog-btn-destructive')).toBe(false);
-        });
+        // Primary buttons inherit Material's filled-container/label tokens
+        // from the panel-level `_severity-panel` mixin in
+        // `_tbx-mat-dialogs.scss` (mirroring how banners/notifications style
+        // their action buttons), so any `matButton="filled"` button on the
+        // dialog inherits the severity styling automatically. Destructive
+        // prompts are expressed via the dialog `severity` ('warning' or
+        // 'error'), not via a per-button emphasis variant.
     });
 });
