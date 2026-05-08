@@ -30,7 +30,7 @@
  * - {@link TBX_MAT_DIALOG_BUTTONS_OK}, {@link TBX_MAT_DIALOG_BUTTONS_OK_CANCEL}, {@link TBX_MAT_DIALOG_BUTTONS_YES_NO}, {@link TBX_MAT_DIALOG_BUTTONS_YES_NO_CANCEL} — button presets
  *
  * @see {@link https://angular.dev | Angular}
- * @see {@link https://material.angular.dev/components/dialog/api | Angular Material MatDialog}
+ * @see {@link https://material.angular.dev | Angular Material}
  *
  * @packageDocumentation
  */
