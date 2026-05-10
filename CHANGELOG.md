@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.0.2](https://github.com/teqbench/tbx-mat-dialogs/compare/v2.0.1...v2.0.2) (2026-05-10)
+
+
+### Bug Fixes
+
+* **ci:** pin reusable workflows to [@v2](https://github.com/v2).9.3 ([1830ce5](https://github.com/teqbench/tbx-mat-dialogs/commit/1830ce579ffd0bbae4ac2c97f9d6ffaf37713196)), closes [#28](https://github.com/teqbench/tbx-mat-dialogs/issues/28)
+* **deps:** bump tbx-mat-icons and tbx-mat-severity-theme peerDeps ([3ff5e7b](https://github.com/teqbench/tbx-mat-dialogs/commit/3ff5e7b0538df4b5a432c6853bd3249a5fe4d4e6))
+* **deps:** bump tbx-mat-icons and tbx-mat-severity-theme peerDeps ([976ac71](https://github.com/teqbench/tbx-mat-dialogs/commit/976ac71bb6cac47a6ddd06ac8cbc2114729e7bbc)), closes [#28](https://github.com/teqbench/tbx-mat-dialogs/issues/28)
+
 ## [2.0.1](https://github.com/teqbench/tbx-mat-dialogs/compare/v2.0.0...v2.0.1) (2026-05-09)
 
 
