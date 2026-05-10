@@ -84,7 +84,7 @@
   "//overrides": "Pin vite to 7.3.2 — @angular/build bundles vite internally but does not constrain the version tightly enough; 7.4+ causes build failures with ng-packagr. Remove when @angular/build supports vite 7.4+. Tracking: https://github.com/teqbench/tbx-mat-dialogs/issues/72.",
   "overrides": {
     "@angular/build": {
-      "vite": "7.3.2"
+      "vite": "7.3.3"
     }
   },
   "lint-staged": {
