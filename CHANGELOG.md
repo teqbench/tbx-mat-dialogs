@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.3](https://github.com/teqbench/tbx-mat-dialogs/compare/v2.0.2...v2.0.3) (2026-05-11)
+
+
+### Bug Fixes
+
+* **changelog:** strip broken at-mention autolinks from history ([fa82ea7](https://github.com/teqbench/tbx-mat-dialogs/commit/fa82ea72b4c092a35e72e684b161049303679ae4))
+* **changelog:** strip broken at-mention autolinks from history ([9a8ae25](https://github.com/teqbench/tbx-mat-dialogs/commit/9a8ae252814044618bf74efb28bcaf71525fc0eb))
+
 ## [2.0.2](https://github.com/teqbench/tbx-mat-dialogs/compare/v2.0.1...v2.0.2) (2026-05-10)
 
 
