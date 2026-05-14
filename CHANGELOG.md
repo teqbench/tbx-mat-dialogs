@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.4](https://github.com/teqbench/tbx-mat-dialogs/compare/v2.0.3...v2.0.4) (2026-05-14)
+
+
+### Bug Fixes
+
+* **deps:** Update teqbench packages ([#157](https://github.com/teqbench/tbx-mat-dialogs/issues/157)) ([8861ed7](https://github.com/teqbench/tbx-mat-dialogs/commit/8861ed773e39bbfebaa3028f3698880299c055f1))
+
 ## [2.0.3](https://github.com/teqbench/tbx-mat-dialogs/compare/v2.0.2...v2.0.3) (2026-05-11)
 
 
